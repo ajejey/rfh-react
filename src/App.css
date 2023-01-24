@@ -51,7 +51,7 @@ h1 {
   gap: 2vh;
   margin-top: -50px;
   /* background-color: aqua; */
-  background-image: url(./assets/images/cover.jpg);
+  /* background-image: url(./assets/images/cover-min.jpg); */
   /* background:
               linear-gradient(rgba(239, 180, 66, 0.40),
                   rgba(239, 180, 66, 0.40)),
@@ -59,7 +59,7 @@ h1 {
   background:
     linear-gradient(rgba(239, 181, 66, 0.5),
       rgba(68, 133, 95, 0.603)),
-    url(./assets/images/cover.jpg);
+    url(./assets/images/cover-min.jpg);
   /* filter: contrast(110%); */
   background-size: cover;
   background-position: center;
