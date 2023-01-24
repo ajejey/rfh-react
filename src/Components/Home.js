@@ -10,6 +10,7 @@ import events from '../assets/images/events.png'
 import family from '../assets/images/family.png'
 import logo from '../assets/images/Logo.jpg'
 import CountUp from 'react-countup';
+import VisibilitySensor from 'react-visibility-sensor';
 
 function Home() {
     return (
@@ -105,27 +106,57 @@ function Home() {
                     <div className="my-card">
                         <p><img src={heart} alt="" height="50" /></p>
                         {/* <div className="counter"></div> */}
-                        <CountUp end={3458} duration={2} enableScrollSpy={true} />
+                        <CountUp end={3458}>
+                            {({ countUpRef, start }) => (
+                                <VisibilitySensor onChange={start}>
+                                    <span ref={countUpRef} />
+                                </VisibilitySensor>
+                            )}
+                        </CountUp>
                         <p>Number of Donors</p>
                     </div>
                     <div className="my-card">
                         <p><img src={team} alt="" height="50" /></p>
-                        <CountUp end={56} duration={0.5} enableScrollSpy={true} />
+                        <CountUp end={56}>
+                            {({ countUpRef, start }) => (
+                                <VisibilitySensor onChange={start}>
+                                    <span ref={countUpRef} />
+                                </VisibilitySensor>
+                            )}
+                        </CountUp>
                         <p>Number of volunteers </p>
                     </div>
                     <div className="my-card">
                         <p><img src={kidsCouple} alt="" height="50" /></p>
-                        <CountUp end={205} duration={1} enableScrollSpy={true} />
+                        <CountUp end={205}>
+                            {({ countUpRef, start }) => (
+                                <VisibilitySensor onChange={start}>
+                                    <span ref={countUpRef} />
+                                </VisibilitySensor>
+                            )}
+                        </CountUp>
                         <p>Number of Children helped!</p>
                     </div>
                     <div className="my-card">
                         <p><img src={events} alt="" height="50" /></p>
-                        <span><CountUp end={40} duration={0.5} enableScrollSpy={true} />+</span>
+                        <span><CountUp end={40}>
+                            {({ countUpRef, start }) => (
+                                <VisibilitySensor onChange={start}>
+                                    <span ref={countUpRef} />
+                                </VisibilitySensor>
+                            )}
+                        </CountUp>+</span>
                         <p>Number of Events conducted</p>
                     </div>
                     <div className="my-card">
                         <p><img src={family} alt="" height="50" /></p>
-                        <span><CountUp end={1200} duration={2} enableScrollSpy={true} />+</span>
+                        <span><CountUp end={1200}>
+                            {({ countUpRef, start }) => (
+                                <VisibilitySensor onChange={start}>
+                                    <span ref={countUpRef} />
+                                </VisibilitySensor>
+                            )}
+                        </CountUp>+</span>
                         <p>Number of Families supported</p>
                     </div>
 
