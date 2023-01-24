@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Header from '../Header'
 import { useForm } from "react-hook-form";
 import { countries, indianStates } from '../../Constants/constants';
@@ -26,6 +26,11 @@ function EventForm() {
     const handleEditClick = () => {
         setSubmitted(!submitted)
     }
+
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [])
+
     return (
         <div style={{ backgroundColor: "#040002", color: "lightgray", minHeight: "100vh" }}>
             <Header />
