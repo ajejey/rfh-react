@@ -17,12 +17,12 @@ function Events() {
             <div className="container-md" style={{ paddingTop: "18px" }}>
                 <div className="row">
 
-                    <div className="col-md-6 flex-center" >
+                    {/* <div className="col-md-6 flex-center" >
                         <div className="blob flex-center">
                             <img className='runner-img' src={runner} alt="RFH Runner" />
                         </div>
-                    </div>
-                    <div className='col-md-6'>
+                    </div> */}
+                    <div className='col-md-12'>
                         <h2 className="h2" style={{ color: "#fff4de", padding: "16px 0" }}>
                             <b>Welcome to Rupee For Humanity!</b>
                         </h2>

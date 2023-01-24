@@ -9,6 +9,7 @@ import kidsCouple from '../assets/images/kids-couple.png'
 import events from '../assets/images/events.png'
 import family from '../assets/images/family.png'
 import logo from '../assets/images/Logo.jpg'
+import CountUp from 'react-countup';
 
 function Home() {
     return (
@@ -79,31 +80,52 @@ function Home() {
                 </div>
             </section>
 
+            {/* .animate {
+  --num: 3458;
+}
+
+.animate-1 {
+  --num: 56;
+}
+
+.animate-2 {
+  --num: 205;
+}
+
+.animate-3 {
+  --num: 40;
+}
+
+.animate-4 {
+  --num: 1200;
+} */}
+
             <section className="section-3">
                 <div className="cards-component">
                     <div className="my-card">
                         <p><img src={heart} alt="" height="50" /></p>
-                        <div className="counter"></div>
+                        {/* <div className="counter"></div> */}
+                        <CountUp end={3458} duration={2} enableScrollSpy={true} />
                         <p>Number of Donors</p>
                     </div>
                     <div className="my-card">
                         <p><img src={team} alt="" height="50" /></p>
-                        <div className="counter"></div>
+                        <CountUp end={56} duration={0.5} enableScrollSpy={true} />
                         <p>Number of volunteers </p>
                     </div>
                     <div className="my-card">
                         <p><img src={kidsCouple} alt="" height="50" /></p>
-                        <div className="counter"></div>
+                        <CountUp end={205} duration={1} enableScrollSpy={true} />
                         <p>Number of Children helped!</p>
                     </div>
                     <div className="my-card">
                         <p><img src={events} alt="" height="50" /></p>
-                        <div className="counter">+</div>
+                        <span><CountUp end={40} duration={0.5} enableScrollSpy={true} />+</span>
                         <p>Number of Events conducted</p>
                     </div>
                     <div className="my-card">
                         <p><img src={family} alt="" height="50" /></p>
-                        <div className="counter">+</div>
+                        <span><CountUp end={1200} duration={2} enableScrollSpy={true} />+</span>
                         <p>Number of Families supported</p>
                     </div>
 
