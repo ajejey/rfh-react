@@ -1,11 +1,11 @@
 {
   "files": {
-    "main.css": "/rfh-react/static/css/main.9b9ccbfd.css",
+    "main.css": "/rfh-react/static/css/main.536b55a8.css",
     "main.js": "/rfh-react/static/js/main.a76fb9f9.js",
     "static/js/787.56fd6c41.chunk.js": "/rfh-react/static/js/787.56fd6c41.chunk.js",
     "static/media/paperTorn-3.png": "/rfh-react/static/media/paperTorn-3.cd2d8c764031a2a50d49.png",
     "static/media/marathon.jpg": "/rfh-react/static/media/marathon.5fb6fb38a217f2c825dd.jpg",
-    "static/media/cover.jpg": "/rfh-react/static/media/cover.0a7c5a3338023d2dd733.jpg",
+    "static/media/cover-min.jpg": "/rfh-react/static/media/cover-min.382444a0f735213991be.jpg",
     "static/media/cheque1.jpg": "/rfh-react/static/media/cheque1.5485e09aea460f2a6c40.jpg",
     "static/media/runner-min.png": "/rfh-react/static/media/runner-min.625f937c5068fd43fae9.png",
     "static/media/cheque2.jpg": "/rfh-react/static/media/cheque2.c6358cf1bf3336b886dd.jpg",
@@ -55,12 +55,12 @@
     "static/media/events.png": "/rfh-react/static/media/events.e7aedf0ac39746c7ecc5.png",
     "static/media/logo.svg": "/rfh-react/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
     "index.html": "/rfh-react/index.html",
-    "main.9b9ccbfd.css.map": "/rfh-react/static/css/main.9b9ccbfd.css.map",
+    "main.536b55a8.css.map": "/rfh-react/static/css/main.536b55a8.css.map",
     "main.a76fb9f9.js.map": "/rfh-react/static/js/main.a76fb9f9.js.map",
     "787.56fd6c41.chunk.js.map": "/rfh-react/static/js/787.56fd6c41.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.9b9ccbfd.css",
+    "static/css/main.536b55a8.css",
     "static/js/main.a76fb9f9.js"
   ]
 }
