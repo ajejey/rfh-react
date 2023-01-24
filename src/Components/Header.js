@@ -1,9 +1,18 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 import logo from '../assets/images/Logo.jpg'
 
 
 function Header() {
+    const location = useLocation()
+    const [navClass, setNavClass] = useState("")
+    console.log("Location ", location)
+
+    useEffect(() => {
+
+    }, [])
+
+
     return (
         <div>
             <nav className="navbar header-container navbar-expand-lg">
@@ -25,13 +34,13 @@ function Header() {
                     <div className="collapse navbar-collapse" id="navbarTogglerDemo02">
                         <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
                             <li className="nav-item">
-                                <Link to="/" className="nav-link " preventScrollReset={true}>Home</Link>
+                                <NavLink to="/" className={({ isActive }) => (isActive ? 'nav-link active1' : 'nav-link')} preventScrollReset={true}>Home</NavLink>
                             </li>
                             <li className="nav-item">
-                                <Link to="/events" className="nav-link" preventScrollReset={true}>Events</Link>
+                                <NavLink to="/events" className={({ isActive }) => (isActive ? 'nav-link active1' : 'nav-link')} preventScrollReset={true}>Events</NavLink>
                             </li>
                             <li className="nav-item">
-                                <Link to="/gallery" className="nav-link" preventScrollReset={true}>Gallery</Link>
+                                <NavLink to="/gallery" className={({ isActive }) => (isActive ? 'nav-link active1' : 'nav-link')} preventScrollReset={true}>Gallery</NavLink>
                             </li>
                         </ul>
                     </div>
