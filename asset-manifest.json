@@ -1,0 +1,26 @@
+{
+  "files": {
+    "main.css": "/static/css/main.5aee9ca5.css",
+    "main.js": "/static/js/main.298a7a96.js",
+    "static/js/787.56fd6c41.chunk.js": "/static/js/787.56fd6c41.chunk.js",
+    "static/media/paperTorn-3.png": "/static/media/paperTorn-3.cd2d8c764031a2a50d49.png",
+    "static/media/marathon.jpg": "/static/media/marathon.5fb6fb38a217f2c825dd.jpg",
+    "static/media/cover.jpg": "/static/media/cover.0a7c5a3338023d2dd733.jpg",
+    "static/media/cheque1.jpg": "/static/media/cheque1.5485e09aea460f2a6c40.jpg",
+    "static/media/runner-min.png": "/static/media/runner-min.625f937c5068fd43fae9.png",
+    "static/media/cheque2.jpg": "/static/media/cheque2.c6358cf1bf3336b886dd.jpg",
+    "static/media/cheque4.jpg": "/static/media/cheque4.cf4f59a87417beda0a2f.jpg",
+    "static/media/family.png": "/static/media/family.c9764c2d743429fb8691.png",
+    "static/media/Logo.jpg": "/static/media/Logo.d50e4ff718fcc174a5c0.jpg",
+    "static/media/events.png": "/static/media/events.e7aedf0ac39746c7ecc5.png",
+    "static/media/logo.svg": "/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
+    "index.html": "/index.html",
+    "main.5aee9ca5.css.map": "/static/css/main.5aee9ca5.css.map",
+    "main.298a7a96.js.map": "/static/js/main.298a7a96.js.map",
+    "787.56fd6c41.chunk.js.map": "/static/js/787.56fd6c41.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.5aee9ca5.css",
+    "static/js/main.298a7a96.js"
+  ]
+}
