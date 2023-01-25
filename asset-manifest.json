@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/rfh-react/static/css/main.536b55a8.css",
-    "main.js": "/rfh-react/static/js/main.5beec6aa.js",
+    "main.css": "/rfh-react/static/css/main.9f6fe09a.css",
+    "main.js": "/rfh-react/static/js/main.2e7dff16.js",
     "static/js/787.56fd6c41.chunk.js": "/rfh-react/static/js/787.56fd6c41.chunk.js",
     "static/media/paperTorn-3.png": "/rfh-react/static/media/paperTorn-3.cd2d8c764031a2a50d49.png",
     "static/media/marathon.jpg": "/rfh-react/static/media/marathon.5fb6fb38a217f2c825dd.jpg",
@@ -55,12 +55,12 @@
     "static/media/events.png": "/rfh-react/static/media/events.e7aedf0ac39746c7ecc5.png",
     "static/media/logo.svg": "/rfh-react/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
     "index.html": "/rfh-react/index.html",
-    "main.536b55a8.css.map": "/rfh-react/static/css/main.536b55a8.css.map",
-    "main.5beec6aa.js.map": "/rfh-react/static/js/main.5beec6aa.js.map",
+    "main.9f6fe09a.css.map": "/rfh-react/static/css/main.9f6fe09a.css.map",
+    "main.2e7dff16.js.map": "/rfh-react/static/js/main.2e7dff16.js.map",
     "787.56fd6c41.chunk.js.map": "/rfh-react/static/js/787.56fd6c41.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.536b55a8.css",
-    "static/js/main.5beec6aa.js"
+    "static/css/main.9f6fe09a.css",
+    "static/js/main.2e7dff16.js"
   ]
 }
