@@ -207,12 +207,12 @@ function Home() {
             </section>
 
             <section id="cta">
-                <h3 class="cta-heading mb-5">Even a Rupee Donated will help build the Future of India</h3>
+                <h3 className="cta-heading mb-5">Even a Rupee Donated will help build the Future of India</h3>
                 <div style={{ display: "flex", justifyContent: "center", gap: "10px" }} >
-                    <button type="button" class="btn btn-dark btn-lg download-button">
+                    <button type="button" className="btn btn-dark btn-lg download-button">
                         Donate
                     </button>
-                    <button type="button" class="btn btn-outline-light btn-lg download-button">
+                    <button type="button" className="btn btn-outline-light btn-lg download-button">
                         Contact us
                     </button>
                 </div>
@@ -221,21 +221,21 @@ function Home() {
 
             <section id="contact">
                 <div>
-                    <div class="contact-us">
+                    <div className="contact-us">
                         <div>
-                            <img class="logo1" src={logo} alt="RFH logo" />
+                            <img className="logo1" src={logo} alt="RFH logo" />
                             {/* <h3 style={{ margin: "0" }}>Rupee For Humanity</h3>
                             <p><i>Responsible Indian Thought</i></p> */}
                         </div>
                         <div>
-                            <h3 class="contact-heading">Contact Us</h3>
+                            <h3 className="contact-heading">Contact Us</h3>
 
                             <p style={{ margin: "0" }}><b>Address: Bangalore, India</b></p>
                             <p style={{ margin: "0" }}>Email: rupee4humanity@gmail.com </p>
                             <p style={{ margin: "0" }}>website: www.rupeeforhumanity.org</p>
                             <p style={{ margin: "0" }}>Mob: +91 9164358027</p>
                             <div>
-                                <a href="https://www.facebook.com/RupeeForHumanity/" class="social-media-icons" style={{ color: "#fff" }}>Facebook Page</a>
+                                <a href="https://www.facebook.com/RupeeForHumanity/" className="social-media-icons" style={{ color: "#fff" }}>Facebook Page</a>
                             </div>
                         </div>
                     </div>

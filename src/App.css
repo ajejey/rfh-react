@@ -461,6 +461,10 @@ h1 {
   transform: scaleX(-1); */
 }
 
+.file-upload {
+  width: 500px;
+}
+
 #photos {
   /* Prevent vertical gaps */
   line-height: 0;
@@ -478,6 +482,7 @@ h1 {
   /* width: 100% !important; */
   height: auto !important;
 }
+
 
 @media (max-width: 1200px) {
   .photos {

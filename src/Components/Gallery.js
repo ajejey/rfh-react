@@ -30,7 +30,7 @@ function Gallery() {
                 <div style={{ display: "flex", justifyContent: "flex-start", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
                     {allImages1.map(
                         (image, index) => (
-                            <img key={index} src={image} height={200} class="img-fluid" style={{ maxWidth: "400px", }} alt="Rupee for Humanity 10k Marathon"></img>
+                            <img key={index} src={image} height={200} className="img-fluid" style={{ maxWidth: "400px", }} alt="Rupee for Humanity 10k Marathon"></img>
                         )
                     )}
                 </div>
@@ -39,7 +39,7 @@ function Gallery() {
                 <div style={{ display: "flex", justifyContent: "flex-start", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
                     {allImages3.map(
                         (image, index) => (
-                            <img key={index} src={image} height={200} class="img-fluid" alt="Rupee for Humanity 10k Marathon"></img>
+                            <img key={index} src={image} height={200} className="img-fluid" alt="Rupee for Humanity 10k Marathon"></img>
                         )
                     )}
                 </div>

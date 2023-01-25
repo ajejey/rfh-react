@@ -8,7 +8,7 @@ function EventsMain() {
         <div>
             <Routes>
                 <Route path='/' element={<Events />} />
-                <Route path='/10k-run-for-literacy' element={<EventForm />} />
+                <Route path='/runforliteracy-2023' element={<EventForm />} />
             </Routes>
         </div>
     )

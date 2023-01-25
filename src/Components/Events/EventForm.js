@@ -1,12 +1,33 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import Header from '../Header'
 import { useForm } from "react-hook-form";
 import { countries, indianStates } from '../../Constants/constants';
+import Dropzone from 'react-dropzone'
 
 function EventForm() {
-    const { register, handleSubmit, getValues, formState: { errors } } = useForm();
+    const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
     const [submitted, setSubmitted] = useState(false)
     const [totalPrice, setTotalPrice] = useState(0)
+    const [needTee, setNeedTee] = useState("no")
+    const [willPickUp, setWillPickUp] = useState("no")
+    const [selectedCity, setSelectedCity] = useState("others")
+
+    const onDrop = useCallback((acceptedFiles) => {
+        acceptedFiles.forEach((file) => {
+            const reader = new FileReader()
+
+            reader.onabort = () => console.log('file reading was aborted')
+            reader.onerror = () => console.log('file reading has failed')
+            reader.onload = () => {
+                // Do whatever you want with the file contents
+                const binaryStr = reader.result
+                console.log(binaryStr)
+            }
+            reader.readAsArrayBuffer(file)
+        })
+
+    }, [])
+
     console.log("submitted ", submitted)
     const onSubmit = (data) => {
         console.log(data);
@@ -15,13 +36,51 @@ function EventForm() {
         if (getValues("needTShirt") === "yes") {
             price = 210 + price
         }
-        if (getValues("selfPickUp") === "no" && getValues("city") === "others") {
+        if (getValues("selfPickUp") === "no") {
             price = 150 + price
         }
         setTotalPrice(price)
     }
 
+    const handleSelfPickupChange = (e) => {
+        console.log("selfPickUp e.target.value ", e.target.value)
+        setWillPickUp(e.target.value)
+    }
+
+    // "Bengaluru">Bengaluru</option>
+    //                                                 <option value="Hyderabad">Hyderabad</option>
+    //                                                 <option value="Chennai"
+
+    const handleCityChange = (e) => {
+        setSelectedCity(e.target.value)
+        if (e.target.value !== "others") {
+            setValue("country", 'India')
+            if (e.target.value === "Bengaluru") {
+                setValue("state", "Karnataka")
+            }
+            if (e.target.value === "Hyderabad") {
+                setValue("state", "Telangana")
+            }
+            if (e.target.value === "Chennai") {
+                setValue("state", "Tamil Nadu")
+            }
+        } else {
+            setValue("country", "")
+            setValue("state", "")
+        }
+
+    }
+
+    const handleNeedTee = (e) => {
+        setNeedTee(e.target.value)
+        if (e.target.value === "no") {
+            setValue("TshirtSize", "")
+            setValue("selfPickUp", "")
+        }
+    }
+
     console.log("price total ", totalPrice)
+    console.log("getValues() ", getValues())
 
     const handleEditClick = () => {
         setSubmitted(!submitted)
@@ -37,8 +96,8 @@ function EventForm() {
             <main>
                 {(submitted === false) ?
                     <section id="registration-form">
-                        <div class="container-md">
-                            <h1 class="h1">
+                        <div className="container-md">
+                            <h1 className="h1">
                                 RFH 10K Run - Run for Literacy 2023
                             </h1>
 
@@ -74,31 +133,31 @@ function EventForm() {
                                 We are proud to host the event again this year “RFH 10K Run - Run for Literacy 2023” – this time its
                                 virtual run but the excitement and cause is solid as always.
                             </p>
-                            <h2 class="h2">
+                            <h2 className="h2">
                                 Information
                             </h2>
-                            <div class="info-table">
-                                <table class="table" style={{ backgroundColor: "#040002", color: "lightgray" }}>
+                            <div className="info-table">
+                                <table className="table" style={{ backgroundColor: "#040002", color: "lightgray" }}>
                                     <thead>
                                         <tr>
-                                            <th class="fs-6" scope="col">Run Category</th>
+                                            <th className="fs-6" scope="col">Run Category</th>
                                             <th scope="col">Racer Kit</th>
                                             <th scope="col">Price</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td class="fs-6">3k - Fast Run</td>
+                                            <td className="fs-6">3k - Fun Run</td>
                                             <td>E-Certificate <span style={{ color: "red" }}>*</span> </td>
                                             <td>INR 250</td>
                                         </tr>
                                         <tr>
-                                            <td class="fs-6">5k - Super Run</td>
+                                            <td className="fs-6">5k - Super Run</td>
                                             <td>E-Certificate <span style={{ color: "red" }}>*</span> </td>
                                             <td>INR 250</td>
                                         </tr>
                                         <tr>
-                                            <td class="fs-6">10k - Challenge Run</td>
+                                            <td className="fs-6">10k - Challenge Run</td>
                                             <td>E-Certificate <span style={{ color: "red" }}>*</span> </td>
                                             <td>INR 250</td>
                                         </tr>
@@ -116,17 +175,17 @@ function EventForm() {
 
                             </div>
 
-                            <div class="regestration-form">
+                            <div className="regestration-form">
 
                                 <form onSubmit={handleSubmit(onSubmit)}>
-                                    <h2 class="form-header">Registration Form</h2>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
+                                    <h2 className="form-header">Registration Form</h2>
+                                    <div className="row">
+                                        <div className="col-md-6">
+                                            <div className="form-group">
                                                 <label htmlFor="first">Select Category<span style={{ color: "red" }}>*</span></label>
-                                                <select {...register("category", { required: true })} class="form-select" aria-label="Default select example">
+                                                <select {...register("category", { required: true })} className="form-select" aria-label="Default select example">
                                                     <option value="">select</option>
-                                                    <option value="3k - Fast Run">3k - Fast Run</option>
+                                                    <option value="3k - Fun Run">3k - Fun Run</option>
                                                     <option value="5k - Super Run">5k - Super Run</option>
                                                     <option value="10k - Challenge Run">10k - Challenge Run</option>
                                                 </select>
@@ -134,32 +193,76 @@ function EventForm() {
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label htmlFor="first">First Name <span style={{ color: "red" }}>*</span></label>
-                                                <input {...register("firstName", { required: true })} type="text" class="form-control" placeholder="" id="first" />
-                                                {errors.firstName && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                    <div className="row">
+                                        <div className="col-md-6">
+                                            <div className="form-group">
+                                                <label htmlFor="need-tee">Do you want to opt for T-Shirt?  <span style={{ color: "red" }}>*</span>
+                                                </label>
+                                                <select {...register("needTShirt", { required: true, onChange: (e) => handleNeedTee(e) })} id="need-tee" className="form-select"
+                                                    aria-label="do you want to opt for T-Shirt">
+                                                    <option value="">select</option>
+                                                    <option value="yes">Yes</option>
+                                                    <option value="no">No</option>
+                                                </select>
+                                                {errors.needTShirt && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                            </div>
+                                        </div>
+                                        <div className="col-md-6">
+                                            <div className="form-group">
+                                                <label htmlFor="tee-size">T-Shirt Size {needTee === "no" ? <span></span> : <span style={{ color: "red" }}>*</span>}</label>
+                                                <select disabled={needTee === "no"} {...register("TshirtSize", { required: needTee === "no" ? false : true })} id="tee-size" className="form-select" aria-label="T-Shirt Size">
+                                                    <option value="">select</option>
+                                                    <option value="XSmall">X-Small</option>
+                                                    <option value="Small">Small</option>
+                                                    <option value="Medium">Medium</option>
+                                                    <option value="Large">Large</option>
+                                                    <option value="X-Large">X-Large</option>
+                                                    <option value="XX-Large">XX-Large</option>
+                                                </select>
+                                                {errors.TshirtSize && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="row">
+                                        <div className="col-md-12">
+                                            <div className="form-group">
+                                                <label htmlFor="need-tee">Do you want to pick up yout T-Shirt yourself? (Only in Bengaluru, Hyderabad, and Chennai)  {needTee === "no" ? <span></span> : <span style={{ color: "red" }}>*</span>}
+                                                </label>
+                                                <select disabled={needTee === "no"} {...register("selfPickUp", { required: needTee === "no" ? false : true, onChange: (e) => handleSelfPickupChange(e) })} id="self-pickup" className="form-select"
+                                                    aria-label="Do you want to pick up yout T-Shirt yourself?">
+                                                    <option value="">select</option>
+                                                    <option value="yes">Yes</option>
+                                                    <option value="no">No</option>
+                                                </select>
+                                                {errors.selfPickUp && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="row">
+                                        <div className="col-md-12">
+                                            <div className="form-group">
+                                                <label htmlFor="first">Full Name <span style={{ color: "red" }}>*</span></label>
+                                                <input {...register("fullName", { required: true })} type="text" className="form-control" placeholder="" id="first" />
+                                                {errors.fullName && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
                                         </div>
 
-
-                                        <div class="col-md-6">
-                                            <div class="form-group">
+                                        {/* <div className="col-md-6">
+                                            <div className="form-group">
                                                 <label htmlFor="last">Last Name <span style={{ color: "red" }}>*</span></label>
-                                                <input {...register("lastName", { required: true })} type="text" class="form-control" placeholder="" id="last" />
+                                                <input {...register("lastName", { required: true })} type="text" className="form-control" placeholder="" id="last" />
                                                 {errors.lastName && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
-                                        </div>
+                                        </div> */}
 
                                     </div>
 
 
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="form-group">
+                                    <div className="row">
+                                        <div className="col-md-4">
+                                            <div className="form-group">
                                                 <label htmlFor="gender">Gender <span style={{ color: "red" }}>*</span></label>
-                                                <select {...register("gender", { required: true })} id="gender" class="form-select" aria-label="Default select example">
+                                                <select {...register("gender", { required: true })} id="gender" className="form-select" aria-label="Default select example">
                                                     <option value="">select</option>
                                                     <option value="female">Female</option>
                                                     <option value="male">Male</option>
@@ -170,36 +273,36 @@ function EventForm() {
                                                 {errors.gender && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
+                                        <div className="col-md-4">
+                                            <div className="form-group">
                                                 <label htmlFor="date">Date of Birth <span style={{ color: "red" }}>*</span></label>
-                                                <input {...register("dob", { required: true })} type="date" class="form-control" id="date" placeholder="date" />
+                                                <input {...register("dob", { required: true })} type="date" className="form-control" id="date" placeholder="date" />
                                                 {errors.dob && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label htmlFor="bloodGroup">Blood Group</label>
-                                                <input {...register("bloodGroup", { required: false })} type="text" class="form-control" id="bloodGroup" placeholder="Blood Group" />
+                                        <div className="col-md-4">
+                                            <div className="form-group">
+                                                <label htmlFor="bloodGroup">Blood Group <span style={{ color: "red" }}>*</span></label>
+                                                <input {...register("bloodGroup", { required: true })} type="text" className="form-control" id="bloodGroup" placeholder="Blood Group" />
                                                 {errors.dob && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
                                         </div>
 
                                     </div>
 
-                                    <div class="row">
-                                        <div class="form-group">
-                                            <label htmlFor="address">Full Address <span style={{ color: "red" }}>*</span></label>
-                                            <textarea {...register("address", { required: true })} class="form-control" id="address" rows="3" />
+                                    <div className="row">
+                                        <div className="form-group">
+                                            <label htmlFor="address">Full Address {willPickUp === "no" ? <span style={{ color: "red" }}>*</span> : <span></span>} </label>
+                                            <textarea placeholder={willPickUp === "yes" ? "Adress not needed if picking up T-shirt by yourself" : ""} disabled={willPickUp === "yes"} {...register("address", { required: willPickUp === "yes" ? false : true })} className="form-control" id="address" rows="3" />
                                             {errors.address && <p style={{ color: "red" }}>This field is mandatory</p>}
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="form-group">
+                                    <div className="row">
+                                        <div className="col-md-4">
+                                            <div className="form-group">
                                                 <label htmlFor="city">City <span style={{ color: "red" }}>*</span></label>
-                                                {/* <input {...register("city", { required: true })} class="form-control" type="text" name="city" id="city" /> */}
-                                                <select {...register("city", { required: true })} id="city" class="form-select" aria-label="city select">
+                                                {/* <input {...register("city", { required: true })} className="form-control" type="text" name="city" id="city" /> */}
+                                                <select {...register("city", { required: true, onChange: (e) => handleCityChange(e) })} id="city" className="form-select" aria-label="city select">
                                                     <option value="">select</option>
                                                     <option value="Bengaluru">Bengaluru</option>
                                                     <option value="Hyderabad">Hyderabad</option>
@@ -209,62 +312,66 @@ function EventForm() {
                                                 {errors.city && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label htmlFor="pincode">Pincode <span style={{ color: "red" }}>*</span></label>
-                                                <input {...register("pincode", { required: true })} class="form-control" type="text" name="pincode" id="pincode" />
-                                                {errors.pincode && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                        {selectedCity === "others" &&
+                                            <div className="col-md-4">
+                                                <div className="form-group">
+                                                    <label htmlFor="otherCity">Other City Name <span style={{ color: "red" }}>*</span></label>
+                                                    <input {...register("otherCity", { required: selectedCity === "others" ? true : false })} className="form-control" type="text" name="Other City" id="otherCity" />
+                                                    {errors.pincode && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
+                                        }
+
+
+                                    </div>
+                                    <div className="row">
+                                        <div className="col-md-4">
+                                            <div className="form-group">
                                                 <label htmlFor="state">State <span style={{ color: "red" }}>*</span></label>
-                                                {/* <input {...register("state", { required: true })} class="form-control" type="text" name="state" id="state" /> */}
-                                                <select {...register("state", { required: true })} id="state" class="form-select" aria-label="State select">
+                                                {/* <input {...register("state", { required: true })} className="form-control" type="text" name="state" id="state" /> */}
+                                                <select {...register("state", { required: true })} id="state" className="form-select" aria-label="State select">
                                                     <option value="">select</option>
                                                     {indianStates.map((item, index) => (
-                                                        <option key={index} value={item.code}> {item.name} </option>
+                                                        <option key={index} value={item.name}> {item.name} </option>
                                                     ))}
                                                 </select>
                                                 {errors.state && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="form-group">
+                                        <div className="col-md-4">
+                                            <div className="form-group">
                                                 <label htmlFor="country">Country <span style={{ color: "red" }}>*</span></label>
-                                                {/* <input {...register("country", { required: true })} class="form-control" type="text" name="country" id="country" /> */}
+                                                {/* <input {...register("country", { required: true })} className="form-control" type="text" name="country" id="country" /> */}
 
-                                                <select {...register("country", { required: true })} id="country" class="form-select" aria-label="Countries select">
+                                                <select {...register("country", { required: true })} id="country" className="form-select" aria-label="Countries select">
                                                     <option value="">select</option>
                                                     {countries.map((item, index) => (
-                                                        <option key={index} value={item.code}> {item.name} </option>
+                                                        <option key={index} value={item.name}> {item.name} </option>
                                                     ))}
                                                 </select>
                                                 {errors.country && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
+                                        <div className="col-md-4">
+                                            <div className="form-group">
                                                 <label htmlFor="nationality">Nationality <span style={{ color: "red" }}>*</span></label>
-                                                <input {...register("nationality", { required: true })} class="form-control" type="text" name="nationality" id="nationality" />
+                                                <input {...register("nationality", { required: true })} className="form-control" type="text" name="nationality" id="nationality" />
                                                 {errors.nationality && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="form-group">
+                                    <div className="row">
+                                        <div className="col-md-4">
+                                            <div className="form-group">
                                                 <label htmlFor="mobile">Mobile No. <span style={{ color: "red" }}>*</span></label>
-                                                <input {...register("mobNo", { required: true })} class="form-control" type="tel" id="mobile" />
+                                                <input {...register("mobNo", { required: true })} className="form-control" type="tel" id="mobile" />
                                                 {errors.mobNo && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
+                                        <div className="col-md-4">
+                                            <div className="form-group">
                                                 <label htmlFor="email">Email <span style={{ color: "red" }}>*</span></label>
-                                                <input {...register("email", { required: true })} class="form-control" type="email" name="email" id="email" />
+                                                <input {...register("email", { required: true })} className="form-control" type="email" name="email" id="email" />
                                                 {errors.email && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
                                         </div>
@@ -273,97 +380,74 @@ function EventForm() {
                                     <hr />
                                     <br />
 
-                                    <h2 class="form-header">Other information</h2>
+                                    <h2 className="form-header">Other information</h2>
 
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label htmlFor="emergency-name">Emergency Contact Name <span style={{ color: "red" }}>*</span></label>
-                                                <input {...register("emergencyName", { required: true })} class="form-control" type="text" id="emergency-name" />
-                                                {errors.emergencyName && <p style={{ color: "red" }}>This field is mandatory</p>}
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
+                                    <div className="row">
+                                        <div className="col-md-6">
+                                            <div className="form-group">
                                                 <label htmlFor="emergency-number">Emergency Contact Number <span style={{ color: "red" }}>*</span></label>
-                                                <input {...register("emergencyNo", { required: true })} class="form-control" type="text"
+                                                <input {...register("emergencyNo", { required: true })} className="form-control" type="text"
                                                     id="emergency-number" />
                                                 {errors.emergencyNo && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div class="form-group">
+                                    <div className="row">
+                                        <div className="form-group">
                                             <label htmlFor="illness">Please describe if you have any health issues <span style={{ color: "red" }}>*</span></label>
-                                            <textarea {...register("illness", { required: true })} class="form-control" id="illness" rows="3" />
+                                            <textarea {...register("illness", { required: true })} className="form-control" id="illness" rows="3" />
                                             {errors.illness && <p style={{ color: "red" }}>This field is mandatory</p>}
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="form-group">
+                                    <div className="row">
+                                        <div className="col-md-12">
+                                            <div className="form-group">
                                                 <label htmlFor="reference">How did you come to know about this event? <span style={{ color: "red" }}>*</span></label>
-                                                <input {...register("reference", { required: true })} class="form-control" type="text" id="reference" />
+                                                <input {...register("reference", { required: true })} className="form-control" type="text" id="reference" />
                                                 {errors.reference && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label htmlFor="need-tee">Do you want to opt for T-Shirt?  <span style={{ color: "red" }}>*</span>
-                                                </label>
-                                                <select {...register("needTShirt", { required: true })} id="need-tee" class="form-select"
-                                                    aria-label="do you want to opt for T-Shirt">
-                                                    <option value="">select</option>
-                                                    <option value="yes">Yes</option>
-                                                    <option value="no">No</option>
-                                                </select>
-                                                {errors.needTShirt && <p style={{ color: "red" }}>This field is mandatory</p>}
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label htmlFor="tee-size">T-Shirt Size <span style={{ color: "red" }}>*</span> </label>
-                                                <select {...register("TshirtSize", { required: true })} id="tee-size" class="form-select" aria-label="T-Shirt Size">
-                                                    <option value="">select</option>
-                                                    <option value="small">Small</option>
-                                                    <option value="med">Medium</option>
-                                                    <option value="large">Large</option>
-                                                    <option value="xl">XL</option>
-                                                </select>
-                                                {errors.TshirtSize && <p style={{ color: "red" }}>This field is mandatory</p>}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="form-group">
-                                                <label htmlFor="need-tee">Do you want to pick up yout T-Shirt yourself? (Only in Bengaluru, Hyderabad, and Chennai)  <span style={{ color: "red" }}>*</span>
-                                                </label>
-                                                <select {...register("selfPickUp", { required: true })} id="self-pickup" class="form-select"
-                                                    aria-label="Do you want to pick up yout T-Shirt yourself?">
-                                                    <option value="">select</option>
-                                                    <option value="yes">Yes</option>
-                                                    <option value="no">No</option>
-                                                </select>
-                                                {errors.selfPickUp && <p style={{ color: "red" }}>This field is mandatory</p>}
-                                            </div>
-                                        </div>
-                                    </div>
-
                                     <br />
                                     <hr />
                                     <br />
-                                    <h2 class="form-header">Terms and Conditions</h2>
+                                    <div className="row">
+                                        <div className="col-md-12">
+                                            <div className="form-group">
+                                                <label htmlFor="inputFile">Please upload an ID proof (Aadhar Card or Pan Card)<span style={{ color: "red" }}>*</span></label>
+                                                <Dropzone onDrop={acceptedFiles => console.log(acceptedFiles)}>
+                                                    {({ getRootProps, getInputProps }) => (
+                                                        <section style={{ height: "100px", border: "dashed #F6F0E3", display: "flex", justifyContent: "center", alignItems: "center" }}>
+                                                            <div {...getRootProps()}>
+                                                                <input className="form-control" id="inputFile" {...getInputProps()} />
+                                                                <p>Drag 'n' drop ID Proof here, or click to select files</p>
+                                                            </div>
+                                                        </section>
+                                                    )}
+                                                </Dropzone>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <br />
-                                    <div class="form-group">
-                                        <textarea defaultValue="Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet, inventore rem praesentium sequi unde aliquid laboriosam dolor iusto dolores eaque vero ea ut commodi autem maxime ad eius. Est, quia?
-                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium iste cumque molestias, impedit eum harum minus veniam aperiam odit officia molestiae, tempore consequuntur sunt ut, provident maiores labore quo dolorem.
-                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet, inventore rem praesentium sequi unde aliquid laboriosam dolor iusto dolores eaque vero ea ut commodi autem maxime ad eius. Est, quia?
-                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium iste cumque molestias, impedit eum harum minus veniam aperiam odit officia molestiae, tempore consequuntur sunt ut, provident maiores labore quo dolorem." class="form-control" id="address" rows="4" readOnly />
-
-
+                                    <hr />
+                                    <br />
+                                    <h2 className="form-header">Terms and Conditions</h2>
+                                    <br />
+                                    <div className="form-group">
+                                        <textarea
+                                            defaultValue="&#x2022; Please choose category carefully, confirmed registration are non-refundable, nontransferable and cannot be modified.
+                                        &#x2022; Provide us correct mobile number &amp; email address that you can assess regularly, as this will be our primary resources of contacting you during the run up to the event.
+                                        &#x2022; By registering you agree that running 10K is an extreme sport and can be injures to body and health. You take full responsibility for participating in the RFH 10k Run and do not hold the organizing committee of RFH 10K Run, Rupee for Humanity or other organizing person or entities responsible of any injury or accident.
+                                        &#x2022; You also assume all risks associated with participating in this event including, but not limited to falls, contact with other participants, the effects of the weather, including high heat or humidity, traffic and the condition of the road, arson or terrorist threats and all others risks associated with public event.
+                                        &#x2022; You agree that organizing committee, Rupee for Humanity and associated companies or entities that organize the run shall not be liable for any loss, damage, illness or injury that might occur as a result of participating in the event.
+                                        &#x2022; You confirm that, in the event of adverse weather conditions, major incidents or threats on the day, the organizers reserve the right to stop/ cancel/ postpone the Event.
+                                        &#x2022; You understand that confirmed registrations and merchandise order are non-refundable, non-transferable and cannot be modified. The organizers reserve the right to reject any application without providing reasons. Any amount collected from rejected applications alone will be refundable in full (excluding bank charges wherever applicable).
+                                        &#x2022; The organizer will contact the participant only by email &amp; text msg. Any notice or msg sent to the email or mobile number registered with the organizers shell be deemed as received by the participants."
+                                            className="form-control"
+                                            style={{ fontSize: "0.8rem" }}
+                                            id="address"
+                                            rows="6"
+                                            readOnly />
                                     </div>
                                     <br />
                                     <p style={{ fontWeight: "700" }}>
@@ -374,15 +458,15 @@ function EventForm() {
                                         action taken against Rupee For Humanity.
                                     </p>
 
-                                    <div class="checkbox">
+                                    <div className="checkbox">
                                         <label>
                                             <input {...register("AgreeTnC", { required: true })} type="checkbox" value="Sure!" id="newsletter" /> Agree to terms and conditions.
                                         </label>
                                         {errors.AgreeTnC && <p style={{ color: "red" }}>This field is mandatory</p>}
                                     </div>
 
-                                    <div class="d-grid gap-2">
-                                        <button class="btn btn-dark" type="submit">Submit</button>
+                                    <div className="d-grid gap-2">
+                                        <button className="btn btn-dark" type="submit">Submit</button>
                                     </div>
                                 </form>
 
@@ -395,27 +479,27 @@ function EventForm() {
                     <section className="container-md">
                         <div>
                             <h3 style={{ marginTop: "2%" }}>Your details</h3>
-                            <table class="table" style={{ backgroundColor: "#040002", color: "lightgray" }}>
+                            <table className="table" style={{ backgroundColor: "#040002", color: "lightgray" }}>
 
                                 <tbody>
                                     <tr>
-                                        <td class="fs-6"> Name</td>
+                                        <td className="fs-6"> Name</td>
                                         <td> {getValues("firstName")} {getValues("lastName")} </td>
                                     </tr>
                                     <tr>
-                                        <td class="fs-6">Email</td>
+                                        <td className="fs-6">Email</td>
                                         <td> {getValues("email")} </td>
                                     </tr>
                                     <tr>
-                                        <td class="fs-6">Phone No.</td>
+                                        <td className="fs-6">Phone No.</td>
                                         <td>{getValues("mobNo")}</td>
                                     </tr>
                                     <tr>
-                                        <td class="fs-6">Need T-shirt </td>
+                                        <td className="fs-6">Need T-shirt </td>
                                         <td> {getValues("needTShirt")}  </td>
                                     </tr>
                                     <tr>
-                                        <td class="fs-6">Total Cost </td>
+                                        <td className="fs-6">Total Cost </td>
                                         <td> <b>INR {totalPrice}/-</b>   </td>
                                     </tr>
                                 </tbody>
@@ -428,34 +512,34 @@ function EventForm() {
                         </div>
 
                         <div>
-                            <div class="row m-3">
-                                <div class="card bg-dark mb-4 rounded-3 shadow-sm">
-                                    <div class="card-header py-3 text-center">
-                                        <h4 class="my-0 fw-normal">Cost Breakup</h4>
+                            <div className="row m-3">
+                                <div className="card bg-dark mb-4 rounded-3 shadow-sm">
+                                    <div className="card-header py-3 text-center">
+                                        <h4 className="my-0 fw-normal">Cost Breakup</h4>
                                     </div>
-                                    <div class="card-body">
-                                        <table class="table" style={{ color: "lightgray" }}>
+                                    <div className="card-body">
+                                        <table className="table" style={{ color: "lightgray" }}>
 
                                             <tbody>
                                                 <tr>
                                                     <td> {getValues("category")} </td>
-                                                    <td class="fs-6"> INR 250</td>
+                                                    <td className="fs-6"> INR 250</td>
                                                 </tr>
                                                 <tr>
-                                                    <td class="fs-6">T-shirt</td>
+                                                    <td className="fs-6">T-shirt</td>
                                                     <td> {getValues("needTShirt") === "yes" ? "INR 210" : 0} </td>
                                                 </tr>
                                                 <tr>
-                                                    <td class="fs-6">Courier charges</td>
-                                                    <td>{getValues("selfPickUp") === "yes" ? 0 : " INR 150"}</td>
+                                                    <td className="fs-6">Courier charges</td>
+                                                    <td>{getValues("selfPickUp") !== "no" ? 0 : " INR 150"}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td class="fs-6">Total </td>
+                                                    <td className="fs-6">Total </td>
                                                     <td> {`INR ${totalPrice}`}  </td>
                                                 </tr>
                                             </tbody>
                                         </table>
-                                        <button type="button" class="w-100 btn btn-dark btn-lg btn-outline-primary">Make Payment</button>
+                                        <button type="button" className="w-100 btn btn-dark btn-lg btn-outline-primary">Make Payment</button>
                                     </div>
                                 </div>
                             </div>

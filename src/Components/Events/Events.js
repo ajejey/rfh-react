@@ -9,7 +9,7 @@ function Events() {
 
     const handleRegisterClick = () => {
         console.log("register clicked to navigate")
-        navigate('/events/10k-run-for-literacy')
+        navigate('/events/runforliteracy-2023')
     }
     return (
         <div className='events-page'>
