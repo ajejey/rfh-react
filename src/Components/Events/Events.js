@@ -53,7 +53,7 @@ function Events() {
                     <h2 className="h2" style={{ color: "#2f6e49", fontWeight: "700", paddingBottom: "2%" }}>Current Events</h2>
 
 
-                    <div className="card mb-3" style={{ maxWidth: "640px" }}>
+                    <div className="card mb-3" style={{ maxWidth: "840px" }}>
                         <div className="row g-3">
                             <div className="col-md-4">
                                 <img src={marathon} className="img-fluid rounded-start" alt="RFH Marathon" />
@@ -61,12 +61,15 @@ function Events() {
                             <div className="col-md-8">
                                 <div className="card-body">
                                     <h5 className="card-title h2">RFH 10K Run - Run for Literacy 2023</h5>
-                                    <p className="card-text">Virtual Marathon consisting of various catagories for the run.</p>
-                                    <p className="card-text"><small style={{ color: "red" }}> <strong>Currently Live!</strong> </small></p>
+                                    <span> <strong>Date:</strong>  April 29th & 30th  (Saturday & Sunday)</span><br />
+                                    <span><strong>Time:</strong>  Run anytime during the above dates</span><br />
+                                    <span><strong>Venue:</strong>  Run anywhere as per your comfort</span><br />
+
+                                    <p className="card-text">Virtual Marathon consisting of various catagories for the run.</p><br />
+                                    <span className="card-text"><small style={{ color: "red" }}> <strong>Currently Live!</strong> </small></span><br />
+                                    <span className="card-text"><small style={{ color: "red" }}> <strong>Last Date to Register: March 25th</strong> </small></span><br />
                                     <button onClick={handleRegisterClick} type="button"
                                         className="btn btn-dark btn-lg download-button">Register</button>
-
-
                                 </div>
                             </div>
                         </div>

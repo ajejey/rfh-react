@@ -100,6 +100,13 @@ function EventForm() {
                             <h1 className="h1">
                                 RFH 10K Run - Run for Literacy 2023
                             </h1>
+                            <span> <strong>Date:</strong>  April 29th & 30th  (Saturday & Sunday)</span><br />
+                            <span><strong>Time:</strong>  Run anytime during the above dates</span><br />
+                            <span><strong>Venue:</strong>  Run anywhere as per your comfort</span><br />
+                            <span>Virtual Marathon consisting of various catagories for the run.</span><br />
+
+                            <span ><small style={{ color: "red" }}> <strong>Last Date to Register: March 25th</strong> </small></span><br />
+                            <br />
 
                             <p>
                                 Rupee For Humanity (RFH) is an online NGO registered with the Government, started by a bunch of
