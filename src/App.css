@@ -233,7 +233,7 @@ h1 {
 }
 
 .torn-paper {
-  background-image: url(./assets/images/paperTorn-3.png);
+  background-image: url(./assets/images/paperTorn-3.webp);
   /* height: 600px; */
   background-size: cover;
   background-position: bottom;
