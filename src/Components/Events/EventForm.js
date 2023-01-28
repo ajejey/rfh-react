@@ -491,7 +491,7 @@ function EventForm() {
                                 <tbody>
                                     <tr>
                                         <td className="fs-6"> Name</td>
-                                        <td> {getValues("firstName")} {getValues("lastName")} </td>
+                                        <td> {getValues("fullName")}</td>
                                     </tr>
                                     <tr>
                                         <td className="fs-6">Email</td>
@@ -504,6 +504,10 @@ function EventForm() {
                                     <tr>
                                         <td className="fs-6">Need T-shirt </td>
                                         <td> {getValues("needTShirt")}  </td>
+                                    </tr>
+                                    <tr>
+                                        <td className="fs-6">T-shirt Size </td>
+                                        <td> {getValues("TshirtSize")}  </td>
                                     </tr>
                                     <tr>
                                         <td className="fs-6">Total Cost </td>

@@ -290,6 +290,11 @@ function Home() {
                             <input {...register("PANno", { required: true })} type="text" className="form-control" id="PANno" />
                             {errors.PANno && <p style={{ color: "red" }}>This field is mandatory</p>}
                         </div>
+                        <div className="form-group">
+                            <label htmlFor="donationAmount">Amount you would like to Donate <span style={{ color: "red" }}>*</span></label>
+                            <input {...register("donationAmount", { required: true })} type="number" className="form-control" id="donationAmount" />
+                            {errors.donationAmount && <p style={{ color: "red" }}>This field is mandatory</p>}
+                        </div>
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleClose}>Cancel</Button>
