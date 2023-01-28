@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import Header from './Header'
 import cheque1 from '../assets/images/cheque1.jpg'
 import cheque2 from '../assets/images/cheque2.jpg'
@@ -13,6 +13,10 @@ import CountUp from 'react-countup';
 import VisibilitySensor from 'react-visibility-sensor';
 
 function Home() {
+    const myRef = useRef(null)
+
+    const executeScroll = () => myRef.current.scrollIntoView()
+
     return (
         <div>
             <Header />
@@ -212,7 +216,7 @@ function Home() {
                     <button type="button" className="btn btn-dark btn-lg download-button">
                         Donate
                     </button>
-                    <button type="button" className="btn btn-outline-light btn-lg download-button">
+                    <button onClick={executeScroll} type="button" className="btn btn-outline-light btn-lg download-button">
                         Contact us
                     </button>
                 </div>
@@ -221,7 +225,7 @@ function Home() {
 
             <section id="contact">
                 <div>
-                    <div className="contact-us">
+                    <div className="contact-us" ref={myRef}>
                         <div>
                             <img className="logo1" src={logo} alt="RFH logo" />
                             {/* <h3 style={{ margin: "0" }}>Rupee For Humanity</h3>
