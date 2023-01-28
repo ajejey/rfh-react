@@ -11,9 +11,26 @@ import family from '../assets/images/family.png'
 import logo from '../assets/images/Logo.jpg'
 import CountUp from 'react-countup';
 import VisibilitySensor from 'react-visibility-sensor';
+import { Dialog, Button, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material'
+import { useForm } from 'react-hook-form'
 
 function Home() {
+    const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
     const myRef = useRef(null)
+    const [open, setOpen] = React.useState(false);
+
+    const handleDonateClick = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const onSubmit = (data) => {
+        console.log("donate data ", data)
+        setOpen(false);
+    }
 
     const executeScroll = () => myRef.current.scrollIntoView()
 
@@ -24,7 +41,7 @@ function Home() {
                 <div className="hero-text background">
                     <h1 className="display-1">Invest in the Future of the country</h1>
                     <h2 className="display-5">Help Underprivileged Children Thrive</h2>
-                    <button type="button" className="btn btn-dark btn-lg download-button">
+                    <button onClick={handleDonateClick} type="button" className="btn btn-dark btn-lg download-button">
                         Donate Today
                     </button>
                 </div>
@@ -213,7 +230,7 @@ function Home() {
             <section id="cta">
                 <h3 className="cta-heading mb-5">Even a Rupee Donated will help build the Future of India</h3>
                 <div style={{ display: "flex", justifyContent: "center", gap: "10px" }} >
-                    <button type="button" className="btn btn-dark btn-lg download-button">
+                    <button onClick={handleDonateClick} type="button" className="btn btn-dark btn-lg download-button">
                         Donate
                     </button>
                     <button onClick={executeScroll} type="button" className="btn btn-outline-light btn-lg download-button">
@@ -245,6 +262,42 @@ function Home() {
                     </div>
                 </div>
             </section>
+
+            <Dialog open={open}>
+                <DialogTitle>Donate to Rupee For Humanity</DialogTitle>
+                <form onSubmit={handleSubmit(onSubmit)}>
+                    <DialogContent>
+                        <DialogContentText>
+                            To donate to Rupee For Humanity, please enter the following details:
+                        </DialogContentText>
+                        <div className="form-group">
+                            <label htmlFor="fullName">Full Name <span style={{ color: "red" }}>*</span></label>
+                            <input {...register("fullName", { required: true })} type="text" className="form-control" placeholder="" id="fullName" />
+                            {errors.fullName && <p style={{ color: "red" }}>This field is mandatory</p>}
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="email">Email <span style={{ color: "red" }}>*</span></label>
+                            <input {...register("email", { required: true })} className="form-control" type="email" name="email" id="email" />
+                            {errors.email && <p style={{ color: "red" }}>This field is mandatory</p>}
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="mobile">Mobile No. <small>(include country code (+91 for India))</small>  <span style={{ color: "red" }}>*</span></label>
+                            <input {...register("mobNo", { required: true })} className="form-control" type="tel" id="mobile" />
+                            {errors.mobNo && <p style={{ color: "red" }}>This field is mandatory</p>}
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="PANno">PAN Number <small>(write NA if not available)</small>  <span style={{ color: "red" }}>*</span></label>
+                            <input {...register("PANno", { required: true })} type="text" className="form-control" id="PANno" />
+                            {errors.PANno && <p style={{ color: "red" }}>This field is mandatory</p>}
+                        </div>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleClose}>Cancel</Button>
+                        <Button type='submit' variant='filled' style={{ backgroundColor: "#040002", color: "lightgray" }} >Donate</Button>
+                    </DialogActions>
+                </form>
+
+            </Dialog>
 
             {/* footer */}
 

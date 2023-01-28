@@ -248,8 +248,8 @@ function EventForm() {
                                     <div className="row">
                                         <div className="col-md-12">
                                             <div className="form-group">
-                                                <label htmlFor="first">Full Name <span style={{ color: "red" }}>*</span></label>
-                                                <input {...register("fullName", { required: true })} type="text" className="form-control" placeholder="" id="first" />
+                                                <label htmlFor="fullName">Full Name <span style={{ color: "red" }}>*</span></label>
+                                                <input {...register("fullName", { required: true })} type="text" className="form-control" placeholder="" id="fullName" />
                                                 {errors.fullName && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
                                         </div>
