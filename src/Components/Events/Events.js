@@ -24,7 +24,7 @@ function Events() {
                         </div>
                     </div>
                     <div className='col-sm-6' style={{ display: "flex", flexDirection: "column", justifyContent: 'center' }}>
-                        <h2 className="display-2" style={{ color: "#fff4de", padding: "16px 0", fontWeight: "500" }}>
+                        <h2 className="display-2" style={{ color: "#fff4de", padding: "16px 0", fontWeight: "500", fontFamily: "Asap" }}>
                             <b>Run For Literacy</b>
                         </h2>
 
@@ -64,12 +64,19 @@ function Events() {
                                     <span> <strong>Date:</strong>  April 29th & 30th  (Saturday & Sunday)</span><br />
                                     <span><strong>Time:</strong>  Run anytime during the above dates</span><br />
                                     <span><strong>Venue:</strong>  Run anywhere as per your comfort</span><br />
-
                                     <p className="card-text">Virtual Marathon consisting of various catagories for the run.</p><br />
-                                    <span className="card-text"><small style={{ color: "red" }}> <strong>Currently Live!</strong> </small></span><br />
-                                    <span className="card-text"><small style={{ color: "red" }}> <strong>Last Date to Register: March 25th</strong> </small></span><br />
-                                    <button onClick={handleRegisterClick} type="button"
-                                        className="btn btn-dark btn-lg download-button">Register</button>
+                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                        <div>
+                                            <span className="card-text"><small style={{ color: "red" }}> <strong>Currently Live!</strong> </small></span><br />
+                                            <span className="card-text"><small style={{ color: "red" }}> <strong>Last Date to Register: March 25th</strong> </small></span>
+                                        </div>
+                                        <div>
+                                            <button onClick={handleRegisterClick} type="button"
+                                                className="btn btn-dark btn-lg download-button">Register</button>
+                                        </div>
+                                    </div>
+
+
                                 </div>
                             </div>
                         </div>

@@ -100,6 +100,13 @@ function EventForm() {
         return (
             <div>
                 <p>
+                    RFH provides :
+                    <ul>
+                        <li>Right to education for every child</li>
+                        <li>Food, medical care and healthy atmosphere for the poor and needy.</li>
+                    </ul>
+                </p>
+                <p>
                     For more information about our NGO, please visit the below link: <a
                         href="https://www.facebook.com/RupeeForHumanity/" target="_blank" rel='noreferrer'>RupeeForHumanity</a>
 
@@ -116,10 +123,7 @@ function EventForm() {
                     education for ~180 underprivileged kids from various places including stationary, books and school
                     uniforms.
                 </p>
-                <p>
-                    We are proud to host the event again this year “RFH 10K Run - Run for Literacy 2023” – this time its
-                    virtual run but the excitement and cause is solid as always.
-                </p>
+
             </div>
         )
     }
@@ -135,8 +139,8 @@ function EventForm() {
                 {(submitted === false) ?
                     <section id="registration-form">
                         <div className="container-md">
-                            <h1 className="h1">
-                                RFH 10K Run - Run for Literacy 2023
+                            <h1 className="h1" style={{ fontWeight: "800" }}>
+                                RFH 10K Run - Run for Literacy 2023 <br /> <span className='highlight'>Virtual Run</span>
                             </h1>
                             <div className="row">
                                 <div className="col-md-4">
@@ -162,12 +166,10 @@ function EventForm() {
                                 ladder of developed nations.
                             </p>
                             <p>
-                                RFH provides :
-                                <ul>
-                                    <li>Right to education for every child</li>
-                                    <li>Food, medical care and healthy atmosphere for the poor and needy.</li>
-                                </ul>
+                                We are proud to host the event again this year “RFH 10K Run - Run for Literacy 2023” – this time its
+                                virtual run but the excitement and cause is solid as always.
                             </p>
+
                             {seeMore === true && expandedText()}
                             <div style={{ paddingBottom: "16px" }}>
                                 <span style={{ textDecoration: "underline", cursor: "pointer", color: "lightblue" }} onClick={handleSeeMore}>See {seeMore ? "less" : "more"} </span>

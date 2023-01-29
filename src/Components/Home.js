@@ -8,6 +8,7 @@ import team from '../assets/images/team.png'
 import kidsCouple from '../assets/images/kids-couple.png'
 import events from '../assets/images/events.png'
 import family from '../assets/images/family.png'
+import growth from '../assets/images/growth.png'
 import logo from '../assets/images/Logo.jpg'
 import CountUp from 'react-countup';
 import VisibilitySensor from 'react-visibility-sensor';
@@ -125,60 +126,71 @@ function Home() {
             <section className="section-3">
                 <div className="cards-component">
                     <div className="my-card">
-                        <p><img src={heart} alt="" height="50" /></p>
+                        <p><img src={heart} alt="" height="100" /></p>
                         {/* <div className="counter"></div> */}
                         <CountUp end={3458}>
                             {({ countUpRef, start }) => (
                                 <VisibilitySensor onChange={start}>
-                                    <span ref={countUpRef} />
+                                    <span style={{ fontSize: "2rem", fontWeight: "800" }} ref={countUpRef} />
                                 </VisibilitySensor>
                             )}
                         </CountUp>
                         <p>Number of Donors</p>
                     </div>
                     <div className="my-card">
-                        <p><img src={team} alt="" height="50" /></p>
+                        <p><img src={team} alt="" height="100" /></p>
                         <CountUp end={56}>
                             {({ countUpRef, start }) => (
                                 <VisibilitySensor onChange={start}>
-                                    <span ref={countUpRef} />
+                                    <span style={{ fontSize: "2rem", fontWeight: "800" }} ref={countUpRef} />
                                 </VisibilitySensor>
                             )}
                         </CountUp>
                         <p>Number of volunteers </p>
                     </div>
                     <div className="my-card">
-                        <p><img src={kidsCouple} alt="" height="50" /></p>
+                        <p><img src={kidsCouple} alt="" height="100" /></p>
                         <CountUp end={205}>
                             {({ countUpRef, start }) => (
                                 <VisibilitySensor onChange={start}>
-                                    <span ref={countUpRef} />
+                                    <span style={{ fontSize: "2rem", fontWeight: "800" }} ref={countUpRef} />
                                 </VisibilitySensor>
                             )}
                         </CountUp>
                         <p>Number of Children helped!</p>
                     </div>
                     <div className="my-card">
-                        <p><img src={events} alt="" height="50" /></p>
+                        <p><img src={events} alt="" height="100" /></p>
                         <span><CountUp end={40}>
                             {({ countUpRef, start }) => (
                                 <VisibilitySensor onChange={start}>
-                                    <span ref={countUpRef} />
+                                    <span style={{ fontSize: "2rem", fontWeight: "800" }} ref={countUpRef} />
                                 </VisibilitySensor>
                             )}
                         </CountUp>+</span>
                         <p>Number of Events conducted</p>
                     </div>
                     <div className="my-card">
-                        <p><img src={family} alt="" height="50" /></p>
+                        <p><img src={family} alt="" height="100" /></p>
                         <span><CountUp end={1200}>
                             {({ countUpRef, start }) => (
                                 <VisibilitySensor onChange={start}>
-                                    <span ref={countUpRef} />
+                                    <span style={{ fontSize: "2rem", fontWeight: "800" }} ref={countUpRef} />
                                 </VisibilitySensor>
                             )}
                         </CountUp>+</span>
                         <p>Number of Families supported</p>
+                    </div>
+                    <div className="my-card">
+                        <p><img src={growth} alt="" height="100" /></p>
+                        <span>INR <CountUp end={25}>
+                            {({ countUpRef, start }) => (
+                                <VisibilitySensor onChange={start}>
+                                    <span style={{ fontSize: "2rem", fontWeight: "800" }} ref={countUpRef} />
+                                </VisibilitySensor>
+                            )}
+                        </CountUp> Lakhs+</span>
+                        <p>Total Funds Raised and Donated</p>
                     </div>
 
                 </div>
@@ -190,7 +202,7 @@ function Home() {
                         <div className="container">
                             <div className="carousel-item active" style={{ padding: "100px 40px" }}>
                                 <div>
-                                    <iframe width="560" height="315" src="https://www.youtube.com/embed/TZDn4-FeAHY"
+                                    <iframe width="320" height="300" src="https://www.youtube.com/embed/TZDn4-FeAHY"
                                         title="YouTube video player" frameborder="0"
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                         allowfullscreen></iframe>
