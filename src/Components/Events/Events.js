@@ -2,6 +2,7 @@ import React from 'react'
 import Header from '../Header'
 import runner from '../../assets/images/runner-min.png'
 import marathon from '../../assets/images/marathon.jpg'
+import runnersVector from '../../assets/images/RunnersVectors.svg'
 import { useNavigate } from 'react-router-dom'
 
 function Events() {
@@ -14,17 +15,17 @@ function Events() {
     return (
         <div className='events-page'>
             <Header />
-            <div className="container-md" style={{ paddingTop: "18px" }}>
+            <div className="container-sm" style={{ paddingTop: "18px" }}>
                 <div className="row">
 
-                    {/* <div className="col-md-6 flex-center" >
-                        <div className="blob flex-center">
-                            <img className='runner-img' src={runner} alt="RFH Runner" />
+                    <div className="col-sm-6 flex-center" >
+                        <div className="flex-center">
+                            <img className='runner-img' src={runnersVector} alt="RFH Runner" />
                         </div>
-                    </div> */}
-                    <div className='col-md-12'>
-                        <h2 className="h2" style={{ color: "#fff4de", padding: "16px 0" }}>
-                            <b>Welcome to Rupee For Humanity!</b>
+                    </div>
+                    <div className='col-sm-6' style={{ display: "flex", flexDirection: "column", justifyContent: 'center' }}>
+                        <h2 className="display-2" style={{ color: "#fff4de", padding: "16px 0", fontWeight: "500" }}>
+                            <b>Run For Literacy</b>
                         </h2>
 
                         <p className="paragraph events-p">
@@ -36,7 +37,6 @@ function Events() {
                         <p className="paragraph events-p">
                             Our events are centered around fun activities and involve everyone – from runners to fitness enthusiasts and sports-lovers to those who simply want to lend a helping hand.
                         </p>
-
                     </div>
                     <div style={{ padding: "3%", textAlign: "center" }}>
                         <p className="paragraph">

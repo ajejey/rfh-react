@@ -3,6 +3,11 @@ import Header from '../Header'
 import { useForm } from "react-hook-form";
 import { countries, indianStates } from '../../Constants/constants';
 import Dropzone from 'react-dropzone'
+import EventTwoToneIcon from '@mui/icons-material/EventTwoTone';
+import AccessTimeTwoToneIcon from '@mui/icons-material/AccessTimeTwoTone';
+import PlaceTwoToneIcon from '@mui/icons-material/PlaceTwoTone';
+import MilitaryTechTwoToneIcon from '@mui/icons-material/MilitaryTechTwoTone';
+import { Button } from '@mui/material';
 
 function EventForm() {
     const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
@@ -11,6 +16,7 @@ function EventForm() {
     const [needTee, setNeedTee] = useState("no")
     const [willPickUp, setWillPickUp] = useState("no")
     const [selectedCity, setSelectedCity] = useState("others")
+    const [seeMore, setSeeMore] = useState(false)
 
     const onDrop = useCallback((acceptedFiles) => {
         acceptedFiles.forEach((file) => {
@@ -79,11 +85,43 @@ function EventForm() {
         }
     }
 
+    const handleSeeMore = () => {
+        setSeeMore(!seeMore)
+    }
+
     console.log("price total ", totalPrice)
     console.log("getValues() ", getValues())
 
     const handleEditClick = () => {
         setSubmitted(!submitted)
+    }
+
+    const expandedText = () => {
+        return (
+            <div>
+                <p>
+                    For more information about our NGO, please visit the below link: <a
+                        href="https://www.facebook.com/RupeeForHumanity/" target="_blank" rel='noreferrer'>RupeeForHumanity</a>
+
+                </p>
+                <p>
+                    RFH has initiated a program - "Shikshakaar - Shikshan ka Adhikaar", a step to eradicate illiteracy
+                    in India. We believe education is the backbone of any developing country. Driven by this belief, we
+                    provide free education for meritorious, poor, needy and orphaned children from NGOs, Government
+                    schools and various other sources.
+                </p>
+                <p>
+                    As a part of this initiative, we conducted ‘RFH 10K Run - Run for Literacy’ last 5 years at Cubbon
+                    park, Bangalore and from the contributions of kind hearts like you, we were able to sponsor
+                    education for ~180 underprivileged kids from various places including stationary, books and school
+                    uniforms.
+                </p>
+                <p>
+                    We are proud to host the event again this year “RFH 10K Run - Run for Literacy 2023” – this time its
+                    virtual run but the excitement and cause is solid as always.
+                </p>
+            </div>
+        )
     }
 
     useEffect(() => {
@@ -100,10 +138,19 @@ function EventForm() {
                             <h1 className="h1">
                                 RFH 10K Run - Run for Literacy 2023
                             </h1>
-                            <span> <strong>Date:</strong>  April 29th & 30th  (Saturday & Sunday)</span><br />
-                            <span><strong>Time:</strong>  Run anytime during the above dates</span><br />
-                            <span><strong>Venue:</strong>  Run anywhere as per your comfort</span><br />
-                            <span>Virtual Marathon consisting of various catagories for the run.</span><br />
+                            <div className="row">
+                                <div className="col-md-4">
+                                    <span> <strong><EventTwoToneIcon /> Date:</strong>  April 29th & 30th  (Saturday & Sunday)  </span>
+                                </div>
+                                <div className="col-md-4">
+                                    <span><strong> <AccessTimeTwoToneIcon /> Time:</strong>  Run anytime during the above dates</span>
+                                </div>
+                                <div className="col-md-4">
+                                    <span><strong> <PlaceTwoToneIcon /> Venue:</strong>  Run anywhere as per your comfort</span>
+                                </div>
+                            </div>
+
+                            <span> <MilitaryTechTwoToneIcon /> Virtual Marathon consisting of various catagories for the run.</span><br />
 
                             <span ><small style={{ color: "red" }}> <strong>Last Date to Register: March 25th</strong> </small></span><br />
                             <br />
@@ -116,30 +163,16 @@ function EventForm() {
                             </p>
                             <p>
                                 RFH provides :
-                                • Right to education for every child
-                                • Food, medical care and healthy atmosphere for the poor and needy.
+                                <ul>
+                                    <li>Right to education for every child</li>
+                                    <li>Food, medical care and healthy atmosphere for the poor and needy.</li>
+                                </ul>
                             </p>
-                            <p>
-                                For more information about our NGO, please visit the below link: <a
-                                    href="https://www.facebook.com/RupeeForHumanity/" target="_blank" rel='noreferrer'>RupeeForHumanity</a>
+                            {seeMore === true && expandedText()}
+                            <div style={{ paddingBottom: "16px" }}>
+                                <span style={{ textDecoration: "underline", cursor: "pointer", color: "lightblue" }} onClick={handleSeeMore}>See {seeMore ? "less" : "more"} </span>
+                            </div>
 
-                            </p>
-                            <p>
-                                RFH has initiated a program - "Shikshakaar - Shikshan ka Adhikaar", a step to eradicate illiteracy
-                                in India. We believe education is the backbone of any developing country. Driven by this belief, we
-                                provide free education for meritorious, poor, needy and orphaned children from NGOs, Government
-                                schools and various other sources.
-                            </p>
-                            <p>
-                                As a part of this initiative, we conducted ‘RFH 10K Run - Run for Literacy’ last 5 years at Cubbon
-                                park, Bangalore and from the contributions of kind hearts like you, we were able to sponsor
-                                education for ~180 underprivileged kids from various places including stationary, books and school
-                                uniforms.
-                            </p>
-                            <p>
-                                We are proud to host the event again this year “RFH 10K Run - Run for Literacy 2023” – this time its
-                                virtual run but the excitement and cause is solid as always.
-                            </p>
                             <h2 className="h2">
                                 Information
                             </h2>
@@ -172,11 +205,31 @@ function EventForm() {
                                 </table>
                                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                                     <div>
-                                        <b>T-shirt</b> : INR 210/- <br />
+                                        {/* <b>T-shirt</b> : INR 210/- <br />
                                         <b>Courier charges anywhere in India</b> : INR 150/- <br />
                                         <b>Self Pickup available only in Bengaluru, Hyderabad, Chennai</b> <br />
-                                        <small>Above items are optional and are not applicable for runners outside India</small><br />
+                                        <small>Above items are optional and are not applicable for runners outside India</small><br /> */}
                                         <small style={{ color: "red" }}>* Upon upload of the screenshot of your running activity in portal</small>
+                                    </div>
+                                </div>
+                                <div className="row mt-4">
+                                    <div className="col-md-6">
+                                        <table className="table" style={{ backgroundColor: "#040002", color: "lightgray" }}>
+                                            <tbody>
+                                                <tr>
+                                                    <td>T-Shirt Price</td>
+                                                    <td>INR 210/-</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Courier charges anywere in India</td>
+                                                    <td>INR 150/-</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Self Pickup available only in Bengaluru, Hyderabad, Chennai</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <small>Above items are optional and are not applicable for runners outside India</small><br />
                                     </div>
                                 </div>
 
