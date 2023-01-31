@@ -104,15 +104,15 @@ function Home() {
                                     </p>
                                 </div>
                             </div>
-                            <div className="row m-4">
-                                <div className="col-md-4">
-                                    <img src={cheque6} className="img-fluid" alt="Rupee for humanity volunteer donating to a student" height={50} />
+                            <div className="row m-4" >
+                                <div className="col-md-4 text-center">
+                                    <img style={{ maxHeight: "210px" }} src={cheque6} className="img-fluid" alt="Rupee for humanity volunteer donating to a student" />
                                 </div>
-                                <div className="col-md-4">
-                                    <img src={cheque7} className="img-fluid" alt="Rupee for humanity volunteer donating to a student" height={50} />
+                                <div className="col-md-4 text-center">
+                                    <img style={{ maxHeight: "210px" }} src={cheque7} className="img-fluid" alt="Rupee for humanity volunteer donating to a student" />
                                 </div>
-                                <div className="col-md-4">
-                                    <img src={cheque8} className="img-fluid" alt="Rupee for humanity volunteer donating to a student" height={50} />
+                                <div className="col-md-4 text-center">
+                                    <img style={{ maxHeight: "210px" }} src={cheque8} className="img-fluid" alt="Rupee for humanity volunteer donating to a student" />
                                 </div>
                             </div>
                         </div>
