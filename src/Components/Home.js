@@ -1,8 +1,11 @@
 import React, { useRef } from 'react'
 import Header from './Header'
-import cheque1 from '../assets/images/cheque1.jpg'
-import cheque2 from '../assets/images/cheque2.jpg'
-import cheque4 from '../assets/images/cheque4.jpg'
+import cheque1 from '../assets/images/cheque1.webp'
+import cheque4 from '../assets/images/cheque4.webp'
+import cheque5 from '../assets/images/cheque5.webp'
+import cheque6 from '../assets/images/cheque6.webp'
+import cheque7 from '../assets/images/cheque7.webp'
+import cheque8 from '../assets/images/cheque8.webp'
 import heart from '../assets/images/heart.png'
 import team from '../assets/images/team.png'
 import kidsCouple from '../assets/images/kids-couple.png'
@@ -66,18 +69,18 @@ function Home() {
                             <div className="row m-4">
                                 <h2 className="sub-heading">Your donation directly goes to the education of the needy</h2>
                                 <div className="col-md-4">
-                                    <img src={cheque1} className="img-fluid" alt="" />
+                                    <img src={cheque1} className="img-fluid" alt="Rupee for humanity donating to a student" />
                                 </div>
                                 <div className="col-md-4">
-                                    <img src={cheque2} className="img-fluid" alt="" />
+                                    <img src={cheque4} className="img-fluid" alt="Rupee for humanity donating to a student" />
                                 </div>
                                 <div className="col-md-4">
-                                    <img src={cheque4} className="img-fluid" alt="" />
+                                    <img src={cheque5} className="img-fluid" alt="Rupee for humanity donating to a student" />
                                 </div>
                             </div>
                             <div className="row m-4">
                                 <div className="col-md-12">
-                                    <p className="paragraph">
+                                    {/* <p className="paragraph">
                                         Team <b>Rupee for Humanity (RFH)</b> has a long history of working to improve the
                                         lives of
                                         those in need. In 2013, we visited the <b>Courtesy Foundation</b> in Bangalore,
@@ -95,7 +98,21 @@ function Home() {
                                         focused on supporting education and providing resources such as food, shelter, and
                                         medical care to those in need, and we remain committed to continuing this important
                                         work.
+                                    </p> */}
+                                    <p className="paragraph">
+                                        Our course of action at Rupee For Humanity (RFH) is centered on providing basic necessities like food, shelter, clothing, and education to children. To make this happen, we collaborate with nearby schools and hospitals and directly connect with food caterers and NGOs to guarantee that the money is used effectively. Our next step is to offer health care facilities and a healthy environment for the elderly. Additionally, we aim to enhance rural areas by providing basic necessities such as electricity, food, health care, and hygiene centers. We ensure transparency in all transactions so that individuals can track how their donations are being utilized.
                                     </p>
+                                </div>
+                            </div>
+                            <div className="row m-4">
+                                <div className="col-md-4">
+                                    <img src={cheque6} className="img-fluid" alt="Rupee for humanity volunteer donating to a student" height={50} />
+                                </div>
+                                <div className="col-md-4">
+                                    <img src={cheque7} className="img-fluid" alt="Rupee for humanity volunteer donating to a student" height={50} />
+                                </div>
+                                <div className="col-md-4">
+                                    <img src={cheque8} className="img-fluid" alt="Rupee for humanity volunteer donating to a student" height={50} />
                                 </div>
                             </div>
                         </div>

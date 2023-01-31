@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import Header from '../Header'
 import runner from '../../assets/images/runner-min.png'
 import marathon from '../../assets/images/marathon.jpg'
@@ -8,10 +8,14 @@ import { useNavigate } from 'react-router-dom'
 function Events() {
     const navigate = useNavigate()
 
+
     const handleRegisterClick = () => {
         console.log("register clicked to navigate")
         navigate('/events/runforliteracy-2023')
     }
+
+
+
     return (
         <div className='events-page'>
             <Header />

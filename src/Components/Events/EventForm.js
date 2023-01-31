@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import Header from '../Header'
 import { useForm } from "react-hook-form";
 import { countries, indianStates } from '../../Constants/constants';
@@ -11,12 +11,15 @@ import { Button } from '@mui/material';
 
 function EventForm() {
     const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
+    const myRef = useRef(null)
     const [submitted, setSubmitted] = useState(false)
     const [totalPrice, setTotalPrice] = useState(0)
     const [needTee, setNeedTee] = useState("no")
     const [willPickUp, setWillPickUp] = useState("no")
     const [selectedCity, setSelectedCity] = useState("others")
     const [seeMore, setSeeMore] = useState(false)
+
+    const executeScroll = () => myRef.current.scrollIntoView()
 
     const onDrop = useCallback((acceptedFiles) => {
         acceptedFiles.forEach((file) => {
@@ -140,7 +143,7 @@ function EventForm() {
                     <section id="registration-form">
                         <div className="container-md">
                             <h1 className="h1" style={{ fontWeight: "800" }}>
-                                RFH 10K Run - Run for Literacy 2023 <br /> <span className='highlight'>Virtual Run</span>
+                                RFH 10K Run - Run for Literacy 2023 <br /> <span className='highlight' style={{ cursor: "pointer" }} onClick={executeScroll}>Virtual Run</span>
                             </h1>
                             <div className="row">
                                 <div className="col-md-4">
@@ -237,7 +240,7 @@ function EventForm() {
 
                             </div>
 
-                            <div className="regestration-form">
+                            <div ref={myRef} className="regestration-form">
 
                                 <form onSubmit={handleSubmit(onSubmit)}>
                                     <h2 className="form-header">Registration Form</h2>
