@@ -44,7 +44,7 @@ function Home() {
         // setOpen(false);
 
         try {
-            const response = await fetch("http://localhost:4000/api/initiate-payment", {
+            const response = await fetch("https://rfh-backend.up.railway.app/api/initiate-payment", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -69,7 +69,7 @@ function Home() {
         if (paymentStatus === 'Payment Initiated') {
             const getPaymentStatus = async () => {
                 try {
-                    const response = await fetch("http://localhost:4000/app/payment-status", {
+                    const response = await fetch("https://rfh-backend.up.railway.app/app/payment-status", {
                         method: "GET",
                         headers: {
                             "Content-Type": "application/json",
