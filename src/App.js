@@ -1,10 +1,9 @@
-import logo from './logo.svg';
 import './App.css';
-import { Navigate, Route, Routes, ScrollRestoration } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import Home from './Components/Home';
-import Events from './Components/Events/Events';
 import Gallery from './Components/Gallery';
 import EventsMain from './Components/Events/EventsMain';
+import VolunteerForm from './Components/VolunteerForm';
 
 function App() {
   return (
@@ -13,6 +12,7 @@ function App() {
         <Route path='/' element={<Home />} />
         <Route path='events/*' element={<EventsMain />} />
         <Route path='/gallery' element={<Gallery />} />
+        <Route path='/volunteer-register' element={<VolunteerForm />} />
         {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
 
       </Routes>

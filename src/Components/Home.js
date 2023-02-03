@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Header from './Header'
 import cheque1 from '../assets/images/cheque1.webp'
 import cheque4 from '../assets/images/cheque4.webp'
@@ -17,11 +17,15 @@ import CountUp from 'react-countup';
 import VisibilitySensor from 'react-visibility-sensor';
 import { Dialog, Button, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material'
 import { useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
 
 function Home() {
     const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
     const myRef = useRef(null)
+    const navigate = useNavigate()
     const [open, setOpen] = React.useState(false);
+    const [paymentStatus, setPaymentStatus] = useState("")
+    const [paymentLink, setPaymentLink] = useState("")
 
     const handleDonateClick = () => {
         setOpen(true);
@@ -31,12 +35,56 @@ function Home() {
         setOpen(false);
     };
 
-    const onSubmit = (data) => {
-        console.log("donate data ", data)
-        setOpen(false);
+    const handleVolunteerClick = () => {
+        navigate('/volunteer-register')
     }
 
+    const onSubmit = async (formData) => {
+        console.log("donate data ", formData)
+        // setOpen(false);
+
+        try {
+            const response = await fetch("http://localhost:4000/api/initiate-payment", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+            });
+            const data = await response.json();
+            console.log("data.message", data, data.message);
+            setPaymentStatus(data.message)
+            setPaymentLink(data?.data?.instrumentResponse?.intentUrl)
+        } catch (error) {
+            console.error(error);
+        }
+
+    }
+    console.log("paymentstatus ", paymentStatus)
+
     const executeScroll = () => myRef.current.scrollIntoView()
+
+    useEffect(() => {
+        console.log("calling status api")
+        if (paymentStatus === 'Payment Initiated') {
+            const getPaymentStatus = async () => {
+                try {
+                    const response = await fetch("http://localhost:4000/app/payment-status", {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    });
+                    const data = await response.json();
+                    console.log("status data", data);
+                    setPaymentStatus(data.code)
+                } catch (error) {
+                    console.log(error)
+                }
+            }
+            getPaymentStatus()
+        }
+    }, [paymentStatus])
 
     return (
         <div>
@@ -45,9 +93,15 @@ function Home() {
                 <div className="hero-text background">
                     <h1 className="display-1">Invest in the Future of the country</h1>
                     <h2 className="display-5">Help Underprivileged Children Thrive</h2>
-                    <button onClick={handleDonateClick} type="button" className="btn btn-dark btn-lg download-button">
-                        Donate Today
-                    </button>
+                    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "24px", flexWrap: "wrap" }}>
+                        <button onClick={handleDonateClick} type="button" className="btn btn-dark btn-lg download-button">
+                            Donate Today
+                        </button>
+                        <button onClick={handleVolunteerClick} type="button" className="btn btn-dark btn-outline btn-lg download-button">
+                            Volunteer Today
+                        </button>
+                    </div>
+
                 </div>
             </section>
             <section id="about">
@@ -324,6 +378,8 @@ function Home() {
                             <input {...register("donationAmount", { required: true })} type="number" className="form-control" id="donationAmount" />
                             {errors.donationAmount && <p style={{ color: "red" }}>This field is mandatory</p>}
                         </div>
+                        <small style={{ color: "green", fontWeight: "600" }}> {paymentStatus} </small>
+                        {paymentStatus === "Payment Initiated" && <a href={paymentLink} target="_blank" rel='noreferrer' > Payment Link</a>}
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleClose}>Cancel</Button>

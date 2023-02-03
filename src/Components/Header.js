@@ -1,17 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { Link, NavLink, useLocation } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import logo from '../assets/images/Logo.jpg'
 
 
 function Header() {
-    const location = useLocation()
-    const [navClass, setNavClass] = useState("")
-    console.log("Location ", location)
-
-    useEffect(() => {
-
-    }, [])
-
 
     return (
         <div>
@@ -41,6 +33,9 @@ function Header() {
                             </li>
                             <li className="nav-item">
                                 <NavLink to="/gallery" className={({ isActive }) => (isActive ? 'nav-link active1' : 'nav-link')} preventScrollReset={true}>Gallery</NavLink>
+                            </li>
+                            <li className="nav-item">
+                                <NavLink to="/volunteer-register" className={({ isActive }) => (isActive ? 'nav-link active1' : 'nav-link')} preventScrollReset={true}>volunteer</NavLink>
                             </li>
                         </ul>
                     </div>
