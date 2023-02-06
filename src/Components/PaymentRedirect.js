@@ -1,8 +1,15 @@
 import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 function PaymentRedirect() {
+    const navigate = useNavigate()
     const [paymentStatus, setPaymentStatus] = useState("")
     const [paymentDetails, setPaymentDetails] = useState({})
+
+    const handleOkayClick = () => {
+        navigate('/')
+    }
+
     useEffect(() => {
         // if (paymentStatus === 'Payment Initiated') {
         const getPaymentStatus = async () => {
@@ -26,12 +33,36 @@ function PaymentRedirect() {
     }, [paymentStatus])
     return (
         <div>
-            <h3>Your payment status is:  {paymentStatus} </h3>
-            <h4>Payment details are: </h4>
-            <p> Amount: INR {Number(paymentDetails?.amount) / 100} </p>
-            <p> UPI Transaction ID: {paymentDetails?.paymentInstrument?.upiTransactionId} </p>
-            <p> Account No: {paymentDetails?.paymentInstrument?.maskedAccountNumber} </p>
-            <p> Transaction ID: {paymentDetails?.transactionId} </p>
+            <div style={{ height: "100vh", display: "flex", justifyContent: "center", alignItems: 'center', }}>
+                <div style={{ padding: "3%", boxShadow: "4px 8px 29px -10px rgba(0,0,0,0.75)", borderRadius: "16px" }} >
+                    <h3 style={{ margin: "0" }}>Your payment status: </h3>
+                    <small>{paymentStatus}</small>
+                    <br />
+                    <br />
+
+                    <h5 style={{ margin: "0" }}> Amount:  </h5>
+                    <small>INR {Number(paymentDetails?.amount) / 100}</small>
+                    <br />
+                    <br />
+                    <h5 style={{ margin: "0" }}> UPI Transaction ID:  </h5>
+                    <small>{paymentDetails?.paymentInstrument?.upiTransactionId}</small>
+                    <br />
+                    <br />
+                    <h5 style={{ margin: "0" }}> Account No:  </h5>
+                    <small>{paymentDetails?.paymentInstrument?.maskedAccountNumber}</small>
+                    <br />
+                    <br />
+                    <h5 style={{ margin: "0" }}> Transaction ID:  </h5>
+                    <small>{paymentDetails?.transactionId}</small>
+                    <br />
+                    <br />
+                    <button onClick={handleOkayClick} type="button" className="btn btn-dark download-button">
+                        Go Back Home
+                    </button>
+                </div>
+
+            </div>
+
         </div>
     )
 }
