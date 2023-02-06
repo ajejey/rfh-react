@@ -4,6 +4,7 @@ import Home from './Components/Home';
 import Gallery from './Components/Gallery';
 import EventsMain from './Components/Events/EventsMain';
 import VolunteerForm from './Components/VolunteerForm';
+import PaymentRedirect from './Components/PaymentRedirect';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path='events/*' element={<EventsMain />} />
         <Route path='/gallery' element={<Gallery />} />
         <Route path='/volunteer-register' element={<VolunteerForm />} />
+        <Route path='/payment-redirect' element={<PaymentRedirect />} />
         {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
 
       </Routes>

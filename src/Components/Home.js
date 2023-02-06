@@ -54,38 +54,40 @@ function Home() {
             const data = await response.json();
             console.log("data.message", data, data.message);
             setPaymentStatus(data.message)
-            setPaymentLink(data?.data?.instrumentResponse?.intentUrl)
+            setPaymentLink(data?.data?.instrumentResponse?.redirectInfo?.url)
+            window.location.href = data?.data?.instrumentResponse?.redirectInfo?.url;
+            // navigate(data?.data?.instrumentResponse?.redirectInfo?.url)
         } catch (error) {
             console.error(error);
         }
 
     }
     console.log("paymentstatus ", paymentStatus)
+    console.log("payment Link ", paymentLink)
 
     const executeScroll = () => myRef.current.scrollIntoView()
 
-    useEffect(() => {
-        console.log("calling status api", paymentStatus)
-        // if (paymentStatus === 'Payment Initiated') {
-        const getPaymentStatus = async () => {
-            try {
-                const response = await fetch("https://rfh-backend.up.railway.app/app/payment-status", {
-                    // const response = await fetch("http://localhost:4000/app/payment-status", {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                });
-                const data = await response.json();
-                console.log("status data", data);
-                setPaymentStatus(data.code)
-            } catch (error) {
-                console.log(error)
-            }
-        }
-        getPaymentStatus()
-        // }
-    }, [paymentStatus])
+    // useEffect(() => {
+    //     console.log("calling status api", paymentStatus)
+    //     // if (paymentStatus === 'Payment Initiated') {
+    //     const getPaymentStatus = async () => {
+    //         try {
+    //             const response = await fetch("https://rfh-backend.up.railway.app/app/payment-status", {
+    //                 method: "GET",
+    //                 headers: {
+    //                     "Content-Type": "application/json",
+    //                 },
+    //             });
+    //             const data = await response.json();
+    //             console.log("status data", data);
+    //             setPaymentStatus(data.code)
+    //         } catch (error) {
+    //             console.log(error)
+    //         }
+    //     }
+    //     getPaymentStatus()
+    //     // }
+    // }, [paymentStatus])
 
     return (
         <div>
