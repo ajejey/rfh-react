@@ -65,25 +65,26 @@ function Home() {
     const executeScroll = () => myRef.current.scrollIntoView()
 
     useEffect(() => {
-        console.log("calling status api")
-        if (paymentStatus === 'Payment Initiated') {
-            const getPaymentStatus = async () => {
-                try {
-                    const response = await fetch("https://rfh-backend.up.railway.app/app/payment-status", {
-                        method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                    });
-                    const data = await response.json();
-                    console.log("status data", data);
-                    setPaymentStatus(data.code)
-                } catch (error) {
-                    console.log(error)
-                }
+        console.log("calling status api", paymentStatus)
+        // if (paymentStatus === 'Payment Initiated') {
+        const getPaymentStatus = async () => {
+            try {
+                const response = await fetch("https://rfh-backend.up.railway.app/app/payment-status", {
+                    // const response = await fetch("http://localhost:4000/app/payment-status", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+                const data = await response.json();
+                console.log("status data", data);
+                setPaymentStatus(data.code)
+            } catch (error) {
+                console.log(error)
             }
-            getPaymentStatus()
         }
+        getPaymentStatus()
+        // }
     }, [paymentStatus])
 
     return (
@@ -274,9 +275,9 @@ function Home() {
                             <div className="carousel-item active" style={{ padding: "100px 40px" }}>
                                 <div>
                                     <iframe width="320" height="300" src="https://www.youtube.com/embed/TZDn4-FeAHY"
-                                        title="YouTube video player" frameborder="0"
+                                        title="YouTube video player" frameBorder="0"
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                        allowfullscreen></iframe>
+                                        allowFullScreen></iframe>
                                 </div>
                             </div>
                             <div className="carousel-item">
