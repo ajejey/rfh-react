@@ -1,3 +1,4 @@
+import { Checkbox, FormControl, ListItemText, MenuItem, Select } from '@mui/material';
 import React, { useState } from 'react'
 import Dropzone from 'react-dropzone';
 import { useForm } from 'react-hook-form';
@@ -11,7 +12,44 @@ function VolunteerForm() {
     const [willPickUp, setWillPickUp] = useState("no")
     const [selectedCity, setSelectedCity] = useState("others")
     const [seeMore, setSeeMore] = useState(false)
+    const [personName, setPersonName] = useState([])
+    const [bloodDonor, setBloodDonor] = useState("no")
+    const [regularAmountDonor, setRegularAmountDonor] = useState("no")
 
+    const handleCityChange = (e) => {
+        setSelectedCity(e.target.value)
+        if (e.target.value !== "others") {
+            setValue("country", 'India')
+            if (e.target.value === "Bengaluru") {
+                setValue("state", "Karnataka")
+            }
+            if (e.target.value === "Hyderabad") {
+                setValue("state", "Telangana")
+            }
+            if (e.target.value === "Chennai") {
+                setValue("state", "Tamil Nadu")
+            }
+        } else {
+            setValue("country", "")
+            setValue("state", "")
+        }
+
+    }
+
+    const handleBloodDonor = (e) => {
+        setBloodDonor(e.target.value)
+        if (e.target.value === "no") {
+            setValue("bloodGroup", "")
+        }
+    }
+
+    const handleRegularAmountDonor = (e) => {
+        setRegularAmountDonor(e.target.value)
+        if (e.target.value === "no") {
+            setValue("donationAmount", "")
+        }
+
+    }
     const handleNeedTee = () => {
 
     }
@@ -80,7 +118,7 @@ function VolunteerForm() {
 
 
                     <div className="row">
-                        <div className="col-md-4">
+                        <div className="col-md-6">
                             <div className="form-group">
                                 <label htmlFor="gender">Gender <span style={{ color: "red" }}>*</span></label>
                                 <select {...register("gender", { required: true })} id="gender" className="form-select" aria-label="Default select example">
@@ -94,20 +132,14 @@ function VolunteerForm() {
                                 {errors.gender && <p style={{ color: "red" }}>This field is mandatory</p>}
                             </div>
                         </div>
-                        <div className="col-md-4">
+                        <div className="col-md-6">
                             <div className="form-group">
                                 <label htmlFor="date">Date of Birth <span style={{ color: "red" }}>*</span></label>
                                 <input {...register("dob", { required: true })} type="date" className="form-control" id="date" placeholder="date" />
                                 {errors.dob && <p style={{ color: "red" }}>This field is mandatory</p>}
                             </div>
                         </div>
-                        <div className="col-md-4">
-                            <div className="form-group">
-                                <label htmlFor="bloodGroup">Blood Group <span style={{ color: "red" }}>*</span></label>
-                                <input {...register("bloodGroup", { required: true })} type="text" className="form-control" id="bloodGroup" placeholder="Blood Group" />
-                                {errors.dob && <p style={{ color: "red" }}>This field is mandatory</p>}
-                            </div>
-                        </div>
+
 
                     </div>
 
@@ -123,7 +155,7 @@ function VolunteerForm() {
                             <div className="form-group">
                                 <label htmlFor="city">City <span style={{ color: "red" }}>*</span></label>
                                 {/* <input {...register("city", { required: true })} className="form-control" type="text" name="city" id="city" /> */}
-                                <select {...register("city", { required: true, onChange: (e) => handleNeedTee(e) })} id="city" className="form-select" aria-label="city select">
+                                <select {...register("city", { required: true, onChange: (e) => handleCityChange(e) })} id="city" className="form-select" aria-label="city select">
                                     <option value="">select</option>
                                     <option value="Bengaluru">Bengaluru</option>
                                     <option value="Hyderabad">Hyderabad</option>
@@ -182,26 +214,35 @@ function VolunteerForm() {
                             </div>
                         </div>
                     </div>
+                    <br />
                     <div className="row">
                         <div className="form-group">
                             <label htmlFor="supportAreas">What are the areas you would like to support? <span style={{ color: "red" }}>*</span></label>
-                            <select {...register("supportAreas", { required: true, onChange: (e) => handleNeedTee(e) })} id="supportAreas" className="form-select" aria-label="city select">
-                                <option value="">select</option>
-                                <option value="Organizing the Events">Organizing the Events</option>
-                                <option value="Promotion activities">Promotion activities</option>
-                                <option value="Content creation">Content creation</option>
-                                <option value="Image designing">Image designing.</option>
-                                <option value="Maintaining the expenses of the Event and perform Auditing">Maintaining the expenses of the Event and perform Auditing.</option>
-                                <option value="Find sponsors">Find sponsors</option>
-                                <option value="Collaboration with CSR groups/other groups">Collaboration with CSR groups/other groups.</option>
-                                <option value="Ready to perform field work for the event">Ready to perform field work for the event.</option>
-                                <option value="Find the needy people with all required background information">Find the needy people with all required background information.</option>
-                                <option value="Be a part of event and take any responsibility">Be a part of event and take any responsibility</option>
+                            <br />
+                            <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Organizing the Events" id="newsletter" /> Organizing the Events.
+                            <br />
+                            <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Promotion activities" id="newsletter" /> Promotion activities.
+                            <br />
+                            <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Content creation" id="newsletter" /> Content creation.
+                            <br />
+                            <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Image designing" id="newsletter" /> Image designing.
+                            <br />
+                            <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Maintaining the expenses of the Event and perform Auditing" id="newsletter" /> Maintaining the expenses of the Event and perform Auditing.
+                            <br />
+                            <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Find sponsors" id="newsletter" /> Find sponsors.
+                            <br />
+                            <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Collaboration with CSR groups/other groups" id="newsletter" /> Collaboration with CSR groups/other groups.
+                            <br />
+                            <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Ready to perform field work for the event" id="newsletter" /> Ready to perform field work for the event.
+                            <br />
+                            <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Find the needy people with all required background information" id="newsletter" /> Find the needy people with all required background information.
+                            <br />
+                            <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Be a part of event and take any responsibility" id="newsletter" /> Be a part of event and take any responsibility.
 
-                            </select>
                             {errors.supportAreas && <p style={{ color: "red" }}>This field is mandatory</p>}
                         </div>
                     </div>
+                    <br />
                     <div className="row">
                         <div className="col-md-6">
                             <div className="form-group">
@@ -235,8 +276,8 @@ function VolunteerForm() {
                     <div className="row">
                         <div className="col-md-6">
                             <div className="form-group">
-                                <label htmlFor="bloodDonor">What is your current occupation?<span style={{ color: "red" }}>*</span></label>
-                                <select {...register("bloodDonor", { required: true, onChange: (e) => handleNeedTee(e) })} id="bloodDonor" className="form-select" aria-label="city select">
+                                <label htmlFor="bloodDonor">Would you like to sign-up as Blood donor?<span style={{ color: "red" }}>*</span></label>
+                                <select {...register("bloodDonor", { required: true, onChange: (e) => handleBloodDonor(e) })} id="bloodDonor" className="form-select" aria-label="city select">
                                     <option value="">select</option>
                                     <option value="yes">yes</option>
                                     <option value="no">no</option>
@@ -246,8 +287,8 @@ function VolunteerForm() {
                         </div>
                         <div className="col-md-6">
                             <div className="form-group">
-                                <label htmlFor="bloodGroup">If above selection is yes, please share your Blood group? <span style={{ color: "red" }}>*</span></label>
-                                <input {...register("bloodGroup", { required: true })} type="text" className="form-control" id="bloodGroup" placeholder="Blood Group" />
+                                <label htmlFor="bloodGroup">If above selection is yes, please share your Blood group? {bloodDonor === "yes" ? <span style={{ color: "red" }}>*</span> : <span> </span>} </label>
+                                <input disabled={bloodDonor === "no" ? true : false} {...register("bloodGroup", { required: bloodDonor === "no" ? false : true })} type="text" className="form-control" id="bloodGroup" placeholder="Blood Group" />
                                 {errors.bloodGroup && <p style={{ color: "red" }}>This field is mandatory</p>}
                             </div>
                         </div>
@@ -255,19 +296,19 @@ function VolunteerForm() {
                     <div className="row">
                         <div className="col-md-6">
                             <div className="form-group">
-                                <label htmlFor="regularDonor">Would you like to donate small amount to RFH every month/year?<span style={{ color: "red" }}>*</span></label>
-                                <select {...register("regularDonor", { required: true, onChange: (e) => handleNeedTee(e) })} id="regularDonor" className="form-select" aria-label="city select">
+                                <label htmlFor="regularAmountDonor">Would you like to donate small amount to RFH every month/year?<span style={{ color: "red" }}>*</span></label>
+                                <select {...register("regularAmountDonor", { required: true, onChange: (e) => handleRegularAmountDonor(e) })} id="regularAmountDonor" className="form-select" aria-label="city select">
                                     <option value="">select</option>
                                     <option value="yes">yes</option>
                                     <option value="no">no</option>
                                 </select>
-                                {errors.regularDonor && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                {errors.regularAmountDonor && <p style={{ color: "red" }}>This field is mandatory</p>}
                             </div>
                         </div>
                         <div className="col-md-6">
                             <div className="form-group">
-                                <label htmlFor="donationAmount">If above selection is yes, what is the amount you would like to sign up for?<span style={{ color: "red" }}>*</span></label>
-                                <input {...register("donationAmount", { required: true })} type="text" className="form-control" id="donationAmount" />
+                                <label htmlFor="donationAmount">If above selection is yes, what is the amount you would like to sign up for? {regularAmountDonor === "yes" ? <span style={{ color: "red" }}>*</span> : <span> </span>} </label>
+                                <input disabled={regularAmountDonor === "no" ? true : false} {...register("donationAmount", { required: regularAmountDonor === 'yes' ? true : false })} type="text" className="form-control" id="donationAmount" />
                                 {errors.donationAmount && <p style={{ color: "red" }}>This field is mandatory</p>}
                             </div>
                         </div>
@@ -293,8 +334,9 @@ function VolunteerForm() {
                     <div className="row">
                         <div className="col-md-12">
                             <div className="form-group">
-                                <label htmlFor="volunteeredForNGOorCSR">Have you volunteered before for any NGO or CSR activity.? (If yes, please share details (mention your roles and responsibilities, what you did, where
-                                    you did))  <span style={{ color: "red" }}>*</span> </label>
+                                <label htmlFor="volunteeredForNGOorCSR">Have you volunteered before for any NGO or CSR activity?   <span style={{ color: "red" }}>*</span> </label> <br />
+                                <small>If yes, please share details. Mention your roles and responsibilities, what you did, where
+                                    you did</small>
                                 <textarea {...register("volunteeredForNGOorCSR", { required: willPickUp === "yes" ? false : true })} className="form-control" id="volunteeredForNGOorCSR" rows="3" />
                                 {errors.volunteeredForNGOorCSR && <p style={{ color: "red" }}>This field is mandatory</p>}
                             </div>
@@ -303,8 +345,8 @@ function VolunteerForm() {
                     <div className="row">
                         <div className="col-md-6">
                             <div className="form-group">
-                                <label htmlFor="tee-size">T-Shirt Size {needTee === "no" ? <span></span> : <span style={{ color: "red" }}>*</span>}</label>
-                                <select disabled={needTee === "no"} {...register("TshirtSize", { required: needTee === "no" ? false : true })} id="tee-size" className="form-select" aria-label="T-Shirt Size">
+                                <label htmlFor="tee-size">T-Shirt Size  <span style={{ color: "red" }}>*</span></label>
+                                <select {...register("TshirtSize", { required: true })} id="tee-size" className="form-select" aria-label="T-Shirt Size">
                                     <option value="">select</option>
                                     <option value="XSmall">X-Small</option>
                                     <option value="Small">Small</option>
