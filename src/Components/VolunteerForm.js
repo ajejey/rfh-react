@@ -64,7 +64,7 @@ function VolunteerForm() {
             <Header />
             <div className="container-md volunteer-form">
                 <form onSubmit={handleSubmit(onSubmit)}>
-                    <h2>Registration Form</h2>
+                    <h2>Volunteering Registration Form</h2>
 
                     {/* <div className="row">
                         <div className="col-md-6">
@@ -145,16 +145,15 @@ function VolunteerForm() {
 
                     <div className="row">
                         <div className="form-group">
-                            <label htmlFor="address">Your Current Location {willPickUp === "no" ? <span style={{ color: "red" }}>*</span> : <span></span>} </label>
-                            <textarea placeholder={willPickUp === "yes" ? "Adress not needed if picking up T-shirt by yourself" : ""} disabled={willPickUp === "yes"} {...register("address", { required: willPickUp === "yes" ? false : true })} className="form-control" id="address" rows="3" />
+                            <label htmlFor="address">Residing City <span style={{ color: "red" }}>*</span> </label>
+                            <textarea {...register("address", { required: true })} className="form-control" id="address" rows="3" />
                             {errors.address && <p style={{ color: "red" }}>This field is mandatory</p>}
                         </div>
                     </div>
-                    <div className="row">
+                    {/* <div className="row">
                         <div className="col-md-4">
                             <div className="form-group">
                                 <label htmlFor="city">City <span style={{ color: "red" }}>*</span></label>
-                                {/* <input {...register("city", { required: true })} className="form-control" type="text" name="city" id="city" /> */}
                                 <select {...register("city", { required: true, onChange: (e) => handleCityChange(e) })} id="city" className="form-select" aria-label="city select">
                                     <option value="">select</option>
                                     <option value="Bengaluru">Bengaluru</option>
@@ -176,7 +175,7 @@ function VolunteerForm() {
                         }
 
 
-                    </div>
+                    </div> */}
 
                     <div className="row">
                         <div className="col-md-4">
@@ -203,14 +202,14 @@ function VolunteerForm() {
                     <div className="row">
                         <div className="col-md-6">
                             <div className="form-group">
-                                <label htmlFor="volunteerCatagory">What Catagory do you belong to? <span style={{ color: "red" }}>*</span></label>
-                                <select {...register("volunteerCatagory", { required: true, onChange: (e) => handleNeedTee(e) })} id="volunteerCatagory" className="form-select" aria-label="city select">
+                                <label htmlFor="volunteerCategory">What category do you belong to? <span style={{ color: "red" }}>*</span></label>
+                                <select {...register("volunteerCategory", { required: true, onChange: (e) => handleNeedTee(e) })} id="volunteerCategory" className="form-select" aria-label="city select">
                                     <option value="">select</option>
                                     <option value="Support remotely in all possibilities">Support remotely in all possibilities</option>
-                                    <option value="Attend and organize events in Bengaluru and other cities.">Support remotely in all possibilities</option>
+                                    <option value="Attend and organize events in Bengaluru and other cities.">Attend and organize events in Bengaluru and other cities</option>
 
                                 </select>
-                                {errors.volunteerCatagory && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                {errors.volunteerCategory && <p style={{ color: "red" }}>This field is mandatory</p>}
                             </div>
                         </div>
                     </div>
@@ -252,8 +251,8 @@ function VolunteerForm() {
                                     <option value="2-5 hours a week">2-5 hours a week</option>
                                     <option value="5-8 hours a week">5-8 hours a week</option>
                                     <option value="8-12 hours a week">8-12 hours a week</option>
-                                    <option value="12-20 hours a week">12-20 hours a week.</option>
-                                    <option value="20 hours a week">20 hours a week.</option>
+                                    <option value="12-20 hours a week">12-20 hours a week</option>
+                                    <option value="20 hours a week">More than 20 hours a week</option>
                                     <option value="Anytime requested by RFH">Anytime requested by RFH</option>
                                 </select>
                                 {errors.dedicationTime && <p style={{ color: "red" }}>This field is mandatory</p>}
@@ -267,7 +266,7 @@ function VolunteerForm() {
                                     <option value="Studying">Studying</option>
                                     <option value="Housemaker">Housemaker</option>
                                     <option value="Working Professional">Working Professional</option>
-                                    <option value="Others">Others.</option>
+                                    <option value="Others">Others</option>
                                 </select>
                                 {errors.currentOccupation && <p style={{ color: "red" }}>This field is mandatory</p>}
                             </div>
@@ -294,10 +293,10 @@ function VolunteerForm() {
                         </div>
                     </div>
                     <div className="row">
-                        <div className="col-md-6">
+                        <div className="col-md-12">
                             <div className="form-group">
                                 <label htmlFor="regularAmountDonor">Would you like to donate small amount to RFH every month/year?<span style={{ color: "red" }}>*</span></label>
-                                <select {...register("regularAmountDonor", { required: true, onChange: (e) => handleRegularAmountDonor(e) })} id="regularAmountDonor" className="form-select" aria-label="city select">
+                                <select {...register("regularAmountDonor", { required: true, onChange: (e) => handleRegularAmountDonor(e) })} id="regularAmountDonor" className="form-select" aria-label="regular amount donor select">
                                     <option value="">select</option>
                                     <option value="yes">yes</option>
                                     <option value="no">no</option>
@@ -305,14 +304,33 @@ function VolunteerForm() {
                                 {errors.regularAmountDonor && <p style={{ color: "red" }}>This field is mandatory</p>}
                             </div>
                         </div>
-                        <div className="col-md-6">
-                            <div className="form-group">
-                                <label htmlFor="donationAmount">If above selection is yes, what is the amount you would like to sign up for? {regularAmountDonor === "yes" ? <span style={{ color: "red" }}>*</span> : <span> </span>} </label>
-                                <input disabled={regularAmountDonor === "no" ? true : false} {...register("donationAmount", { required: regularAmountDonor === 'yes' ? true : false })} type="text" className="form-control" id="donationAmount" />
-                                {errors.donationAmount && <p style={{ color: "red" }}>This field is mandatory</p>}
+                    </div>
+                    <div className="row">
+                        <div className="col-md-12">
+                            <div className="row">
+                                <div className="col-sm-9">
+                                    <div className="form-group">
+                                        <label htmlFor="donationAmount">If above selection is yes, what is the amount you would like to sign up for? {regularAmountDonor === "yes" ? <span style={{ color: "red" }}>*</span> : <span> </span>} </label>
+                                        <input disabled={regularAmountDonor === "no" ? true : false} {...register("donationAmount", { required: regularAmountDonor === 'yes' ? true : false })} type="text" className="form-control" id="donationAmount" />
+                                        {errors.donationAmount && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                    </div>
+                                </div>
+                                <div className="col-sm-3">
+                                    <div className="form-group">
+                                        <label htmlFor="donationFrequency">Frequency of Donation {regularAmountDonor === "yes" ? <span style={{ color: "red" }}>*</span> : <span> </span>} </label>
+                                        <select disabled={regularAmountDonor === "no" ? true : false} {...register("donationFrequency", { required: regularAmountDonor === 'yes' ? true : false })} id="donationFrequency" className="form-select" aria-label="donation frequency select">
+                                            <option value="">select</option>
+                                            <option value="yes">per month</option>
+                                            <option value="no">per year</option>
+                                        </select>
+                                        {errors.donationFrequency && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
+
+
                     <div className="row">
                         <div className="col-md-12">
                             <div className="form-group">
