@@ -96,7 +96,7 @@ function PaymentRedirect() {
                             {loading ?
                                 <span class="placeholder col-12"></span>
                                 :
-                                <small> {status?.data?.data?.amount && `INR ${(Number(status?.data?.data?.amount)) / 1000}`}</small>
+                                <small> {status?.data?.data?.amount && `INR ${(Number(status?.data?.data?.amount)) / 100}`}</small>
                             }
                             {console.log(status?.data?.data.paymentInstrument)}
                             <br />
