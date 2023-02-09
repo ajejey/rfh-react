@@ -6,15 +6,25 @@ import reportWebVitals from './reportWebVitals';
 // import { HashRouter as Router } from "react-router-dom";
 import { BrowserRouter } from "react-router-dom";
 import { hydrate, render } from "react-dom";
+import { GlobalProvider } from './context/Provider';
 
 const rootElement = document.getElementById("root");
 if (rootElement.hasChildNodes()) {
   hydrate(
-    <BrowserRouter><App /></BrowserRouter>
-
+    <GlobalProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </GlobalProvider>
     , rootElement);
 } else {
-  render(<BrowserRouter><App /></BrowserRouter>, rootElement);
+  render(
+    <GlobalProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </GlobalProvider>
+    , rootElement);
 }
 
 // const root = ReactDOM.createRoot(document.getElementById('root'));

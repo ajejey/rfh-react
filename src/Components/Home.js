@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import Header from './Header'
 import cheque1 from '../assets/images/cheque1.webp'
 import cheque4 from '../assets/images/cheque4.webp'
@@ -18,14 +18,27 @@ import VisibilitySensor from 'react-visibility-sensor';
 import { Dialog, Button, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
+import { GlobalContext } from '../context/Provider'
 
 function Home() {
     const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
     const myRef = useRef(null)
     const navigate = useNavigate()
+    const { transaction, setTransaction } = useContext(GlobalContext)
     const [open, setOpen] = React.useState(false);
     const [paymentStatus, setPaymentStatus] = useState("")
     const [paymentLink, setPaymentLink] = useState("")
+
+    function generateTransactionId() {
+        let id = "RFH";
+        let characters = "0123456789";
+
+        for (let i = 0; i < 14; i++) {
+            id += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+
+        return id;
+    }
 
     const handleDonateClick = () => {
         setOpen(true);
@@ -41,15 +54,23 @@ function Home() {
 
     const onSubmit = async (formData) => {
         console.log("donate data ", formData)
+        // setValue("merchantTransactionId", generateTransactionId())
         // setOpen(false);
+        let formDataCopy = JSON.parse(JSON.stringify(formData))
+        formDataCopy = { ...formDataCopy, merchantTransactionId: generateTransactionId() }
+
+        // favDispatch({ type: "SET_TRANSACTION_ID", payload: formDataCopy })
+        setTransaction({ ...formDataCopy })
+        localStorage.setItem('transactionID', formDataCopy.merchantTransactionId);
 
         try {
+            // const response = await fetch("https://rfh-backend.up.railway.app/api/initiate-payment", {
             const response = await fetch("https://rfh-backend.up.railway.app/api/initiate-payment", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(formDataCopy),
             });
             const data = await response.json();
             console.log("data.message", data, data.message);
