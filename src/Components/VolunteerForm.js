@@ -54,8 +54,22 @@ function VolunteerForm() {
 
     }
 
-    const onSubmit = (data) => {
-        console.log(data);
+    const onSubmit = async (formData) => {
+        console.log(formData);
+        try {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/volunteer-form-submit`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+            });
+            const data = await response.json();
+            console.log("data.message", data, data.message);
+
+        } catch (error) {
+            console.error(error);
+        }
 
     }
 
@@ -334,28 +348,27 @@ function VolunteerForm() {
                     <div className="row">
                         <div className="col-md-12">
                             <div className="form-group">
-                                <label htmlFor="volunteeringReason">Why do you wish to be a volunteer?  <span style={{ color: "red" }}>*</span> </label>
-                                <textarea {...register("volunteeringReason", { required: willPickUp === "yes" ? false : true })} className="form-control" id="volunteeringReason" rows="3" />
-                                {errors.volunteeringReason && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                <label htmlFor="volunteeringReason">Why do you wish to be a volunteer?  </label>
+                                <textarea {...register("volunteeringReason", { required: false })} className="form-control" id="volunteeringReason" rows="3" />
                             </div>
                         </div>
                     </div>
                     <div className="row">
                         <div className="col-md-12">
                             <div className="form-group">
-                                <label htmlFor="aquisitionSource">How did you come to know about RFH ?  <span style={{ color: "red" }}>*</span> </label>
-                                <textarea {...register("aquisitionSource", { required: willPickUp === "yes" ? false : true })} className="form-control" id="aquisitionSource" rows="3" />
-                                {errors.aquisitionSource && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                <label htmlFor="aquisitionSource">How did you come to know about RFH ?  </label>
+                                <textarea {...register("aquisitionSource", { required: false })} className="form-control" id="aquisitionSource" rows="3" />
+
                             </div>
                         </div>
                     </div>
                     <div className="row">
                         <div className="col-md-12">
                             <div className="form-group">
-                                <label htmlFor="volunteeredForNGOorCSR">Have you volunteered before for any NGO or CSR activity?   <span style={{ color: "red" }}>*</span> </label> <br />
+                                <label htmlFor="volunteeredForNGOorCSR">Have you volunteered before for any NGO or CSR activity?    </label> <br />
                                 <small>If yes, please share details. Mention your roles and responsibilities, what you did, where
                                     you did</small>
-                                <textarea {...register("volunteeredForNGOorCSR", { required: willPickUp === "yes" ? false : true })} className="form-control" id="volunteeredForNGOorCSR" rows="3" />
+                                <textarea {...register("volunteeredForNGOorCSR", { required: false })} className="form-control" id="volunteeredForNGOorCSR" rows="3" />
                                 {errors.volunteeredForNGOorCSR && <p style={{ color: "red" }}>This field is mandatory</p>}
                             </div>
                         </div>
@@ -378,9 +391,8 @@ function VolunteerForm() {
                         </div>
                     </div>
                     <br />
-                    <hr />
-                    <br />
-                    <div className="row">
+
+                    {/* <div className="row">
                         <div className="col-md-12">
                             <div className="form-group">
                                 <label htmlFor="inputFile">Please upload an ID proof (Aadhar Card or Pan Card)<span style={{ color: "red" }}>*</span></label>
@@ -396,30 +408,17 @@ function VolunteerForm() {
                                 </Dropzone>
                             </div>
                         </div>
-                    </div>
-                    <br />
+                    </div> */}
+
                     <hr />
                     <br />
                     <h2>By Signing Up: </h2>
-                    {/* <div className="form-group">
-                        <textarea
-                            defaultValue="You promise and commit your time to “Rupee For Humanity” for next 1 year. 
-                            You will not mis-use the organization name for any of the personal benefits.
-                            Respect every individual during the event and maintain the decorum of the group.
-                            Every volunteer would get authorized certificate, T-shirt, momentous etc. based on the contribution
-                            towards society."
-                            className="form-control"
-                            style={{ fontSize: "0.8rem" }}
-                            id="address"
-                            rows="6"
-                            readOnly />
-                    </div> */}
                     <br />
                     <p style={{ fontWeight: "700" }}>
                         You promise and commit your time to “Rupee For Humanity” for next 1 year.
                         You will not mis-use the organization name for any of the personal benefits.
                         Respect every individual during the event and maintain the decorum of the group.
-                        Every volunteer would get authorized certificate, T-shirt, momentous etc. based on the contribution
+                        Every volunteer would get authorized certificate, T-shirt, momentous and many more, based on the contribution
                         towards society.
                     </p>
 

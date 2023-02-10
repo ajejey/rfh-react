@@ -36,7 +36,7 @@ function PaymentRedirect() {
             let transactionID = localStorage.getItem('transactionID')
             let body = { merchantTransactionId: transactionID }
             try {
-                const res = await fetch('https://rfh-backend.up.railway.app/app/payment-status', {
+                const res = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/app/payment-status`, {
                     method: 'POST',
                     headers: {
                         "Content-Type": "application/json",
@@ -76,7 +76,7 @@ function PaymentRedirect() {
 
     return (
         <div>
-            <div style={{ height: "100vh", display: "flex", justifyContent: "center", alignItems: 'center', }}>
+            <div style={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: 'center', }}>
                 <div style={{ padding: "3%", boxShadow: "4px 8px 29px -10px rgba(0,0,0,0.75)", borderRadius: "16px" }} >
                     <img src={logo} className="brand-img" alt="RFH Logo" />
                     <br />

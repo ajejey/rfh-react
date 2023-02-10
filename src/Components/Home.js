@@ -65,7 +65,7 @@ function Home() {
 
         try {
             // const response = await fetch("https://rfh-backend.up.railway.app/api/initiate-payment", {
-            const response = await fetch("https://rfh-backend.up.railway.app/api/initiate-payment", {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/initiate-payment`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
