@@ -2,39 +2,19 @@ import { Checkbox, FormControl, ListItemText, MenuItem, Select } from '@mui/mate
 import React, { useState } from 'react'
 import Dropzone from 'react-dropzone';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 import Header from './Header'
 
 function VolunteerForm() {
     const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
+    const navigate = useNavigate()
     const [submitted, setSubmitted] = useState(false)
-    const [totalPrice, setTotalPrice] = useState(0)
-    const [needTee, setNeedTee] = useState("no")
-    const [willPickUp, setWillPickUp] = useState("no")
-    const [selectedCity, setSelectedCity] = useState("others")
-    const [seeMore, setSeeMore] = useState(false)
-    const [personName, setPersonName] = useState([])
+    const [formValues, setFormValues] = useState({})
     const [bloodDonor, setBloodDonor] = useState("no")
     const [regularAmountDonor, setRegularAmountDonor] = useState("no")
-
-    const handleCityChange = (e) => {
-        setSelectedCity(e.target.value)
-        if (e.target.value !== "others") {
-            setValue("country", 'India')
-            if (e.target.value === "Bengaluru") {
-                setValue("state", "Karnataka")
-            }
-            if (e.target.value === "Hyderabad") {
-                setValue("state", "Telangana")
-            }
-            if (e.target.value === "Chennai") {
-                setValue("state", "Tamil Nadu")
-            }
-        } else {
-            setValue("country", "")
-            setValue("state", "")
-        }
-
-    }
+    const [loading, setLoading] = useState(false)
+    const [dataSavedInDB, setDataSavedInDB] = useState(false)
+    const [dbMessage, setDbMessage] = useState("")
 
     const handleBloodDonor = (e) => {
         setBloodDonor(e.target.value)
@@ -50,121 +30,103 @@ function VolunteerForm() {
         }
 
     }
-    const handleNeedTee = () => {
+
+    const handleEditClick = () => {
+        setSubmitted(!submitted)
+    }
+
+    const handleHomeClick = () => {
+        navigate('/')
+    }
+    // const handleNeedTee = () => {
+
+    // }
+
+    const onSubmit = async (formData, submitted) => {
+        formData.email = formData.email.trim();
+        formData.mobNo = formData.mobNo.trim();
+        console.log(formData);
+        setFormValues(formData)
+        setSubmitted(true)
+
 
     }
 
-    const onSubmit = async (formData) => {
-        console.log(formData);
+    const handleFinalSubmit = async () => {
+        console.log("formValues ", formValues)
+        setLoading(true)
         try {
             const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/volunteer-form-submit`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(formValues),
             });
             const data = await response.json();
             console.log("data.message", data, data.message);
+            setDbMessage(data.message)
+            setLoading(false)
+            setDataSavedInDB(true)
+
 
         } catch (error) {
             console.error(error);
+            setDbMessage(error.message)
         }
-
     }
 
     return (
         <div className='volunteer-container'>
             <Header />
-            <div className="container-md volunteer-form">
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <h2>Volunteering Registration Form</h2>
-
-                    {/* <div className="row">
-                        <div className="col-md-6">
-                            <div className="form-group">
-                                <label htmlFor="need-tee">Do you want to opt for T-Shirt?  <span style={{ color: "red" }}>*</span>
-                                </label>
-                                <select {...register("needTShirt", { required: true, onChange: (e) => handleNeedTee(e) })} id="need-tee" className="form-select"
-                                    aria-label="do you want to opt for T-Shirt">
-                                    <option value="">select</option>
-                                    <option value="yes">Yes</option>
-                                    <option value="no">No</option>
-                                </select>
-                                {errors.needTShirt && <p style={{ color: "red" }}>This field is mandatory</p>}
-                            </div>
-                        </div>
-                        <div className="col-md-6">
-                            <div className="form-group">
-                                <label htmlFor="tee-size">T-Shirt Size {needTee === "no" ? <span></span> : <span style={{ color: "red" }}>*</span>}</label>
-                                <select disabled={needTee === "no"} {...register("TshirtSize", { required: needTee === "no" ? false : true })} id="tee-size" className="form-select" aria-label="T-Shirt Size">
-                                    <option value="">select</option>
-                                    <option value="XSmall">X-Small</option>
-                                    <option value="Small">Small</option>
-                                    <option value="Medium">Medium</option>
-                                    <option value="Large">Large</option>
-                                    <option value="X-Large">X-Large</option>
-                                    <option value="XX-Large">XX-Large</option>
-                                </select>
-                                {errors.TshirtSize && <p style={{ color: "red" }}>This field is mandatory</p>}
-                            </div>
-                        </div>
-                    </div> */}
-
-                    <div className="row">
-                        <div className="col-md-12">
-                            <div className="form-group">
-                                <label htmlFor="fullName">Full Name <span style={{ color: "red" }}>*</span></label>
-                                <input {...register("fullName", { required: true })} type="text" className="form-control" placeholder="" id="fullName" />
-                                {errors.fullName && <p style={{ color: "red" }}>This field is mandatory</p>}
+            {submitted === false ?
+                <div className="container-md volunteer-form">
+                    <form onSubmit={handleSubmit((formData) => onSubmit(formData, false))}>
+                        <h2>Volunteering Registration Form</h2>
+                        <div className="row">
+                            <div className="col-md-12">
+                                <div className="form-group">
+                                    <label htmlFor="fullName">Full Name <span style={{ color: "red" }}>*</span></label>
+                                    <input {...register("fullName", { required: true })} type="text" className="form-control" placeholder="" id="fullName" />
+                                    {errors.fullName && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                </div>
                             </div>
                         </div>
 
-                        {/* <div className="col-md-6">
-                                            <div className="form-group">
-                                                <label htmlFor="last">Last Name <span style={{ color: "red" }}>*</span></label>
-                                                <input {...register("lastName", { required: true })} type="text" className="form-control" placeholder="" id="last" />
-                                                {errors.lastName && <p style={{ color: "red" }}>This field is mandatory</p>}
-                                            </div>
-                                        </div> */}
+                        <div className="row">
+                            <div className="col-md-6">
+                                <div className="form-group">
+                                    <label htmlFor="gender">Gender <span style={{ color: "red" }}>*</span></label>
+                                    <select {...register("gender", { required: true })} id="gender" className="form-select" aria-label="Gender Select">
+                                        <option value="">select</option>
+                                        <option value="female">Female</option>
+                                        <option value="male">Male</option>
+                                        <option value="transGender">Transgender</option>
+                                        <option value="nonBinary">Non-binary/non-conforming</option>
+                                        <option value="noResponse">Prefer not to respond</option>
+                                    </select>
+                                    {errors.gender && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                </div>
+                            </div>
+                            <div className="col-md-6">
+                                <div className="form-group">
+                                    <label htmlFor="date">Date of Birth <span style={{ color: "red" }}>*</span></label>
+                                    <input {...register("dob", { required: true })} type="date" className="form-control" id="date" placeholder="date" />
+                                    {errors.dob && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                </div>
+                            </div>
 
-                    </div>
 
+                        </div>
 
-                    <div className="row">
-                        <div className="col-md-6">
+                        <div className="row">
                             <div className="form-group">
-                                <label htmlFor="gender">Gender <span style={{ color: "red" }}>*</span></label>
-                                <select {...register("gender", { required: true })} id="gender" className="form-select" aria-label="Default select example">
-                                    <option value="">select</option>
-                                    <option value="female">Female</option>
-                                    <option value="male">Male</option>
-                                    <option value="transGender">Transgender</option>
-                                    <option value="nonBinary">Non-binary/non-conforming</option>
-                                    <option value="noResponse">Prefer not to respond</option>
-                                </select>
-                                {errors.gender && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                <label htmlFor="address">Residing City <span style={{ color: "red" }}>*</span> </label>
+                                <textarea {...register("address", { required: true })} className="form-control" id="address" rows="3" />
+                                {errors.address && <p style={{ color: "red" }}>This field is mandatory</p>}
                             </div>
                         </div>
-                        <div className="col-md-6">
-                            <div className="form-group">
-                                <label htmlFor="date">Date of Birth <span style={{ color: "red" }}>*</span></label>
-                                <input {...register("dob", { required: true })} type="date" className="form-control" id="date" placeholder="date" />
-                                {errors.dob && <p style={{ color: "red" }}>This field is mandatory</p>}
-                            </div>
-                        </div>
-
-
-                    </div>
-
-                    <div className="row">
-                        <div className="form-group">
-                            <label htmlFor="address">Residing City <span style={{ color: "red" }}>*</span> </label>
-                            <textarea {...register("address", { required: true })} className="form-control" id="address" rows="3" />
-                            {errors.address && <p style={{ color: "red" }}>This field is mandatory</p>}
-                        </div>
-                    </div>
-                    {/* <div className="row">
+                        {/* <div className="row">
                         <div className="col-md-4">
                             <div className="form-group">
                                 <label htmlFor="city">City <span style={{ color: "red" }}>*</span></label>
@@ -191,208 +153,208 @@ function VolunteerForm() {
 
                     </div> */}
 
-                    <div className="row">
-                        <div className="col-md-4">
-                            <div className="form-group">
-                                <label htmlFor="mobile">Mobile No. <span style={{ color: "red" }}>*</span></label>
-                                <input {...register("mobNo", { required: true })} className="form-control" type="tel" id="mobile" />
-                                {errors.mobNo && <p style={{ color: "red" }}>This field is mandatory</p>}
-                            </div>
-                        </div>
-                        <div className="col-md-4">
-                            <div className="form-group">
-                                <label htmlFor="email">Email <span style={{ color: "red" }}>*</span></label>
-                                <input {...register("email", { required: true })} className="form-control" type="email" name="email" id="email" />
-                                {errors.email && <p style={{ color: "red" }}>This field is mandatory</p>}
-                            </div>
-                        </div>
-                    </div>
-                    <br />
-                    <hr />
-                    <br />
-
-                    {/* <h2 className="form-header">Other information</h2> */}
-
-                    <div className="row">
-                        <div className="col-md-6">
-                            <div className="form-group">
-                                <label htmlFor="volunteerCategory">What category do you belong to? <span style={{ color: "red" }}>*</span></label>
-                                <select {...register("volunteerCategory", { required: true, onChange: (e) => handleNeedTee(e) })} id="volunteerCategory" className="form-select" aria-label="city select">
-                                    <option value="">select</option>
-                                    <option value="Support remotely in all possibilities">Support remotely in all possibilities</option>
-                                    <option value="Attend and organize events in Bengaluru and other cities.">Attend and organize events in Bengaluru and other cities</option>
-
-                                </select>
-                                {errors.volunteerCategory && <p style={{ color: "red" }}>This field is mandatory</p>}
-                            </div>
-                        </div>
-                    </div>
-                    <br />
-                    <div className="row">
-                        <div className="form-group">
-                            <label htmlFor="supportAreas">What are the areas you would like to support? <span style={{ color: "red" }}>*</span></label>
-                            <br />
-                            <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Organizing the Events" id="newsletter" /> Organizing the Events.
-                            <br />
-                            <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Promotion activities" id="newsletter" /> Promotion activities.
-                            <br />
-                            <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Content creation" id="newsletter" /> Content creation.
-                            <br />
-                            <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Image designing" id="newsletter" /> Image designing.
-                            <br />
-                            <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Maintaining the expenses of the Event and perform Auditing" id="newsletter" /> Maintaining the expenses of the Event and perform Auditing.
-                            <br />
-                            <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Find sponsors" id="newsletter" /> Find sponsors.
-                            <br />
-                            <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Collaboration with CSR groups/other groups" id="newsletter" /> Collaboration with CSR groups/other groups.
-                            <br />
-                            <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Ready to perform field work for the event" id="newsletter" /> Ready to perform field work for the event.
-                            <br />
-                            <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Find the needy people with all required background information" id="newsletter" /> Find the needy people with all required background information.
-                            <br />
-                            <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Be a part of event and take any responsibility" id="newsletter" /> Be a part of event and take any responsibility.
-
-                            {errors.supportAreas && <p style={{ color: "red" }}>This field is mandatory</p>}
-                        </div>
-                    </div>
-                    <br />
-                    <div className="row">
-                        <div className="col-md-6">
-                            <div className="form-group">
-                                <label htmlFor="dedicationTime">On an average, how much time can you dedicate for RFH in a year? <span style={{ color: "red" }}>*</span></label>
-                                <select {...register("dedicationTime", { required: true, onChange: (e) => handleNeedTee(e) })} id="dedicationTime" className="form-select" aria-label="city select">
-                                    <option value="">select</option>
-                                    <option value="2-5 hours a week">2-5 hours a week</option>
-                                    <option value="5-8 hours a week">5-8 hours a week</option>
-                                    <option value="8-12 hours a week">8-12 hours a week</option>
-                                    <option value="12-20 hours a week">12-20 hours a week</option>
-                                    <option value="20 hours a week">More than 20 hours a week</option>
-                                    <option value="Anytime requested by RFH">Anytime requested by RFH</option>
-                                </select>
-                                {errors.dedicationTime && <p style={{ color: "red" }}>This field is mandatory</p>}
-                            </div>
-                        </div>
-                        <div className="col-md-6">
-                            <div className="form-group">
-                                <label htmlFor="currentOccupation">What is your current occupation?<span style={{ color: "red" }}>*</span></label>
-                                <select {...register("currentOccupation", { required: true, onChange: (e) => handleNeedTee(e) })} id="currentOccupation" className="form-select" aria-label="city select">
-                                    <option value="">select</option>
-                                    <option value="Studying">Studying</option>
-                                    <option value="Housemaker">Housemaker</option>
-                                    <option value="Working Professional">Working Professional</option>
-                                    <option value="Others">Others</option>
-                                </select>
-                                {errors.currentOccupation && <p style={{ color: "red" }}>This field is mandatory</p>}
-                            </div>
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-md-6">
-                            <div className="form-group">
-                                <label htmlFor="bloodDonor">Would you like to sign-up as Blood donor?<span style={{ color: "red" }}>*</span></label>
-                                <select {...register("bloodDonor", { required: true, onChange: (e) => handleBloodDonor(e) })} id="bloodDonor" className="form-select" aria-label="city select">
-                                    <option value="">select</option>
-                                    <option value="yes">yes</option>
-                                    <option value="no">no</option>
-                                </select>
-                                {errors.bloodDonor && <p style={{ color: "red" }}>This field is mandatory</p>}
-                            </div>
-                        </div>
-                        <div className="col-md-6">
-                            <div className="form-group">
-                                <label htmlFor="bloodGroup">If above selection is yes, please share your Blood group? {bloodDonor === "yes" ? <span style={{ color: "red" }}>*</span> : <span> </span>} </label>
-                                <input disabled={bloodDonor === "no" ? true : false} {...register("bloodGroup", { required: bloodDonor === "no" ? false : true })} type="text" className="form-control" id="bloodGroup" placeholder="Blood Group" />
-                                {errors.bloodGroup && <p style={{ color: "red" }}>This field is mandatory</p>}
-                            </div>
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-md-12">
-                            <div className="form-group">
-                                <label htmlFor="regularAmountDonor">Would you like to donate small amount to RFH every month/year?<span style={{ color: "red" }}>*</span></label>
-                                <select {...register("regularAmountDonor", { required: true, onChange: (e) => handleRegularAmountDonor(e) })} id="regularAmountDonor" className="form-select" aria-label="regular amount donor select">
-                                    <option value="">select</option>
-                                    <option value="yes">yes</option>
-                                    <option value="no">no</option>
-                                </select>
-                                {errors.regularAmountDonor && <p style={{ color: "red" }}>This field is mandatory</p>}
-                            </div>
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-md-12">
-                            <div className="row">
-                                <div className="col-sm-9">
-                                    <div className="form-group">
-                                        <label htmlFor="donationAmount">If above selection is yes, what is the amount you would like to sign up for? {regularAmountDonor === "yes" ? <span style={{ color: "red" }}>*</span> : <span> </span>} </label>
-                                        <input disabled={regularAmountDonor === "no" ? true : false} {...register("donationAmount", { required: regularAmountDonor === 'yes' ? true : false })} type="text" className="form-control" id="donationAmount" />
-                                        {errors.donationAmount && <p style={{ color: "red" }}>This field is mandatory</p>}
-                                    </div>
+                        <div className="row">
+                            <div className="col-md-4">
+                                <div className="form-group">
+                                    <label htmlFor="mobile">Mobile No. <span style={{ color: "red" }}>*</span></label>
+                                    <input {...register("mobNo", { required: true })} className="form-control" type="tel" id="mobile" />
+                                    {errors.mobNo && <p style={{ color: "red" }}>This field is mandatory</p>}
                                 </div>
-                                <div className="col-sm-3">
-                                    <div className="form-group">
-                                        <label htmlFor="donationFrequency">Frequency of Donation {regularAmountDonor === "yes" ? <span style={{ color: "red" }}>*</span> : <span> </span>} </label>
-                                        <select disabled={regularAmountDonor === "no" ? true : false} {...register("donationFrequency", { required: regularAmountDonor === 'yes' ? true : false })} id="donationFrequency" className="form-select" aria-label="donation frequency select">
-                                            <option value="">select</option>
-                                            <option value="yes">per month</option>
-                                            <option value="no">per year</option>
-                                        </select>
-                                        {errors.donationFrequency && <p style={{ color: "red" }}>This field is mandatory</p>}
-                                    </div>
+                            </div>
+                            <div className="col-md-4">
+                                <div className="form-group">
+                                    <label htmlFor="email">Email <span style={{ color: "red" }}>*</span></label>
+                                    <input {...register("email", { required: true })} className="form-control" type="email" name="email" id="email" />
+                                    {errors.email && <p style={{ color: "red" }}>This field is mandatory</p>}
                                 </div>
                             </div>
                         </div>
-                    </div>
+                        <br />
+                        <hr />
+                        <br />
 
+                        {/* <h2 className="form-header">Other information</h2> */}
 
-                    <div className="row">
-                        <div className="col-md-12">
-                            <div className="form-group">
-                                <label htmlFor="volunteeringReason">Why do you wish to be a volunteer?  </label>
-                                <textarea {...register("volunteeringReason", { required: false })} className="form-control" id="volunteeringReason" rows="3" />
+                        <div className="row">
+                            <div className="col-md-6">
+                                <div className="form-group">
+                                    <label htmlFor="volunteerCategory">What category do you belong to? <span style={{ color: "red" }}>*</span></label>
+                                    <select {...register("volunteerCategory", { required: true })} id="volunteerCategory" className="form-select" aria-label="city select">
+                                        <option value="">select</option>
+                                        <option value="Support remotely in all possibilities">Support remotely in all possibilities</option>
+                                        <option value="Attend and organize events in Bengaluru and other cities.">Attend and organize events in Bengaluru and other cities</option>
+
+                                    </select>
+                                    {errors.volunteerCategory && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-md-12">
+                        <br />
+                        <div className="row">
                             <div className="form-group">
-                                <label htmlFor="aquisitionSource">How did you come to know about RFH ?  </label>
-                                <textarea {...register("aquisitionSource", { required: false })} className="form-control" id="aquisitionSource" rows="3" />
+                                <label htmlFor="supportAreas">What are the areas you would like to support? <span style={{ color: "red" }}>*</span></label>
+                                <br />
+                                <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Organizing the Events" id="newsletter" /> Organizing the Events.
+                                <br />
+                                <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Promotion activities" id="newsletter" /> Promotion activities.
+                                <br />
+                                <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Content creation" id="newsletter" /> Content creation.
+                                <br />
+                                <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Image designing" id="newsletter" /> Image designing.
+                                <br />
+                                <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Maintaining the expenses of the Event and perform Auditing" id="newsletter" /> Maintaining the expenses of the Event and perform Auditing.
+                                <br />
+                                <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Find sponsors" id="newsletter" /> Find sponsors.
+                                <br />
+                                <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Collaboration with CSR groups/other groups" id="newsletter" /> Collaboration with CSR groups/other groups.
+                                <br />
+                                <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Ready to perform field work for the event" id="newsletter" /> Ready to perform field work for the event.
+                                <br />
+                                <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Find the needy people with all required background information" id="newsletter" /> Find the needy people with all required background information.
+                                <br />
+                                <input {...register("supportAreas", { required: true })} type="checkbox" name='supportAreas' value="Be a part of event and take any responsibility" id="newsletter" /> Be a part of event and take any responsibility.
 
+                                {errors.supportAreas && <p style={{ color: "red" }}>This field is mandatory</p>}
                             </div>
                         </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-md-12">
-                            <div className="form-group">
-                                <label htmlFor="volunteeredForNGOorCSR">Have you volunteered before for any NGO or CSR activity?    </label> <br />
-                                <small>If yes, please share details. Mention your roles and responsibilities, what you did, where
-                                    you did</small>
-                                <textarea {...register("volunteeredForNGOorCSR", { required: false })} className="form-control" id="volunteeredForNGOorCSR" rows="3" />
-                                {errors.volunteeredForNGOorCSR && <p style={{ color: "red" }}>This field is mandatory</p>}
+                        <br />
+                        <div className="row">
+                            <div className="col-md-6">
+                                <div className="form-group">
+                                    <label htmlFor="dedicationTime">On an average, how much time can you dedicate for RFH in a year? <span style={{ color: "red" }}>*</span></label>
+                                    <select {...register("dedicationTime", { required: true })} id="dedicationTime" className="form-select" aria-label="city select">
+                                        <option value="">select</option>
+                                        <option value="2-5 hours a week">2-5 hours a week</option>
+                                        <option value="5-8 hours a week">5-8 hours a week</option>
+                                        <option value="8-12 hours a week">8-12 hours a week</option>
+                                        <option value="12-20 hours a week">12-20 hours a week</option>
+                                        <option value="20 hours a week">More than 20 hours a week</option>
+                                        <option value="Anytime requested by RFH">Anytime requested by RFH</option>
+                                    </select>
+                                    {errors.dedicationTime && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                </div>
+                            </div>
+                            <div className="col-md-6">
+                                <div className="form-group">
+                                    <label htmlFor="currentOccupation">What is your current occupation?<span style={{ color: "red" }}>*</span></label>
+                                    <select {...register("currentOccupation", { required: true })} id="currentOccupation" className="form-select" aria-label="city select">
+                                        <option value="">select</option>
+                                        <option value="Studying">Studying</option>
+                                        <option value="Housemaker">Housemaker</option>
+                                        <option value="Working Professional">Working Professional</option>
+                                        <option value="Others">Others</option>
+                                    </select>
+                                    {errors.currentOccupation && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-md-6">
-                            <div className="form-group">
-                                <label htmlFor="tee-size">T-Shirt Size  <span style={{ color: "red" }}>*</span></label>
-                                <select {...register("TshirtSize", { required: true })} id="tee-size" className="form-select" aria-label="T-Shirt Size">
-                                    <option value="">select</option>
-                                    <option value="XSmall">X-Small</option>
-                                    <option value="Small">Small</option>
-                                    <option value="Medium">Medium</option>
-                                    <option value="Large">Large</option>
-                                    <option value="X-Large">X-Large</option>
-                                    <option value="XX-Large">XX-Large</option>
-                                </select>
-                                {errors.TshirtSize && <p style={{ color: "red" }}>This field is mandatory</p>}
+                        <div className="row">
+                            <div className="col-md-6">
+                                <div className="form-group">
+                                    <label htmlFor="bloodDonor">Would you like to sign-up as Blood donor?<span style={{ color: "red" }}>*</span></label>
+                                    <select {...register("bloodDonor", { required: true, onChange: (e) => handleBloodDonor(e) })} id="bloodDonor" className="form-select" aria-label="city select">
+                                        <option value="">select</option>
+                                        <option value="yes">yes</option>
+                                        <option value="no">no</option>
+                                    </select>
+                                    {errors.bloodDonor && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                </div>
+                            </div>
+                            <div className="col-md-6">
+                                <div className="form-group">
+                                    <label htmlFor="bloodGroup">If above selection is yes, please share your Blood group? {bloodDonor === "yes" ? <span style={{ color: "red" }}>*</span> : <span> </span>} </label>
+                                    <input disabled={bloodDonor === "no" ? true : false} {...register("bloodGroup", { required: bloodDonor === "no" ? false : true })} type="text" className="form-control" id="bloodGroup" placeholder="Blood Group" />
+                                    {errors.bloodGroup && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <br />
+                        <div className="row">
+                            <div className="col-md-12">
+                                <div className="form-group">
+                                    <label htmlFor="regularAmountDonor">Would you like to donate small amount to RFH every month/year?<span style={{ color: "red" }}>*</span></label>
+                                    <select {...register("regularAmountDonor", { required: true, onChange: (e) => handleRegularAmountDonor(e) })} id="regularAmountDonor" className="form-select" aria-label="regular amount donor select">
+                                        <option value="">select</option>
+                                        <option value="yes">yes</option>
+                                        <option value="no">no</option>
+                                    </select>
+                                    {errors.regularAmountDonor && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                </div>
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="col-md-12">
+                                <div className="row">
+                                    <div className="col-sm-9">
+                                        <div className="form-group">
+                                            <label htmlFor="donationAmount">If above selection is yes, what is the amount you would like to sign up for? {regularAmountDonor === "yes" ? <span style={{ color: "red" }}>*</span> : <span> </span>} </label>
+                                            <input disabled={regularAmountDonor === "no" ? true : false} {...register("donationAmount", { required: regularAmountDonor === 'yes' ? true : false })} type="text" className="form-control" id="donationAmount" />
+                                            {errors.donationAmount && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                        </div>
+                                    </div>
+                                    <div className="col-sm-3">
+                                        <div className="form-group">
+                                            <label htmlFor="donationFrequency">Frequency of Donation {regularAmountDonor === "yes" ? <span style={{ color: "red" }}>*</span> : <span> </span>} </label>
+                                            <select disabled={regularAmountDonor === "no" ? true : false} {...register("donationFrequency", { required: regularAmountDonor === 'yes' ? true : false })} id="donationFrequency" className="form-select" aria-label="donation frequency select">
+                                                <option value="">select</option>
+                                                <option value="yes">per month</option>
+                                                <option value="no">per year</option>
+                                            </select>
+                                            {errors.donationFrequency && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                    {/* <div className="row">
+
+                        <div className="row">
+                            <div className="col-md-12">
+                                <div className="form-group">
+                                    <label htmlFor="volunteeringReason">Why do you wish to be a volunteer?  </label>
+                                    <textarea {...register("volunteeringReason", { required: false })} className="form-control" id="volunteeringReason" rows="3" />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="col-md-12">
+                                <div className="form-group">
+                                    <label htmlFor="aquisitionSource">How did you come to know about RFH ?  </label>
+                                    <textarea {...register("aquisitionSource", { required: false })} className="form-control" id="aquisitionSource" rows="3" />
+
+                                </div>
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="col-md-12">
+                                <div className="form-group">
+                                    <label htmlFor="volunteeredForNGOorCSR">Have you volunteered before for any NGO or CSR activity?    </label> <br />
+                                    <small>If yes, please share details. Mention your roles and responsibilities, what you did, where
+                                        you did</small>
+                                    <textarea {...register("volunteeredForNGOorCSR", { required: false })} className="form-control" id="volunteeredForNGOorCSR" rows="3" />
+                                    {errors.volunteeredForNGOorCSR && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                </div>
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="col-md-6">
+                                <div className="form-group">
+                                    <label htmlFor="tee-size">T-Shirt Size  <span style={{ color: "red" }}>*</span></label>
+                                    <select {...register("TshirtSize", { required: true })} id="tee-size" className="form-select" aria-label="T-Shirt Size">
+                                        <option value="">select</option>
+                                        <option value="XSmall">X-Small</option>
+                                        <option value="Small">Small</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="Large">Large</option>
+                                        <option value="X-Large">X-Large</option>
+                                        <option value="XX-Large">XX-Large</option>
+                                    </select>
+                                    {errors.TshirtSize && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+
+                        {/* <div className="row">
                         <div className="col-md-12">
                             <div className="form-group">
                                 <label htmlFor="inputFile">Please upload an ID proof (Aadhar Card or Pan Card)<span style={{ color: "red" }}>*</span></label>
@@ -410,30 +372,90 @@ function VolunteerForm() {
                         </div>
                     </div> */}
 
-                    <hr />
-                    <br />
-                    <h2>By Signing Up: </h2>
-                    <br />
-                    <p style={{ fontWeight: "700" }}>
-                        You promise and commit your time to “Rupee For Humanity” for next 1 year.
-                        You will not mis-use the organization name for any of the personal benefits.
-                        Respect every individual during the event and maintain the decorum of the group.
-                        Every volunteer would get authorized certificate, T-shirt, momentous and many more, based on the contribution
-                        towards society.
-                    </p>
+                        <hr />
+                        <br />
+                        <h2>By Signing Up: </h2>
+                        <br />
+                        <p style={{ fontWeight: "700" }}>
+                            You promise and commit your time to “Rupee For Humanity” for next 1 year.
+                            You will not mis-use the organization name for any of the personal benefits.
+                            Respect every individual during the event and maintain the decorum of the group.
+                            Every volunteer would get authorized certificate, T-shirt, momentous and many more, based on the contribution
+                            towards society.
+                        </p>
 
-                    <div className="checkbox">
-                        <label>
-                            <input {...register("AgreeTnC", { required: true })} type="checkbox" value="Sure!" id="newsletter" /> Agree to terms and conditions.
-                        </label>
-                        {errors.AgreeTnC && <p style={{ color: "red" }}>This field is mandatory</p>}
+                        <div className="checkbox">
+                            <label>
+                                <input {...register("AgreeTnC", { required: true })} type="checkbox" value="Sure!" id="newsletter" /> Agree to terms and conditions.
+                            </label>
+                            {errors.AgreeTnC && <p style={{ color: "red" }}>This field is mandatory</p>}
+                        </div>
+
+                        <div className="d-grid gap-2">
+                            <button className="btn btn-dark" type="submit">Submit</button>
+                        </div>
+                    </form>
+                </div>
+                :
+                <div className="container-md volunteer-form">
+                    <h3 style={{ marginTop: "2%" }}>Your details</h3>
+                    <table className="table" style={{ backgroundColor: "#040002", color: "lightgray" }}>
+
+                        <tbody>
+                            <tr>
+                                <td className="fs-6"> Name</td>
+                                <td> {getValues("fullName")}</td>
+                            </tr>
+                            <tr>
+                                <td className="fs-6">Email</td>
+                                <td> {getValues("email")} </td>
+                            </tr>
+                            <tr>
+                                <td className="fs-6">Phone No.</td>
+                                <td>{getValues("mobNo")}</td>
+                            </tr>
+                            <tr>
+                                <td className="fs-6">Date of Birth</td>
+                                <td>
+                                    <span>
+                                        {JSON.stringify(new Date(getValues("dob")).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' }))}
+                                    </span>
+
+                                </td>
+                                {console.log("DOB ", new Date(getValues("dob")))}
+                            </tr>
+                            <tr>
+                                <td className="fs-6">Residing City</td>
+                                <td>{getValues("address")}</td>
+                            </tr>
+                            <tr>
+                                <td className="fs-6">T-shirt Size </td>
+                                <td> {getValues("TshirtSize")}  </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <span style={{ fontWeight: "bold" }}>{dbMessage}</span>
+                    <div style={{ display: "flex", justifyContent: "flex-end", gap: "16px" }}>
+                        {dataSavedInDB === false &&
+                            <>
+                                <button disabled={dataSavedInDB === true} className="btn btn-outline-dark" onClick={handleEditClick}>Edit</button>
+                                <button disabled={dataSavedInDB === true} className="btn btn-dark" onClick={handleFinalSubmit}>
+                                    {loading === true ?
+                                        <div class="spinner-border text-light spinner-border-sm m-1" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div> :
+                                        <span></span>}
+                                    Confirm & Submit
+                                </button>
+                            </>
+                        }
+                        {dataSavedInDB && <button className="btn btn-outline-dark" onClick={handleHomeClick}>Go back Home</button>}
+
+
                     </div>
 
-                    <div className="d-grid gap-2">
-                        <button className="btn btn-dark" type="submit">Submit</button>
-                    </div>
-                </form>
-            </div>
+                </div>
+            }
         </div>
     )
 }

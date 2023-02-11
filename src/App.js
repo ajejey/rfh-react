@@ -6,6 +6,7 @@ import EventsMain from './Components/Events/EventsMain';
 import VolunteerForm from './Components/VolunteerForm';
 import PaymentRedirect from './Components/PaymentRedirect';
 import AdminHome from './Components/Admin/AdminHome';
+import EmailVerification from './Components/EmailVerification';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path='events/*' element={<EventsMain />} />
         <Route path='/gallery' element={<Gallery />} />
         <Route path='/volunteer-register' element={<VolunteerForm />} />
+        <Route path='/verifyEmail/:id/:token' element={<EmailVerification />} />
         <Route path='/payment-redirect' element={<PaymentRedirect />} />
         <Route path='/admin' element={<AdminHome />} />
         {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
