@@ -14,7 +14,7 @@ function VolunteerForm() {
     const [regularAmountDonor, setRegularAmountDonor] = useState("no")
     const [loading, setLoading] = useState(false)
     const [dataSavedInDB, setDataSavedInDB] = useState(false)
-    const [dbMessage, setDbMessage] = useState("")
+    const [dbMessage, setDbMessage] = useState({ message: "", color: "" })
 
     const handleBloodDonor = (e) => {
         setBloodDonor(e.target.value)
@@ -65,14 +65,14 @@ function VolunteerForm() {
             });
             const data = await response.json();
             console.log("data.message", data, data.message);
-            setDbMessage(data.message)
+            setDbMessage({ message: data.message, color: "" })
             setLoading(false)
             setDataSavedInDB(true)
 
 
         } catch (error) {
             console.error(error);
-            setDbMessage(error.message)
+            setDbMessage({ message: error.message, color: "" })
         }
     }
 
@@ -434,7 +434,7 @@ function VolunteerForm() {
                             </tr>
                         </tbody>
                     </table>
-                    <span style={{ fontWeight: "bold" }}>{dbMessage}</span>
+                    <span style={{ fontWeight: "bold", color: dbMessage.color }}>{dbMessage.message}</span>
                     <div style={{ display: "flex", justifyContent: "flex-end", gap: "16px" }}>
                         {dataSavedInDB === false &&
                             <>
