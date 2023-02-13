@@ -76,8 +76,23 @@ function Home() {
             console.log("data.message", data, data.message);
             setPaymentStatus(data.message)
             setPaymentLink(data?.data?.instrumentResponse?.redirectInfo?.url)
-            window.location.href = data?.data?.instrumentResponse?.redirectInfo?.url;
-            // navigate(data?.data?.instrumentResponse?.redirectInfo?.url)
+            // window.location.href = data?.data?.instrumentResponse?.redirectInfo?.url;
+
+            window.open(
+                data?.data?.instrumentResponse?.redirectInfo?.url,
+                '_blank' // <- This is what makes it open in a new window.
+            );
+
+            const callbackResponse = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/callback`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+
+            const callbackData = await callbackResponse.json()
+            console.log("callbackData ", callbackData)
+
         } catch (error) {
             console.error(error);
         }
