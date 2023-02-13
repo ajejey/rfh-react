@@ -83,15 +83,7 @@ function Home() {
                 '_blank' // <- This is what makes it open in a new window.
             );
 
-            const callbackResponse = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/callback`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
 
-            const callbackData = await callbackResponse.json()
-            console.log("callbackData ", callbackData)
 
         } catch (error) {
             console.error(error);
