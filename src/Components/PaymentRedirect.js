@@ -33,20 +33,34 @@ function PaymentRedirect() {
     useEffect(() => {
         setLoading(true)
         const fetchStatus = async () => {
+
+
             let transactionID = localStorage.getItem('transactionID')
             let body = { merchantTransactionId: transactionID }
             try {
-                const res = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/app/payment-status`, {
+
+
+                const callbackResponse = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/callback`, {
                     method: 'POST',
                     headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(body)
-                });
-                const data = await res.json();
-                console.log("data ", data)
+                        'Content-Type': 'application/json'
+                    }
+                })
 
-                setStatus(data);
+                const callbackData = await callbackResponse.json()
+                console.log("callbackData ", callbackData)
+
+                // const res = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/app/payment-status`, {
+                //     method: 'POST',
+                //     headers: {
+                //         "Content-Type": "application/json",
+                //     },
+                //     body: JSON.stringify(body)
+                // });
+                // const data = await res.json();
+                // console.log("data ", data)
+
+                // setStatus(data);
                 setLoading(false)
 
                 // Check if payment is still pending
