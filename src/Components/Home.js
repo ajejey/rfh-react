@@ -28,6 +28,8 @@ function Home() {
     const [open, setOpen] = React.useState(false);
     const [paymentStatus, setPaymentStatus] = useState("")
     const [paymentLink, setPaymentLink] = useState("")
+    const [loading, setLoading] = useState(false)
+    const [status, setStatus] = useState({});
 
     function generateTransactionId() {
         let id = "RFH";
@@ -56,6 +58,7 @@ function Home() {
         console.log("donate data ", formData)
         // setValue("merchantTransactionId", generateTransactionId())
         // setOpen(false);
+        setLoading(true)
         let formDataCopy = JSON.parse(JSON.stringify(formData))
         formDataCopy = { ...formDataCopy, merchantTransactionId: generateTransactionId() }
 
@@ -83,6 +86,32 @@ function Home() {
                 '_blank' // <- This is what makes it open in a new window.
             );
 
+            // let transactionID = localStorage.getItem('transactionID')
+            let transactionID = formDataCopy.merchantTransactionId
+            let body = { merchantTransactionId: transactionID }
+            try {
+                const res = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/app/payment-status`, {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(body)
+                });
+                const data = await res.json();
+                console.log("data ", data)
+
+                setStatus(data);
+                setLoading(false)
+
+                navigate('/payment-redirect')
+
+                // Check if payment is still pending
+                // if (data.success === true && data.data.state === 'PENDING') {
+                //     setTimeout(fetchStatus, 3000);
+                // }
+            } catch (error) {
+                console.error(error);
+            }
 
 
         } catch (error) {
@@ -414,7 +443,14 @@ function Home() {
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleClose}>Cancel</Button>
-                        <Button type='submit' variant='filled' style={{ backgroundColor: "#040002", color: "lightgray" }} >Donate</Button>
+                        <Button type='submit' variant='filled' style={{ backgroundColor: "#040002", color: "lightgray" }} >
+                            {loading === true ?
+                                <div class="spinner-border text-light spinner-border-sm m-1" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div> :
+                                <span></span>}
+                            Donate
+                        </Button>
                     </DialogActions>
                 </form>
 
