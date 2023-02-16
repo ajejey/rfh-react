@@ -12,7 +12,7 @@ function EmailVerification() {
             try {
                 const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/verifyEmail/${id}/${token}`, {
                     method: "GET",
-                    timeout: 20000,
+                    timeout: 1200000,
                 });
                 const data = await response.json();
                 setMessage(data?.message)

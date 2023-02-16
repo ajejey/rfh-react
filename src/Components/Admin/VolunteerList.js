@@ -18,7 +18,7 @@ function VolunteerList() {
             try {
                 const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/get-volunteer-list?page=${page}&limit=${limit}`, {
                     method: "GET",
-                    timeout: 20000
+                    timeout: 1200000
                 });
                 const data = await response.json();
                 setVolunteers(data);

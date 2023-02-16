@@ -70,7 +70,7 @@ function Home() {
             // const response = await fetch("https://rfh-backend.up.railway.app/api/initiate-payment", {
             const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/initiate-payment`, {
                 method: "POST",
-                timeout: 20000,
+                timeout: 1200000,
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -95,7 +95,7 @@ function Home() {
                 try {
                     const res = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/app/payment-status`, {
                         method: 'POST',
-                        timeout: 20000,
+                        timeout: 1200000,
                         headers: {
                             "Content-Type": "application/json",
                         },
