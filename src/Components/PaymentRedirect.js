@@ -90,7 +90,7 @@ function PaymentRedirect() {
                         </p>
                     }
 
-                    {status?.message === 'Your payment is successful.' &&
+                    {/* {status?.message === 'Your payment is successful.' &&
                         <div>
                             <h5 style={{ margin: "0" }}> Amount:  </h5>
                             {loading ?
@@ -112,7 +112,7 @@ function PaymentRedirect() {
                             ))}
                             <h6>Thank you for your generous donation towards <br /> Rupee For Humanity</h6>
                         </div>
-                    }
+                    } */}
 
                     {/* <h5 style={{ margin: "0" }}> IFSC:  </h5>
                     {loading ?
@@ -121,21 +121,42 @@ function PaymentRedirect() {
                         <small>{status?.data?.paymentInstrument?.ifsc}</small>
                     }
                     <br />
-                    <br />
-                    <h5 style={{ margin: "0" }}> Account No:  </h5>
+                    <br /> */}
+                    {/* <h5 style={{ margin: "0" }}> Account No:  </h5>
                     {loading ?
                         <span class="placeholder col-12"></span>
                         :
                         <small>{status?.data?.paymentInstrument?.maskedAccountNumber}</small>
                     }
+                    <br /> */}
+
+                    <h5 style={{ margin: "0" }}> Amount:  </h5>
+                    {loading ?
+                        <span class="placeholder col-6"></span>
+                        :
+                        <small> {status?.data?.data?.amount && `INR ${(Number(status?.data?.data?.amount))}`}</small>
+                    }
+                    {console.log(status?.data?.data.paymentInstrument)}
                     <br />
-                    
+                    <br />
+
                     <h5 style={{ margin: "0" }}> Transaction ID:  </h5>
                     {loading ?
-                        <span class="placeholder col-12"></span>
+                        <span class="placeholder col-6"></span>
                         :
-                        <small>{status?.data?.transactionId}</small>
-                    } */}
+                        <small>{status?.data?.data?.transactionId
+                        }</small>
+                    }
+                    <br />
+                    <br />
+
+                    <h5 style={{ margin: "0" }}> RFH Reference Number:  </h5>
+                    {loading ?
+                        <span class="placeholder col-6"></span>
+                        :
+                        <small>{status?.data?.data?.merchantTransactionId}</small>
+                    }
+                    <br />
                     <br />
                     <button onClick={handleOkayClick} type="button" className="btn btn-dark download-button">
                         Go Back Home
