@@ -10,7 +10,10 @@ function EmailVerification() {
     useEffect(() => {
         const verifyToken = async () => {
             try {
-                const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/verifyEmail/${id}/${token}`);
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/verifyEmail/${id}/${token}`, {
+                    method: "GET",
+                    timeout: 20000,
+                });
                 const data = await response.json();
                 setMessage(data?.message)
             } catch (error) {

@@ -58,6 +58,7 @@ function VolunteerForm() {
         try {
             const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/volunteer-form-submit`, {
                 method: "POST",
+                timeout: 20000,
                 headers: {
                     "Content-Type": "application/json",
                 },
