@@ -95,6 +95,7 @@ function VolunteerForm() {
 
                 } catch (error) {
                     console.error(error);
+                    setLoading(false)
                     setDbMessage({ message: error.message, color: "red" })
                 }
             } else {
@@ -102,6 +103,7 @@ function VolunteerForm() {
             }
         } catch (error) {
             console.error(error);
+            setLoading(false)
             setDbMessage({ message: error.message, color: "red" })
         }
 
@@ -448,7 +450,7 @@ function VolunteerForm() {
                     </form>
                 </div>
                 :
-                <div className="container-md volunteer-form" style={{ minHeight: "80vh" }}>
+                <div className="container-md volunteer-form" style={{ minHeight: "100vh" }}>
                     <h3 style={{ marginTop: "2%" }}>Your details</h3>
                     <table className="table" style={{ backgroundColor: "#040002", color: "lightgray" }}>
 
