@@ -1,13 +1,16 @@
 import { Checkbox, FormControl, ListItemText, MenuItem, Select } from '@mui/material';
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import Dropzone from 'react-dropzone';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import Header from './Header'
+import ReCAPTCHA from "react-google-recaptcha";
+
 
 function VolunteerForm() {
     const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
     const navigate = useNavigate()
+    const captchaRef = useRef(null)
     const [submitted, setSubmitted] = useState(false)
     const [formValues, setFormValues] = useState({})
     const [bloodDonor, setBloodDonor] = useState("no")
@@ -15,6 +18,7 @@ function VolunteerForm() {
     const [loading, setLoading] = useState(false)
     const [dataSavedInDB, setDataSavedInDB] = useState(false)
     const [dbMessage, setDbMessage] = useState({ message: "", color: "" })
+
 
     const handleBloodDonor = (e) => {
         setBloodDonor(e.target.value)
@@ -45,6 +49,7 @@ function VolunteerForm() {
     const onSubmit = async (formData, submitted) => {
         formData.email = formData.email.trim();
         formData.mobNo = formData.mobNo.trim();
+
         console.log(formData);
         setFormValues(formData)
         setSubmitted(true)
@@ -55,26 +60,71 @@ function VolunteerForm() {
     const handleFinalSubmit = async () => {
         console.log("formValues ", formValues)
         setLoading(true)
+        const token = captchaRef.current.getValue();
+        // console.log("token ", token)
+        // captchaRef.current.reset();
+
         try {
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/volunteer-form-submit`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/check-human`, {
                 method: "POST",
                 timeout: 1200000,
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(formValues),
+                body: JSON.stringify({ token: token }),
             });
             const data = await response.json();
-            console.log("data.message", data, data.message);
-            setDbMessage({ message: data.message, color: "" })
-            setLoading(false)
-            setDataSavedInDB(true)
+            console.log("captcha response ", data)
+
+            if (data?.data?.success === true) {
+                try {
+                    const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/volunteer-form-submit`, {
+                        method: "POST",
+                        timeout: 1200000,
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(formValues),
+                    });
+                    const data = await response.json();
+                    console.log("data.message", data, data.message);
+                    setDbMessage({ message: data.message, color: data.color })
+                    setLoading(false)
+                    setDataSavedInDB(true)
 
 
+                } catch (error) {
+                    console.error(error);
+                    setDbMessage({ message: error.message, color: "red" })
+                }
+            } else {
+                throw { message: "Looks like you are not human!" }
+            }
         } catch (error) {
             console.error(error);
-            setDbMessage({ message: error.message, color: "" })
+            setDbMessage({ message: error.message, color: "red" })
         }
+
+        // try {
+        //     const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/volunteer-form-submit`, {
+        //         method: "POST",
+        //         timeout: 1200000,
+        //         headers: {
+        //             "Content-Type": "application/json",
+        //         },
+        //         body: JSON.stringify(formValues),
+        //     });
+        //     const data = await response.json();
+        //     console.log("data.message", data, data.message);
+        //     setDbMessage({ message: data.message, color: "" })
+        //     setLoading(false)
+        //     setDataSavedInDB(true)
+
+
+        // } catch (error) {
+        //     console.error(error);
+        //     setDbMessage({ message: error.message, color: "" })
+        // }
     }
 
     return (
@@ -436,6 +486,9 @@ function VolunteerForm() {
                         </tbody>
                     </table>
                     <span style={{ fontWeight: "bold", color: dbMessage.color }}>{dbMessage.message}</span>
+                    <div style={{ padding: "2%" }}>
+                        <ReCAPTCHA ref={captchaRef} sitekey={process.env.REACT_APP_SITE_KEY} />
+                    </div>
                     <div style={{ display: "flex", justifyContent: "flex-end", gap: "16px" }}>
                         {dataSavedInDB === false &&
                             <>
