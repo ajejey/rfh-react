@@ -88,23 +88,47 @@ function VolunteerForm() {
                     });
                     const data = await response.json();
                     console.log("data.message", data, data.message);
-                    setDbMessage({ message: data.message, color: data.color })
-                    setLoading(false)
-                    setDataSavedInDB(true)
+                    if (data.message.includes("mobNo:") || data.message.includes("email")) {
+                        setDbMessage({ message: "Volunteer with this email or phone number already exists!", color: "red" })
+                        setDataSavedInDB(false)
+                        setLoading(false)
+                        captchaRef.current.reset();
+                    } else {
+                        setDbMessage({ message: data.message, color: data.color })
+                        setLoading(false)
+                        setDataSavedInDB(true)
+                        captchaRef.current.reset();
+                    }
+
+                    // setDbMessage({ message: data.message, color: data.color })
+                    // setLoading(false)
+                    // setDataSavedInDB(true)
 
 
                 } catch (error) {
                     console.error(error);
+                    if (error.message.includes("mobNo:")) {
+                        setDbMessage({ message: "Volunteer with this email or phone number already exists!", color: "red" })
+                    } else {
+                        setDbMessage({ message: error.message, color: 'red' })
+                    }
+                    captchaRef.current.reset();
+                    setDataSavedInDB(false)
                     setLoading(false)
-                    setDbMessage({ message: error.message, color: "red" })
                 }
             } else {
                 throw { message: "Looks like you are not human!" }
             }
         } catch (error) {
             console.error(error);
+            setDataSavedInDB(false)
             setLoading(false)
-            setDbMessage({ message: error.message, color: "red" })
+            if (error.message.includes("mobNo")) {
+                setDbMessage({ message: "Volunteer with this email or phone number already exists!", color: "red" })
+            } else {
+                setDbMessage({ message: error.message, color: 'red' })
+            }
+
         }
 
         // try {
@@ -313,13 +337,15 @@ function VolunteerForm() {
                                     {errors.bloodDonor && <p style={{ color: "red" }}>This field is mandatory</p>}
                                 </div>
                             </div>
-                            <div className="col-md-6">
-                                <div className="form-group">
-                                    <label htmlFor="bloodGroup">If above selection is yes, please share your Blood group? {bloodDonor === "yes" ? <span style={{ color: "red" }}>*</span> : <span> </span>} </label>
-                                    <input disabled={bloodDonor === "no" ? true : false} {...register("bloodGroup", { required: bloodDonor === "no" ? false : true })} type="text" className="form-control" id="bloodGroup" placeholder="Blood Group" />
-                                    {errors.bloodGroup && <p style={{ color: "red" }}>This field is mandatory</p>}
+                            {bloodDonor === 'yes' &&
+                                <div className="col-md-6">
+                                    <div className="form-group">
+                                        <label htmlFor="bloodGroup">If above selection is yes, please share your Blood group? {bloodDonor === "yes" ? <span style={{ color: "red" }}>*</span> : <span> </span>} </label>
+                                        <input disabled={bloodDonor === "no" ? true : false} {...register("bloodGroup", { required: bloodDonor === "no" ? false : true })} type="text" className="form-control" id="bloodGroup" placeholder="Blood Group" />
+                                        {errors.bloodGroup && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                    </div>
                                 </div>
-                            </div>
+                            }
                         </div>
                         <div className="row">
                             <div className="col-md-12">
@@ -334,31 +360,32 @@ function VolunteerForm() {
                                 </div>
                             </div>
                         </div>
-                        <div className="row">
-                            <div className="col-md-12">
-                                <div className="row">
-                                    <div className="col-sm-9">
-                                        <div className="form-group">
-                                            <label htmlFor="donationAmount">If above selection is yes, what is the amount you would like to sign up for? {regularAmountDonor === "yes" ? <span style={{ color: "red" }}>*</span> : <span> </span>} </label>
-                                            <input disabled={regularAmountDonor === "no" ? true : false} {...register("donationAmount", { required: regularAmountDonor === 'yes' ? true : false })} type="text" className="form-control" id="donationAmount" />
-                                            {errors.donationAmount && <p style={{ color: "red" }}>This field is mandatory</p>}
+                        {regularAmountDonor === 'yes' &&
+                            <div className="row">
+                                <div className="col-md-12">
+                                    <div className="row">
+                                        <div className="col-sm-9">
+                                            <div className="form-group">
+                                                <label htmlFor="donationAmount">If above selection is yes, what is the amount you would like to sign up for? {regularAmountDonor === "yes" ? <span style={{ color: "red" }}>*</span> : <span> </span>} </label>
+                                                <input disabled={regularAmountDonor === "no" ? true : false} {...register("donationAmount", { required: regularAmountDonor === 'yes' ? true : false })} type="text" className="form-control" id="donationAmount" />
+                                                {errors.donationAmount && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="col-sm-3">
-                                        <div className="form-group">
-                                            <label htmlFor="donationFrequency">Frequency of Donation {regularAmountDonor === "yes" ? <span style={{ color: "red" }}>*</span> : <span> </span>} </label>
-                                            <select disabled={regularAmountDonor === "no" ? true : false} {...register("donationFrequency", { required: regularAmountDonor === 'yes' ? true : false })} id="donationFrequency" className="form-select" aria-label="donation frequency select">
-                                                <option value="">select</option>
-                                                <option value="yes">per month</option>
-                                                <option value="no">per year</option>
-                                            </select>
-                                            {errors.donationFrequency && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                        <div className="col-sm-3">
+                                            <div className="form-group">
+                                                <label htmlFor="donationFrequency">Frequency of Donation {regularAmountDonor === "yes" ? <span style={{ color: "red" }}>*</span> : <span> </span>} </label>
+                                                <select disabled={regularAmountDonor === "no" ? true : false} {...register("donationFrequency", { required: regularAmountDonor === 'yes' ? true : false })} id="donationFrequency" className="form-select" aria-label="donation frequency select">
+                                                    <option value="">select</option>
+                                                    <option value="yes">per month</option>
+                                                    <option value="no">per year</option>
+                                                </select>
+                                                {errors.donationFrequency && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
+                        }
 
                         <div className="row">
                             <div className="col-md-12">
