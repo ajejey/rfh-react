@@ -15,10 +15,11 @@ import growth from '../assets/images/growth.png'
 import logo from '../assets/images/Logo.jpg'
 import CountUp from 'react-countup';
 import VisibilitySensor from 'react-visibility-sensor';
-import { Dialog, Button, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material'
+import { Dialog, Button, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Fab } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { GlobalContext } from '../context/Provider'
+import CallIcon from '@mui/icons-material/Call';
 
 function Home() {
     const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
@@ -167,6 +168,9 @@ function Home() {
                     </div>
 
                 </div>
+                <Fab onClick={executeScroll} aria-label="contact-us" style={{ position: "fixed", bottom: "2%", right: "2%", backgroundColor: "#efb442" }}>
+                    <CallIcon />
+                </Fab>
             </section>
             <section id="about">
                 <div className="container">
@@ -380,9 +384,9 @@ function Home() {
                     <button onClick={handleDonateClick} type="button" className="btn btn-dark btn-lg download-button">
                         Donate
                     </button>
-                    <button onClick={executeScroll} type="button" className="btn btn-outline-light btn-lg download-button">
+                    {/* <button onClick={executeScroll} type="button" className="btn btn-outline-light btn-lg download-button">
                         Contact us
-                    </button>
+                    </button> */}
                 </div>
 
             </section>
@@ -399,9 +403,11 @@ function Home() {
                             <h3 className="contact-heading">Contact Us</h3>
 
                             <p style={{ margin: "0" }}><b>Address: Bangalore, India</b></p>
-                            <p style={{ margin: "0" }}>Email: rupee4humanity@gmail.com </p>
+                            {/* <p style={{ margin: "0" }}>Email: rupee4humanity@gmail.com </p> */}
+                            <span>Email: </span><a style={{ color: "#fff" }} href="mailto:rupee4humanity@gmail.com"> rupee4humanity@gmail.com </a>
                             <p style={{ margin: "0" }}>website: www.rupeeforhumanity.org</p>
-                            <p style={{ margin: "0" }}>Mob: +91 9164358027</p>
+                            {/* <p style={{ margin: "0" }}>Mob: +91 9164358027</p> */}
+                            <span>Mob: </span> <a style={{ color: "#fff" }} href="tel:+919164358027">+91 9164358027</a>
                             <div>
                                 <a href="https://www.facebook.com/RupeeForHumanity/" className="social-media-icons" style={{ color: "#fff" }}>Facebook Page</a>
                             </div>
