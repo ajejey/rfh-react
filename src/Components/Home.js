@@ -17,13 +17,14 @@ import CountUp from 'react-countup';
 import VisibilitySensor from 'react-visibility-sensor';
 import { Dialog, Button, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material'
 import { useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { GlobalContext } from '../context/Provider'
 
 function Home() {
     const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
     const myRef = useRef(null)
     const navigate = useNavigate()
+    let [searchParams, setSearchParams] = useSearchParams();
     const { transaction, setTransaction } = useContext(GlobalContext)
     const [open, setOpen] = React.useState(false);
     const [paymentStatus, setPaymentStatus] = useState("")
@@ -43,10 +44,16 @@ function Home() {
     }
 
     const handleDonateClick = () => {
+        let params = { donate: true };
+        setSearchParams(params);
         setOpen(true);
     };
 
+    console.log("searchParams, ", Object.fromEntries([...searchParams]))
+
     const handleClose = () => {
+        let params = {};
+        setSearchParams(params);
         setOpen(false);
     };
 
@@ -131,27 +138,17 @@ function Home() {
 
     const executeScroll = () => myRef.current.scrollIntoView()
 
-    // useEffect(() => {
-    //     console.log("calling status api", paymentStatus)
-    //     // if (paymentStatus === 'Payment Initiated') {
-    //     const getPaymentStatus = async () => {
-    //         try {
-    //             const response = await fetch("https://rfh-backend.up.railway.app/app/payment-status", {
-    //                 method: "GET",
-    //                 headers: {
-    //                     "Content-Type": "application/json",
-    //                 },
-    //             });
-    //             const data = await response.json();
-    //             console.log("status data", data);
-    //             setPaymentStatus(data.code)
-    //         } catch (error) {
-    //             console.log(error)
-    //         }
-    //     }
-    //     getPaymentStatus()
-    //     // }
-    // }, [paymentStatus])
+    useEffect(() => {
+        if ([...searchParams].length) {
+            console.log("search params are ", Object.fromEntries([...searchParams]))
+            if (Object.fromEntries([...searchParams])?.donate === 'true') {
+                setOpen(true)
+            }
+        } else {
+            console.log("No Search Params")
+        }
+
+    }, [])
 
     return (
         <div>

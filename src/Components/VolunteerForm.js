@@ -88,7 +88,7 @@ function VolunteerForm() {
                     });
                     const data = await response.json();
                     console.log("data.message", data, data.message);
-                    if (data.message.includes("mobNo:") || data.message.includes("email")) {
+                    if (data.message.includes("mobNo:") || data.message.includes("email:")) {
                         setDbMessage({ message: "Volunteer with this email or phone number already exists!", color: "red" })
                         setDataSavedInDB(false)
                         setLoading(false)
@@ -179,7 +179,7 @@ function VolunteerForm() {
                                         <option value="female">Female</option>
                                         <option value="male">Male</option>
                                         <option value="transGender">Transgender</option>
-                                        <option value="nonBinary">Non-binary/non-conforming</option>
+                                        <option value="nonBinary">Non-binary/Non-conforming</option>
                                         <option value="noResponse">Prefer not to respond</option>
                                     </select>
                                     {errors.gender && <p style={{ color: "red" }}>This field is mandatory</p>}
@@ -317,7 +317,7 @@ function VolunteerForm() {
                                     <select {...register("currentOccupation", { required: true })} id="currentOccupation" className="form-select" aria-label="city select">
                                         <option value="">select</option>
                                         <option value="Studying">Studying</option>
-                                        <option value="Housemaker">Housemaker</option>
+                                        <option value="Housemaker">Homemaker</option>
                                         <option value="Working Professional">Working Professional</option>
                                         <option value="Others">Others</option>
                                     </select>
@@ -376,8 +376,8 @@ function VolunteerForm() {
                                                 <label htmlFor="donationFrequency">Frequency of Donation {regularAmountDonor === "yes" ? <span style={{ color: "red" }}>*</span> : <span> </span>} </label>
                                                 <select disabled={regularAmountDonor === "no" ? true : false} {...register("donationFrequency", { required: regularAmountDonor === 'yes' ? true : false })} id="donationFrequency" className="form-select" aria-label="donation frequency select">
                                                     <option value="">select</option>
-                                                    <option value="yes">per month</option>
-                                                    <option value="no">per year</option>
+                                                    <option value="monthly">Monthly</option>
+                                                    <option value="yearly">Yearly</option>
                                                 </select>
                                                 {errors.donationFrequency && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
@@ -408,8 +408,7 @@ function VolunteerForm() {
                             <div className="col-md-12">
                                 <div className="form-group">
                                     <label htmlFor="volunteeredForNGOorCSR">Have you volunteered before for any NGO or CSR activity?    </label> <br />
-                                    <small>If yes, please share details. Mention your roles and responsibilities, what you did, where
-                                        you did</small>
+                                    <small>If yes, please share details. Mention your roles and responsibilities, what/where/when you did</small>
                                     <textarea {...register("volunteeredForNGOorCSR", { required: false })} className="form-control" id="volunteeredForNGOorCSR" rows="3" />
                                     {errors.volunteeredForNGOorCSR && <p style={{ color: "red" }}>This field is mandatory</p>}
                                 </div>
