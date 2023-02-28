@@ -29,6 +29,7 @@ function EmailVerification() {
         verifyToken()
     }, [])
 
+
     return (
         <div>
             <Header />
