@@ -7,8 +7,13 @@ import VolunteerForm from './Components/VolunteerForm';
 import PaymentRedirect from './Components/PaymentRedirect';
 import AdminHome from './Components/Admin/AdminHome';
 import EmailVerification from './Components/EmailVerification';
+import { app } from './config/firebase-config'
+import { getAuth } from 'firebase/auth';
 
 function App() {
+  const auth = getAuth()
+  console.log("auth.currentUser ", auth.currentUser)
+
   return (
     <div>
       <Routes>

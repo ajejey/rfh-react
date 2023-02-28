@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import Header from './Header'
 
 function EmailVerification() {
 
     let { id, token } = useParams()
+    const navigate = useNavigate()
     const [message, setMessage] = useState("")
+
+    const handleOkayClick = () => {
+        navigate('/')
+    }
 
     useEffect(() => {
         const verifyToken = async () => {
@@ -29,6 +34,9 @@ function EmailVerification() {
             <Header />
             <div className="container-md">
                 <p> Message : {message} </p>
+                <button onClick={handleOkayClick} type="button" className="btn btn-dark download-button">
+                    Go Back Home
+                </button>
             </div>
 
 

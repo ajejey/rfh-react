@@ -1,10 +1,11 @@
-import { Checkbox, FormControl, ListItemText, MenuItem, Select } from '@mui/material';
-import React, { useRef, useState } from 'react'
+import { Checkbox, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, ListItemText, MenuItem, Select } from '@mui/material';
+import React, { useEffect, useRef, useState } from 'react'
 import Dropzone from 'react-dropzone';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import Header from './Header'
 import ReCAPTCHA from "react-google-recaptcha";
+import Login from './AuthComponent/Login';
 
 
 function VolunteerForm() {
@@ -18,7 +19,11 @@ function VolunteerForm() {
     const [loading, setLoading] = useState(false)
     const [dataSavedInDB, setDataSavedInDB] = useState(false)
     const [dbMessage, setDbMessage] = useState({ message: "", color: "" })
-
+    const [loginDialogOpen, setLoginDialogOpen] = useState(false)
+    const [authenticated, setAuthenticated] = useState(false);
+    const [user, setUser] = useState({});
+    const [authToken, setAuthToken] = useState("")
+    const [submitDialogOpen, setSubmitDialogOpen] = useState(false)
 
     const handleBloodDonor = (e) => {
         setBloodDonor(e.target.value)
@@ -42,9 +47,12 @@ function VolunteerForm() {
     const handleHomeClick = () => {
         navigate('/')
     }
-    // const handleNeedTee = () => {
 
-    // }
+    const handleLoginDialogClose = () => {
+        setLoginDialogOpen(!loginDialogOpen)
+    }
+
+
 
     const onSubmit = async (formData, submitted) => {
         formData.email = formData.email.trim();
@@ -59,99 +67,98 @@ function VolunteerForm() {
 
     const handleFinalSubmit = async () => {
         console.log("formValues ", formValues)
-        setLoading(true)
-        const token = captchaRef.current.getValue();
-        // console.log("token ", token)
-        // captchaRef.current.reset();
+        if (authenticated === false) {
+            setLoginDialogOpen(!loginDialogOpen)
+        } else {
+            let formValuesCopy = JSON.parse(JSON.stringify(formValues))
+            formValuesCopy = { ...formValuesCopy, Uid: user.uid }
+            setLoading(true)
+            const token = captchaRef.current.getValue();
+            // console.log("token ", token)
+            // captchaRef.current.reset();
 
-        try {
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/check-human`, {
-                method: "POST",
-                timeout: 1200000,
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ token: token }),
-            });
-            const data = await response.json();
-            console.log("captcha response ", data)
 
-            if (data?.data?.success === true) {
-                try {
-                    const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/volunteer-form-submit`, {
-                        method: "POST",
-                        timeout: 1200000,
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify(formValues),
-                    });
-                    const data = await response.json();
-                    console.log("data.message", data, data.message);
-                    if (data.message.includes("mobNo:") || data.message.includes("email:")) {
-                        setDbMessage({ message: "Volunteer with this email or phone number already exists!", color: "red" })
+            try {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/check-human`, {
+                    method: "POST",
+                    timeout: 1200000,
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ token: token }),
+                });
+                const data = await response.json();
+                console.log("captcha response ", data)
+
+                if (data?.data?.success === true) {
+                    try {
+                        const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/volunteer-form-submit`, {
+                            method: "POST",
+                            timeout: 1200000,
+                            headers: {
+                                "Content-Type": "application/json",
+                                'Authorization': `Bearer ${authToken}`
+                            },
+                            body: JSON.stringify(formValuesCopy),
+                        });
+                        const data = await response.json();
+                        console.log("data.message", data, data.message);
+                        if (data?.message === 'Unauthorized') {
+                            setLoginDialogOpen(!loginDialogOpen)
+                            setLoading(false)
+                        } else if (data.message.includes("mobNo:") || data.message.includes("email:")) {
+                            setDbMessage({ message: "Volunteer with this email or phone number already exists!", color: "red" })
+                            setDataSavedInDB(false)
+                            setLoading(false)
+                            // captchaRef.current.reset();
+                        } else {
+                            setDbMessage({ message: data.message, color: data.color })
+                            setLoading(false)
+                            setDataSavedInDB(true)
+                            setSubmitDialogOpen(true)
+                            // captchaRef.current.reset();
+                        }
+
+                        // setDbMessage({ message: data.message, color: data.color })
+                        // setLoading(false)
+                        // setDataSavedInDB(true)
+
+
+                    } catch (error) {
+                        console.error(error);
+                        if (error?.message?.includes("mobNo:") || error?.message?.includes("email:")) {
+                            setDbMessage({ message: "Volunteer with this email or phone number already exists!", color: "red" })
+                        } else {
+                            setDbMessage({ message: error.message, color: 'red' })
+                        }
+                        // captchaRef.current.reset();
                         setDataSavedInDB(false)
                         setLoading(false)
-                        captchaRef.current.reset();
-                    } else {
-                        setDbMessage({ message: data.message, color: data.color })
-                        setLoading(false)
-                        setDataSavedInDB(true)
-                        captchaRef.current.reset();
                     }
-
-                    // setDbMessage({ message: data.message, color: data.color })
-                    // setLoading(false)
-                    // setDataSavedInDB(true)
-
-
-                } catch (error) {
-                    console.error(error);
-                    if (error.message.includes("mobNo:")) {
-                        setDbMessage({ message: "Volunteer with this email or phone number already exists!", color: "red" })
-                    } else {
-                        setDbMessage({ message: error.message, color: 'red' })
-                    }
-                    captchaRef.current.reset();
-                    setDataSavedInDB(false)
-                    setLoading(false)
+                } else {
+                    throw { message: "Looks like you are not human!" }
                 }
-            } else {
-                throw { message: "Looks like you are not human!" }
-            }
-        } catch (error) {
-            console.error(error);
-            setDataSavedInDB(false)
-            setLoading(false)
-            if (error.message.includes("mobNo")) {
-                setDbMessage({ message: "Volunteer with this email or phone number already exists!", color: "red" })
-            } else {
-                setDbMessage({ message: error.message, color: 'red' })
-            }
+            } catch (error) {
+                console.error(error);
+                setDataSavedInDB(false)
+                setLoading(false)
+                if (error?.message?.includes("mobNo:") || error?.message?.includes("email:")) {
+                    setDbMessage({ message: "Volunteer with this email or phone number already exists!", color: "red" })
+                } else {
+                    setDbMessage({ message: error.message, color: 'red' })
+                }
 
+            }
         }
 
-        // try {
-        //     const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/volunteer-form-submit`, {
-        //         method: "POST",
-        //         timeout: 1200000,
-        //         headers: {
-        //             "Content-Type": "application/json",
-        //         },
-        //         body: JSON.stringify(formValues),
-        //     });
-        //     const data = await response.json();
-        //     console.log("data.message", data, data.message);
-        //     setDbMessage({ message: data.message, color: "" })
-        //     setLoading(false)
-        //     setDataSavedInDB(true)
 
-
-        // } catch (error) {
-        //     console.error(error);
-        //     setDbMessage({ message: error.message, color: "" })
-        // }
     }
+
+    useEffect(() => {
+        if (authenticated === true) {
+            setLoginDialogOpen(false)
+        }
+    }, [authenticated])
 
     return (
         <div className='volunteer-container'>
@@ -203,38 +210,12 @@ function VolunteerForm() {
                                 {errors.address && <p style={{ color: "red" }}>This field is mandatory</p>}
                             </div>
                         </div>
-                        {/* <div className="row">
-                        <div className="col-md-4">
-                            <div className="form-group">
-                                <label htmlFor="city">City <span style={{ color: "red" }}>*</span></label>
-                                <select {...register("city", { required: true, onChange: (e) => handleCityChange(e) })} id="city" className="form-select" aria-label="city select">
-                                    <option value="">select</option>
-                                    <option value="Bengaluru">Bengaluru</option>
-                                    <option value="Hyderabad">Hyderabad</option>
-                                    <option value="Chennai">Chennai</option>
-                                    <option value="others">Others</option>
-                                </select>
-                                {errors.city && <p style={{ color: "red" }}>This field is mandatory</p>}
-                            </div>
-                        </div>
-                        {selectedCity === "others" &&
-                            <div className="col-md-4">
-                                <div className="form-group">
-                                    <label htmlFor="otherCity">Other City Name <span style={{ color: "red" }}>*</span></label>
-                                    <input {...register("otherCity", { required: selectedCity === "others" ? true : false })} className="form-control" type="text" name="Other City" id="otherCity" />
-                                    {errors.pincode && <p style={{ color: "red" }}>This field is mandatory</p>}
-                                </div>
-                            </div>
-                        }
-
-
-                    </div> */}
-
                         <div className="row">
                             <div className="col-md-4">
                                 <div className="form-group">
                                     <label htmlFor="mobile">Mobile No. <span style={{ color: "red" }}>*</span></label>
-                                    <input {...register("mobNo", { required: true })} className="form-control" type="tel" id="mobile" />
+                                    <input {...register("mobNo", { required: true })} className="form-control" type="tel" placeholder='+91-9887766554' id="mobile" />
+                                    {/* <small>Format: +91-9887766554</small><br></br> */}
                                     {errors.mobNo && <p style={{ color: "red" }}>This field is mandatory</p>}
                                 </div>
                             </div>
@@ -249,9 +230,6 @@ function VolunteerForm() {
                         <br />
                         <hr />
                         <br />
-
-                        {/* <h2 className="form-header">Other information</h2> */}
-
                         <div className="row">
                             <div className="col-md-6">
                                 <div className="form-group">
@@ -317,7 +295,7 @@ function VolunteerForm() {
                                     <select {...register("currentOccupation", { required: true })} id="currentOccupation" className="form-select" aria-label="city select">
                                         <option value="">select</option>
                                         <option value="Studying">Studying</option>
-                                        <option value="Housemaker">Homemaker</option>
+                                        <option value="Homemaker">Homemaker</option>
                                         <option value="Working Professional">Working Professional</option>
                                         <option value="Others">Others</option>
                                     </select>
@@ -478,7 +456,9 @@ function VolunteerForm() {
                 :
                 <div className="container-md volunteer-form" style={{ minHeight: "100vh" }}>
                     <h3 style={{ marginTop: "2%" }}>Your details</h3>
-                    <table className="table" style={{ backgroundColor: "#040002", color: "lightgray" }}>
+                    <table className="table"
+                        style={{ backgroundColor: "#040002", color: "lightgray", borderRadius: "10px" }}
+                    >
 
                         <tbody>
                             <tr>
@@ -514,9 +494,12 @@ function VolunteerForm() {
                         </tbody>
                     </table>
                     <span style={{ fontWeight: "bold", color: dbMessage.color }}>{dbMessage.message}</span>
-                    <div style={{ padding: "2%" }}>
-                        <ReCAPTCHA ref={captchaRef} sitekey={process.env.REACT_APP_SITE_KEY} />
-                    </div>
+                    {authenticated === true &&
+                        <div style={{ padding: "2%" }}>
+                            <ReCAPTCHA ref={captchaRef} sitekey={process.env.REACT_APP_SITE_KEY} />
+                        </div>
+                    }
+
                     <div style={{ display: "flex", justifyContent: "flex-end", gap: "16px" }}>
                         {dataSavedInDB === false &&
                             <>
@@ -538,6 +521,51 @@ function VolunteerForm() {
 
                 </div>
             }
+
+            <Dialog
+                open={loginDialogOpen}
+                onClose={handleLoginDialogClose}
+                aria-labelledby="Login-Dialog"
+                aria-describedby="Login-with-google-or-passowrd"
+            >
+                <DialogTitle id="login-dialog-title">
+                    {"Register"}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="Login-dialog-description">
+                        Please Register yourself with Rupee For Humanity before we proceed.
+                        <br />
+                        <br />
+                        <Login
+                            setAuthenticated={setAuthenticated}
+                            setUser={setUser}
+                            authToken={authToken}
+                            setAuthToken={setAuthToken}
+                        />
+                    </DialogContentText>
+                </DialogContent>
+
+            </Dialog>
+
+            <Dialog fullWidth={false} maxWidth='xs' open={submitDialogOpen}>
+                <DialogTitle id="Thank-you-dialog-title">
+                    Thank you
+                </DialogTitle>
+                <DialogContent>
+                    <div className="container-sm">
+                        <p>Thank you for becoming a volunteer with Rupee for Humanity</p>
+                        <p>Please Verify your email by clicking the link sent to you. It expires in 30 minutes.</p>
+                        <small>Check your spam folder too.</small>
+                    </div>
+
+                </DialogContent>
+                <DialogActions>
+                    <button onClick={handleHomeClick} type="button" className="btn btn-dark download-button">
+                        Go Back Home
+                    </button>
+                </DialogActions>
+            </Dialog>
+
         </div>
     )
 }
