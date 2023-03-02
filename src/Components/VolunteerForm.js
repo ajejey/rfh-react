@@ -71,7 +71,7 @@ function VolunteerForm() {
             setLoginDialogOpen(!loginDialogOpen)
         } else {
             let formValuesCopy = JSON.parse(JSON.stringify(formValues))
-            formValuesCopy = { ...formValuesCopy, Uid: user.uid }
+            formValuesCopy = { ...formValuesCopy, Uid: user.uid, role: "volunteer" }
             setLoading(true)
             const token = captchaRef.current.getValue();
             // console.log("token ", token)
@@ -214,7 +214,7 @@ function VolunteerForm() {
                             <div className="col-md-4">
                                 <div className="form-group">
                                     <label htmlFor="mobile">Mobile No. <span style={{ color: "red" }}>*</span></label>
-                                    <input {...register("mobNo", { required: true })} className="form-control" type="tel" placeholder='+91-9887766554' id="mobile" />
+                                    <input {...register("mobNo", { required: true })} className="form-control" type="tel" id="mobile" />
                                     {/* <small>Format: +91-9887766554</small><br></br> */}
                                     {errors.mobNo && <p style={{ color: "red" }}>This field is mandatory</p>}
                                 </div>
@@ -318,7 +318,7 @@ function VolunteerForm() {
                             {bloodDonor === 'yes' &&
                                 <div className="col-md-6">
                                     <div className="form-group">
-                                        <label htmlFor="bloodGroup">If above selection is yes, please share your Blood group? {bloodDonor === "yes" ? <span style={{ color: "red" }}>*</span> : <span> </span>} </label>
+                                        <label htmlFor="bloodGroup">Please share your Blood group? {bloodDonor === "yes" ? <span style={{ color: "red" }}>*</span> : <span> </span>} </label>
                                         <input disabled={bloodDonor === "no" ? true : false} {...register("bloodGroup", { required: bloodDonor === "no" ? false : true })} type="text" className="form-control" id="bloodGroup" placeholder="Blood Group" />
                                         {errors.bloodGroup && <p style={{ color: "red" }}>This field is mandatory</p>}
                                     </div>
@@ -344,7 +344,7 @@ function VolunteerForm() {
                                     <div className="row">
                                         <div className="col-sm-9">
                                             <div className="form-group">
-                                                <label htmlFor="donationAmount">If above selection is yes, what is the amount you would like to sign up for? {regularAmountDonor === "yes" ? <span style={{ color: "red" }}>*</span> : <span> </span>} </label>
+                                                <label htmlFor="donationAmount">What is the amount you would like to sign up for? {regularAmountDonor === "yes" ? <span style={{ color: "red" }}>*</span> : <span> </span>} </label>
                                                 <input disabled={regularAmountDonor === "no" ? true : false} {...register("donationAmount", { required: regularAmountDonor === 'yes' ? true : false })} type="text" className="form-control" id="donationAmount" />
                                                 {errors.donationAmount && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>

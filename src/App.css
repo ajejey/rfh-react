@@ -548,6 +548,14 @@ h1 {
   animation: gradient 2s ease infinite;
 }
 
+.donate-cards {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
 @keyframes gradient {
   0% {
     background-position: 0% 50%;

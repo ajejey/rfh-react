@@ -9,6 +9,7 @@ import AdminHome from './Components/Admin/AdminHome';
 import EmailVerification from './Components/EmailVerification';
 import { app } from './config/firebase-config'
 import { getAuth } from 'firebase/auth';
+import Donate from './Components/Donate/Donate';
 
 function App() {
   const auth = getAuth()
@@ -24,6 +25,7 @@ function App() {
         <Route path='/verifyEmail/:id/:token' element={<EmailVerification />} />
         <Route path='/payment-redirect' element={<PaymentRedirect />} />
         <Route path='/admin' element={<AdminHome />} />
+        <Route path='/donate' element={<Donate />} />
         {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
 
       </Routes>
