@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import GoogleIcon from '@mui/icons-material/Google';
-import { createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, signInWithPopup, updateProfile } from 'firebase/auth'
+import { createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, updateProfile } from 'firebase/auth'
 
 function Login({ setAuthenticated, setUser, authToken, setAuthToken }) {
     const [formData, setFormData] = useState({
@@ -40,7 +40,8 @@ function Login({ setAuthenticated, setUser, authToken, setAuthToken }) {
     const loginWithGoogle = async () => {
         const auth = getAuth()
         const provider = new GoogleAuthProvider()
-        const result = await signInWithPopup(auth, provider)
+        // const result = await signInWithPopup(auth, provider)
+        const result = await signInWithRedirect(auth, provider)
         const user = result.user
         setUser(user)
         console.log("user ", user)
@@ -105,17 +106,17 @@ function Login({ setAuthenticated, setUser, authToken, setAuthToken }) {
     return (
         <div>
             {/* <button onClick={loginWithGoogle}><GoogleIcon />  Login with Google</button> */}
-            <div className="d-grid gap-2 mb-4">
+            {/* <div className="d-grid gap-2 mb-4">
                 <button onClick={loginWithGoogle} type="button" className="btn btn-outline-dark" style={{ textTransform: "none" }}>
                     <img width="20px" style={{ marginBottom: "3px", marginRight: "5px" }} alt="Google sign-in" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png" />
                     Login with Google
                 </button>
-            </div>
+            </div> */}
             <form onSubmit={handleLoginSubmit}>
 
-                <div className="text-center mt-3">
-                    <p>or Sign Up with Email:</p>
-                </div>
+                {/* <div className="text-center mt-3">
+                    <p>Sign Up with Email:</p>
+                </div> */}
 
                 <div>
                     <label for="email" class="form-label">Email address</label>
