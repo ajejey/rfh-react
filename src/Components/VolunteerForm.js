@@ -169,14 +169,15 @@ function VolunteerForm() {
         if (localStorage.getItem('volunteerDetails')) {
             console.log("details available")
             reset(JSON.parse(localStorage.getItem('volunteerDetails')))
-
+        } else {
+            setSearchParams({ form: "form" })
         }
     }, [])
 
     return (
         <div className='volunteer-container'>
             <Header />
-            {(Object.fromEntries([...searchParams])?.form === 'form') &&
+            {(Object.fromEntries([...searchParams])?.form !== 'final-submit') &&
                 <div className="container-md volunteer-form">
                     <form onSubmit={handleSubmit((formData) => onSubmit(formData, false))}>
                         <h2>Volunteering Registration Form</h2>
