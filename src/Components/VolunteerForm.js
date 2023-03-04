@@ -119,6 +119,7 @@ function VolunteerForm() {
                         setDbMessage({ message: data.message, color: data.color })
                         setLoading(false)
                         setDataSavedInDB(true)
+                        localStorage.removeItem('volunteerDetails');
                         // setSubmitDialogOpen(true)
                         // captchaRef.current.reset();
                     }
