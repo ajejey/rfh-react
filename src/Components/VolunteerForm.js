@@ -67,89 +67,86 @@ function VolunteerForm() {
 
     const handleFinalSubmit = async () => {
         console.log("formValues ", formValues)
-        if (authenticated === false) {
-            setLoginDialogOpen(!loginDialogOpen)
-        } else {
-            let formValuesCopy = JSON.parse(JSON.stringify(formValues))
-            formValuesCopy = { ...formValuesCopy, Uid: user.uid, role: "volunteer" }
-            setLoading(true)
-            const token = captchaRef.current.getValue();
-            // console.log("token ", token)
-            // captchaRef.current.reset();
+        let formValuesCopy = JSON.parse(JSON.stringify(formValues))
+        formValuesCopy = { ...formValuesCopy, Uid: user.uid, role: "volunteer" }
+        setLoading(true)
+        const token = captchaRef.current.getValue();
+        // console.log("token ", token)
+        // captchaRef.current.reset();
 
 
-            try {
-                const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/check-human`, {
-                    method: "POST",
-                    timeout: 1200000,
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ token: token }),
-                });
-                const data = await response.json();
-                console.log("captcha response ", data)
+        try {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/check-human`, {
+                method: "POST",
+                timeout: 1200000,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ token: token }),
+            });
+            const data = await response.json();
+            console.log("captcha response ", data)
 
-                if (data?.data?.success === true) {
-                    try {
-                        const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/volunteer-form-submit`, {
-                            method: "POST",
-                            timeout: 1200000,
-                            headers: {
-                                "Content-Type": "application/json",
-                                'Authorization': `Bearer ${authToken}`
-                            },
-                            body: JSON.stringify(formValuesCopy),
-                        });
-                        const data = await response.json();
-                        console.log("data.message", data, data.message);
-                        if (data?.message === 'Unauthorized') {
-                            setLoginDialogOpen(!loginDialogOpen)
-                            setLoading(false)
-                        } else if (data.message.includes("mobNo:") || data.message.includes("email:")) {
-                            setDbMessage({ message: "Volunteer with this email or phone number already exists!", color: "red" })
-                            setDataSavedInDB(false)
-                            setLoading(false)
-                            // captchaRef.current.reset();
-                        } else {
-                            setDbMessage({ message: data.message, color: data.color })
-                            setLoading(false)
-                            setDataSavedInDB(true)
-                            setSubmitDialogOpen(true)
-                            // captchaRef.current.reset();
-                        }
-
-                        // setDbMessage({ message: data.message, color: data.color })
-                        // setLoading(false)
-                        // setDataSavedInDB(true)
-
-
-                    } catch (error) {
-                        console.error(error);
-                        if (error?.message?.includes("mobNo:") || error?.message?.includes("email:")) {
-                            setDbMessage({ message: "Volunteer with this email or phone number already exists!", color: "red" })
-                        } else {
-                            setDbMessage({ message: error.message, color: 'red' })
-                        }
-                        // captchaRef.current.reset();
+            if (data?.data?.success === true) {
+                try {
+                    const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/volunteer-form-submit`, {
+                        method: "POST",
+                        timeout: 1200000,
+                        headers: {
+                            "Content-Type": "application/json",
+                            'Authorization': `Bearer ${authToken}`
+                        },
+                        body: JSON.stringify(formValuesCopy),
+                    });
+                    const data = await response.json();
+                    console.log("data.message", data, data.message);
+                    if (data?.message === 'Unauthorized') {
+                        setLoginDialogOpen(!loginDialogOpen)
+                        setLoading(false)
+                    } else if (data.message.includes("mobNo:") || data.message.includes("email:")) {
+                        setDbMessage({ message: "Volunteer with this email or phone number already exists!", color: "red" })
                         setDataSavedInDB(false)
                         setLoading(false)
+                        // captchaRef.current.reset();
+                    } else {
+                        setDbMessage({ message: data.message, color: data.color })
+                        setLoading(false)
+                        setDataSavedInDB(true)
+                        setSubmitDialogOpen(true)
+                        // captchaRef.current.reset();
                     }
-                } else {
-                    throw { message: "Looks like you are not human!" }
-                }
-            } catch (error) {
-                console.error(error);
-                setDataSavedInDB(false)
-                setLoading(false)
-                if (error?.message?.includes("mobNo:") || error?.message?.includes("email:")) {
-                    setDbMessage({ message: "Volunteer with this email or phone number already exists!", color: "red" })
-                } else {
-                    setDbMessage({ message: error.message, color: 'red' })
-                }
 
+                    // setDbMessage({ message: data.message, color: data.color })
+                    // setLoading(false)
+                    // setDataSavedInDB(true)
+
+
+                } catch (error) {
+                    console.error(error);
+                    if (error?.message?.includes("mobNo:") || error?.message?.includes("email:")) {
+                        setDbMessage({ message: "Volunteer with this email or phone number already exists!", color: "red" })
+                    } else {
+                        setDbMessage({ message: error.message, color: 'red' })
+                    }
+                    // captchaRef.current.reset();
+                    setDataSavedInDB(false)
+                    setLoading(false)
+                }
+            } else {
+                throw { message: "Looks like you are not human!" }
             }
+        } catch (error) {
+            console.error(error);
+            setDataSavedInDB(false)
+            setLoading(false)
+            if (error?.message?.includes("mobNo:") || error?.message?.includes("email:")) {
+                setDbMessage({ message: "Volunteer with this email or phone number already exists!", color: "red" })
+            } else {
+                setDbMessage({ message: error.message, color: 'red' })
+            }
+
         }
+
 
 
     }
@@ -494,11 +491,11 @@ function VolunteerForm() {
                         </tbody>
                     </table>
                     <span style={{ fontWeight: "bold", color: dbMessage.color }}>{dbMessage.message}</span>
-                    {authenticated === true &&
-                        <div style={{ padding: "2%" }}>
-                            <ReCAPTCHA ref={captchaRef} sitekey={process.env.REACT_APP_SITE_KEY} />
-                        </div>
-                    }
+
+                    <div style={{ padding: "2%" }}>
+                        <ReCAPTCHA ref={captchaRef} sitekey={process.env.REACT_APP_SITE_KEY} />
+                    </div>
+
 
                     <div style={{ display: "flex", justifyContent: "flex-end", gap: "16px" }}>
                         {dataSavedInDB === false &&
@@ -522,7 +519,7 @@ function VolunteerForm() {
                 </div>
             }
 
-            <Dialog
+            {/* <Dialog
                 open={loginDialogOpen}
                 onClose={handleLoginDialogClose}
                 aria-labelledby="Login-Dialog"
@@ -545,7 +542,7 @@ function VolunteerForm() {
                     </DialogContentText>
                 </DialogContent>
 
-            </Dialog>
+            </Dialog> */}
 
             <Dialog fullWidth={false} maxWidth='xs' open={submitDialogOpen}>
                 <DialogTitle id="Thank-you-dialog-title">
