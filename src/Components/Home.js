@@ -60,7 +60,7 @@ function Home() {
     };
 
     const handleVolunteerClick = () => {
-        navigate('/volunteer-register')
+        navigate('/volunteer-register?form=form')
     }
 
     const onSubmit = async (formData) => {

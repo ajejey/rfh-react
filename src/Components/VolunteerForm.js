@@ -2,16 +2,17 @@ import { Checkbox, Dialog, DialogActions, DialogContent, DialogContentText, Dial
 import React, { useEffect, useRef, useState } from 'react'
 import Dropzone from 'react-dropzone';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Header from './Header'
 import ReCAPTCHA from "react-google-recaptcha";
 import Login from './AuthComponent/Login';
 
 
 function VolunteerForm() {
-    const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
+    const { register, handleSubmit, getValues, setValue, reset, formState: { errors } } = useForm();
     const navigate = useNavigate()
     const captchaRef = useRef(null)
+    let [searchParams, setSearchParams] = useSearchParams();
     const [submitted, setSubmitted] = useState(false)
     const [formValues, setFormValues] = useState({})
     const [bloodDonor, setBloodDonor] = useState("no")
@@ -42,6 +43,7 @@ function VolunteerForm() {
 
     const handleEditClick = () => {
         setSubmitted(!submitted)
+        setSearchParams({ form: "form" })
     }
 
     const handleHomeClick = () => {
@@ -59,6 +61,8 @@ function VolunteerForm() {
         formData.mobNo = formData.mobNo.trim();
 
         console.log(formData);
+        setSearchParams({ form: "final-submit" })
+        localStorage.setItem('volunteerDetails', JSON.stringify(formData));
         setFormValues(formData)
         setSubmitted(true)
 
@@ -68,7 +72,9 @@ function VolunteerForm() {
     const handleFinalSubmit = async () => {
         console.log("formValues ", formValues)
         let formValuesCopy = JSON.parse(JSON.stringify(formValues))
-        formValuesCopy = { ...formValuesCopy, Uid: user.uid, role: "volunteer" }
+        // formValuesCopy = { ...formValuesCopy, Uid: user.uid, role: "volunteer" }
+        formValuesCopy = { ...formValuesCopy, role: "volunteer" }
+
         setLoading(true)
         const token = captchaRef.current.getValue();
         // console.log("token ", token)
@@ -107,12 +113,13 @@ function VolunteerForm() {
                         setDbMessage({ message: "Volunteer with this email or phone number already exists!", color: "red" })
                         setDataSavedInDB(false)
                         setLoading(false)
+                        return
                         // captchaRef.current.reset();
                     } else {
                         setDbMessage({ message: data.message, color: data.color })
                         setLoading(false)
                         setDataSavedInDB(true)
-                        setSubmitDialogOpen(true)
+                        // setSubmitDialogOpen(true)
                         // captchaRef.current.reset();
                     }
 
@@ -151,16 +158,24 @@ function VolunteerForm() {
 
     }
 
+    // useEffect(() => {
+    //     if (authenticated === true) {
+    //         setLoginDialogOpen(false)
+    //     }
+    // }, [authenticated])
+
     useEffect(() => {
-        if (authenticated === true) {
-            setLoginDialogOpen(false)
+        if (localStorage.getItem('volunteerDetails')) {
+            console.log("details available")
+            reset(JSON.parse(localStorage.getItem('volunteerDetails')))
+
         }
-    }, [authenticated])
+    }, [])
 
     return (
         <div className='volunteer-container'>
             <Header />
-            {submitted === false ?
+            {(Object.fromEntries([...searchParams])?.form === 'form') &&
                 <div className="container-md volunteer-form">
                     <form onSubmit={handleSubmit((formData) => onSubmit(formData, false))}>
                         <h2>Volunteering Registration Form</h2>
@@ -450,7 +465,8 @@ function VolunteerForm() {
                         </div>
                     </form>
                 </div>
-                :
+            }
+            {Object.fromEntries([...searchParams])?.form === 'final-submit' &&
                 <div className="container-md volunteer-form" style={{ minHeight: "100vh" }}>
                     <h3 style={{ marginTop: "2%" }}>Your details</h3>
                     <table className="table"
@@ -490,7 +506,11 @@ function VolunteerForm() {
                             </tr>
                         </tbody>
                     </table>
-                    <span style={{ fontWeight: "bold", color: dbMessage.color }}>{dbMessage.message}</span>
+                    <span style={{ fontWeight: "bold", color: dbMessage.color }}>
+                        {dbMessage.message.split(". ").map((item) => (
+                            <small> {item}. <br /></small>
+                        ))}
+                    </span>
 
                     <div style={{ padding: "2%" }}>
                         <ReCAPTCHA ref={captchaRef} sitekey={process.env.REACT_APP_SITE_KEY} />
