@@ -140,6 +140,7 @@ function Home() {
 
     const executeScroll = () => myRef.current.scrollIntoView()
 
+
     useEffect(() => {
         if ([...searchParams].length) {
             console.log("search params are ", Object.fromEntries([...searchParams]))
