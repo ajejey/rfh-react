@@ -42,6 +42,7 @@ function VolunteerForm() {
     }
 
     const handleEditClick = () => {
+        setDbMessage({ message: "", color: "" })
         setSubmitted(!submitted)
         setSearchParams({ form: "form" })
     }
@@ -288,7 +289,7 @@ function VolunteerForm() {
                         </div>
                         <br />
                         <div className="row">
-                            <div className="col-md-6">
+                            <div className="col-md-12">
                                 <div className="form-group">
                                     <label htmlFor="dedicationTime">On an average, how much time can you dedicate for RFH in a year? <span style={{ color: "red" }}>*</span></label>
                                     <select {...register("dedicationTime", { required: true })} id="dedicationTime" className="form-select" aria-label="city select">
@@ -303,7 +304,9 @@ function VolunteerForm() {
                                     {errors.dedicationTime && <p style={{ color: "red" }}>This field is mandatory</p>}
                                 </div>
                             </div>
-                            <div className="col-md-6">
+                        </div>
+                        <div className="row">
+                            <div className="col-md-12">
                                 <div className="form-group">
                                     <label htmlFor="currentOccupation">What is your current occupation?<span style={{ color: "red" }}>*</span></label>
                                     <select {...register("currentOccupation", { required: true })} id="currentOccupation" className="form-select" aria-label="city select">

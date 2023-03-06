@@ -45,10 +45,10 @@ function Home() {
     }
 
     const handleDonateClick = () => {
-        let params = { donate: true };
-        setSearchParams(params);
-        setOpen(true);
-        // navigate('/donate')
+        // let params = { donate: true };
+        // setSearchParams(params);
+        // setOpen(true);
+        navigate('/donate')
     };
 
     console.log("searchParams, ", Object.fromEntries([...searchParams]))
