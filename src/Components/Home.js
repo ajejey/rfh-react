@@ -35,20 +35,24 @@ function Home() {
 
     function generateTransactionId() {
         let id = "RFH";
-        let characters = "0123456789";
+        // let characters = "0123456789";
 
-        for (let i = 0; i < 14; i++) {
-            id += characters.charAt(Math.floor(Math.random() * characters.length));
-        }
+        // for (let i = 0; i < 14; i++) {
+        //     id += characters.charAt(Math.floor(Math.random() * characters.length));
+        // }
+        let date = Date.now()
+        id = id + date
 
         return id;
     }
 
+    // console.log("unique id", generateTransactionId())
+
     const handleDonateClick = () => {
-        // let params = { donate: true };
-        // setSearchParams(params);
-        // setOpen(true);
-        navigate('/donate')
+        let params = { donate: true };
+        setSearchParams(params);
+        setOpen(true);
+        // navigate('/donate')
     };
 
     console.log("searchParams, ", Object.fromEntries([...searchParams]))
