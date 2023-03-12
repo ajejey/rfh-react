@@ -6,6 +6,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import Header from './Header'
 import ReCAPTCHA from "react-google-recaptcha";
 import Login from './AuthComponent/Login';
+import { Helmet } from 'react-helmet-async';
 
 
 function VolunteerForm() {
@@ -177,6 +178,9 @@ function VolunteerForm() {
 
     return (
         <div className='volunteer-container'>
+            <Helmet>
+                <title>Volunteer Registration | Rupee For Humanity</title>
+            </Helmet>
             <Header />
             {(Object.fromEntries([...searchParams])?.form !== 'final-submit') &&
                 <div className="container-md volunteer-form">

@@ -8,6 +8,7 @@ import AccessTimeTwoToneIcon from '@mui/icons-material/AccessTimeTwoTone';
 import PlaceTwoToneIcon from '@mui/icons-material/PlaceTwoTone';
 import MilitaryTechTwoToneIcon from '@mui/icons-material/MilitaryTechTwoTone';
 import { Button } from '@mui/material';
+import { Helmet } from 'react-helmet-async';
 
 function EventForm() {
     const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
@@ -137,6 +138,9 @@ function EventForm() {
 
     return (
         <div style={{ backgroundColor: "#040002", color: "lightgray", minHeight: "100vh" }}>
+            <Helmet>
+                <title>Run for Literacy 2023 | Rupee For Humanity</title>
+            </Helmet>
             <Header />
             <main>
                 {(submitted === false) ?

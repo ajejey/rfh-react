@@ -4,6 +4,7 @@ import runner from '../../assets/images/runner-min.png'
 import marathon from '../../assets/images/marathon.jpg'
 import runnersVector from '../../assets/images/RunnersVectors.svg'
 import { useNavigate } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 
 function Events() {
     const navigate = useNavigate()
@@ -18,6 +19,9 @@ function Events() {
 
     return (
         <div className='events-page'>
+            <Helmet>
+                <title>Events | Rupee For Humanity</title>
+            </Helmet>
             <Header />
             <div className="container-sm" style={{ paddingTop: "18px" }}>
                 <div className="row">

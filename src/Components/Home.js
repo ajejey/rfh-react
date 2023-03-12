@@ -20,6 +20,7 @@ import { useForm } from 'react-hook-form'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { GlobalContext } from '../context/Provider'
 import CallIcon from '@mui/icons-material/Call';
+import { Helmet } from 'react-helmet-async';
 
 function Home() {
     const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
@@ -77,7 +78,7 @@ function Home() {
 
         // favDispatch({ type: "SET_TRANSACTION_ID", payload: formDataCopy })
         setTransaction({ ...formDataCopy })
-        localStorage.setItem('transactionID', formDataCopy.merchantTransactionId);
+        // localStorage.setItem('transactionID', formDataCopy.merchantTransactionId);
 
         try {
             // const response = await fetch("https://rfh-backend.up.railway.app/api/initiate-payment", {
@@ -91,6 +92,8 @@ function Home() {
             });
             const data = await response.json();
             console.log("data.message", data, data.message);
+            console.log("merchantTransactionId from backend ", data?.data?.merchantTransactionId)
+            localStorage.setItem('transactionID', data?.data?.merchantTransactionId);
             setPaymentStatus(data.message)
             setPaymentLink(data?.data?.instrumentResponse?.redirectInfo?.url)
             // window.location.href = data?.data?.instrumentResponse?.redirectInfo?.url;
@@ -102,8 +105,8 @@ function Home() {
 
 
             const callCheckAPI = async () => {
-                // let transactionID = localStorage.getItem('transactionID')
-                let transactionID = formDataCopy.merchantTransactionId
+                let transactionID = localStorage.getItem('transactionID')
+                // let transactionID = formDataCopy.merchantTransactionId
                 let body = { merchantTransactionId: transactionID }
                 try {
                     const res = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/app/payment-status`, {
@@ -159,6 +162,9 @@ function Home() {
 
     return (
         <div>
+            <Helmet>
+                <title>Rupee For Humanity</title>
+            </Helmet>
             <Header />
             <section id="title">
                 <div className="hero-text background">

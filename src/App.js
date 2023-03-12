@@ -10,25 +10,30 @@ import EmailVerification from './Components/EmailVerification';
 import { app } from './config/firebase-config'
 import { getAuth } from 'firebase/auth';
 import Donate from './Components/Donate/Donate';
+import ReactGA from "react-ga4";
+import { HelmetProvider } from 'react-helmet-async';
 
 function App() {
-  const auth = getAuth()
-  console.log("auth.currentUser ", auth.currentUser)
+  ReactGA.initialize("G-F0XBYL4VY9")
+  ReactGA.send({ hitType: "pageview" })
+  // ReactGA.pageview(document.location.pathname)
 
   return (
     <div>
-      <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='events/*' element={<EventsMain />} />
-        <Route path='/gallery' element={<Gallery />} />
-        <Route path='/volunteer-register' element={<VolunteerForm />} />
-        <Route path='/verifyEmail/:id/:token' element={<EmailVerification />} />
-        <Route path='/payment-redirect' element={<PaymentRedirect />} />
-        <Route path='/admin' element={<AdminHome />} />
-        <Route path='/donate' element={<Donate />} />
-        {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
+      <HelmetProvider>
+        <Routes>
+          <Route path='/' element={<Home />} />
+          <Route path='events/*' element={<EventsMain />} />
+          <Route path='/gallery' element={<Gallery />} />
+          <Route path='/volunteer-register' element={<VolunteerForm />} />
+          <Route path='/verifyEmail/:id/:token' element={<EmailVerification />} />
+          <Route path='/payment-redirect' element={<PaymentRedirect />} />
+          <Route path='/admin' element={<AdminHome />} />
+          <Route path='/donate' element={<Donate />} />
+          {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
 
-      </Routes>
+        </Routes>
+      </HelmetProvider>
     </div>
   );
 }

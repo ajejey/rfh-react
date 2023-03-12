@@ -7,6 +7,7 @@ import lunchSponcer from '../../assets/images/lunchSponcer.png'
 import stationerySponcer from '../../assets/images/stationerySponcer.png'
 import plantingSponcer from '../../assets/images/plantingSponcer.png'
 import check from '../../assets/images/check.png'
+import { Helmet } from 'react-helmet-async'
 
 const donateCards = [
     {
@@ -73,6 +74,9 @@ function Donate() {
 
     return (
         <div className='donate-container'>
+            <Helmet>
+                <title>Donate | Rupee For Humanity</title>
+            </Helmet>
             <Header />
             <br />
             <div className="container-md">
