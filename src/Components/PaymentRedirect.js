@@ -30,6 +30,16 @@ function PaymentRedirect() {
 
     console.log("transactionID Fav ", transaction)
 
+    const handleDownloadInvoice = () => {
+        const link = document.createElement('a');
+        link.href = `data:application/pdf;base64,${status?.data?.result?.pdfBase64}`;
+        link.download = 'invoice.pdf';
+        link.target = '_blank'; // add target="_blank" to open link in new tab
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
     useEffect(() => {
         setLoading(true)
         const fetchStatus = async () => {
@@ -159,9 +169,18 @@ function PaymentRedirect() {
                     }
                     <br />
                     <br />
-                    <button onClick={handleOkayClick} type="button" className="btn btn-dark download-button">
-                        Go Back Home
-                    </button>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: "16px" }} >
+                        <button onClick={handleOkayClick} type="button" className="btn btn-dark download-button">
+                            Go Back Home
+                        </button>
+                        {/* <button disabled={loading} onClick={handleDownloadInvoice} className="btn btn-dark">
+                            Download Invoice
+                        </button> */}
+
+                        {(!loading && status.message === 'Your payment is successful.') && <a href={`data:application/pdf;base64,${status?.data?.pdfBase64}`} download={`RFH_DonationReciept-${status?.data?.data?.merchantTransactionId}.pdf`} target='_blank' rel='noreferrer' >Download Invoice</a>}
+
+                    </div>
+
                 </div>
 
             </div>

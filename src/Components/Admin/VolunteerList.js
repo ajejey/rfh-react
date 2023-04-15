@@ -12,11 +12,16 @@ function VolunteerList() {
 
 
     useEffect(() => {
+        let authToken = localStorage.getItem('rfhLoginToken')
         const fetchVolunteers = async () => {
             setLoading(true);
             setError(null);
             try {
                 const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/get-volunteer-list?page=${page}&limit=${limit}`, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Authorization': `Bearer ${authToken}`
+                    },
                     method: "GET",
                     timeout: 1200000
                 });

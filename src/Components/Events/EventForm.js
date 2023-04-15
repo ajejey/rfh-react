@@ -254,9 +254,9 @@ function EventForm() {
                                                 <label htmlFor="first">Select Category<span style={{ color: "red" }}>*</span></label>
                                                 <select {...register("category", { required: true })} className="form-select" aria-label="Default select example">
                                                     <option value="">select</option>
-                                                    <option value="3k - Fun Run">3k - Fun Run</option>
-                                                    <option value="5k - Super Run">5k - Super Run</option>
-                                                    <option value="10k - Challenge Run">10k - Challenge Run</option>
+                                                    <option value="3k-Fun-Run-2023">3k - Fun Run</option>
+                                                    <option value="5k-Super-Run-2023">5k - Super Run</option>
+                                                    <option value="10k-Challenge-Run-2023">10k - Challenge Run</option>
                                                 </select>
                                                 {errors.category && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
