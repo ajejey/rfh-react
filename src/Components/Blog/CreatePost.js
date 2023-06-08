@@ -39,7 +39,7 @@ export default function CreatePost() {
     const { error } = useSWR('/api/posts', createNewPost);
 
     if (redirect) {
-        return <Navigate to={'/'} />;
+        return <Navigate to={'/blog'} />;
     }
 
     return (
