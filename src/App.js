@@ -15,6 +15,9 @@ import { HelmetProvider } from 'react-helmet-async';
 import PrivateRoute from './Components/PrivateRoute';
 import Login from './Components/AuthComponent/Login';
 import SignUp from './Components/AuthComponent/SignUp';
+import IndexPage from './Components/Blog/IndexPage';
+import CreatePost from './Components/Blog/CreatePost';
+import PostPage from './Components/Blog/PostPage';
 
 // {
 //   "reactSnap": {
@@ -46,6 +49,12 @@ function App() {
             <Route path='/admin' element={<AdminHome />} />
           </Route>
           <Route path='/donate' element={<Donate />} />
+          <Route path='/blog' element={<IndexPage />} />
+          <Route path='/post/:id' element={<PostPage />} />
+          <Route path='/create-post' element={<PrivateRoute />} >
+            <Route path='/create-post' element={<CreatePost />} />
+          </Route>
+
           {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
 
         </Routes>

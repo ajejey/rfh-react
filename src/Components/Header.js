@@ -32,6 +32,9 @@ function Header() {
                                 <NavLink to="/events" className={({ isActive }) => (isActive ? 'nav-link active1' : 'nav-link')} preventScrollReset={true}>Events</NavLink>
                             </li>
                             <li className="nav-item">
+                                <NavLink to="/blog" className={({ isActive }) => (isActive ? 'nav-link active1' : 'nav-link')} preventScrollReset={true}>Blog</NavLink>
+                            </li>
+                            <li className="nav-item">
                                 <NavLink to="/gallery" className={({ isActive }) => (isActive ? 'nav-link active1' : 'nav-link')} preventScrollReset={true}>Gallery</NavLink>
                             </li>
                             <li className="nav-item">
