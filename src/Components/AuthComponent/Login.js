@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import GoogleIcon from '@mui/icons-material/Google';
-import { createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, updateProfile } from 'firebase/auth'
+import { createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, updateProfile } from 'firebase/auth'
 import { Link, useNavigate } from 'react-router-dom';
 
 function Login() {
@@ -25,7 +25,7 @@ function Login() {
 
         try {
             const auth = getAuth();
-            const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password)
+            const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password)
             const user = userCredential.user
             console.log("user ", user)
             // setUser(user)

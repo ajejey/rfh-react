@@ -2,7 +2,7 @@ import React from 'react'
 import Header from '../Header'
 import { Link } from 'react-router-dom'
 
-function Post({ _id, title, content, author, date, summary }) {
+function Post({ _id, title, content, author, date, summary, path }) {
     return (
         <div
             style={{
@@ -15,7 +15,7 @@ function Post({ _id, title, content, author, date, summary }) {
             }}
         >
             <Link
-                to={`/post/${_id}`}
+                to={`/post/${path}`}
                 style={{
                     textDecoration: 'none',
                     color: '#000',

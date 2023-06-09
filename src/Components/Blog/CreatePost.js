@@ -16,11 +16,14 @@ export default function CreatePost() {
     const createNewPost = async (e) => {
         e.preventDefault();
 
+        let path = title.replace(/\s+/g, "-").toLowerCase();
+
         let data = {
             title,
             summary,
             content,
             author,
+            path,
         }
 
         const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/blog-post`, {
