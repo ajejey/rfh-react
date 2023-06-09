@@ -24,7 +24,7 @@ function PostPage() {
                 navigator.share({
                     title: data?.data?.title,
                     text: 'Check out this blog post',
-                    url: `${process.env.REACT_APP_BACKEND_BASE_URL}/blog-post/${id}`,
+                    url: `https://www.rupeeforhumanity.org/post/${id}`,
                 })
                     .then(() => console.log('Shared successfully'))
                     .catch((error) => console.error('Error sharing:', error))
