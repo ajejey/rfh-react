@@ -49,7 +49,7 @@ export default function CreatePost() {
         <>
             <Header />
             <div className="container">
-                <form style={{ width: '100%' }} onSubmit={createNewPost}>
+                <form style={{ width: '100%', padding: '0 0 50px' }} onSubmit={createNewPost}>
                     <input
                         type="title"
                         className='form-control'
@@ -76,7 +76,7 @@ export default function CreatePost() {
                     <br />
                     <Editor value={content} onChange={setContent} />
                     <button style={{ marginTop: '5px' }}>Create post</button>
-                    {error && <div>Error: {error.message}</div>}
+                    {/* {error && <div>Error: {error.message}</div>} */}
                 </form>
             </div>
         </>
