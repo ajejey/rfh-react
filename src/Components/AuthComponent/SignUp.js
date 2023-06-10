@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import GoogleIcon from '@mui/icons-material/Google';
 import { createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, updateProfile } from 'firebase/auth'
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Header from '../Header';
 
 function SignUp() {
     const navigate = useNavigate()
+    const location = useLocation();
     const [user, setUser] = useState({})
     const [formData, setFormData] = useState({
         email: "",
@@ -99,7 +100,13 @@ function SignUp() {
             console.log("data after /authenticate ", data)
             // setAuthenticated(true);
             setUser(data);
-            navigate(-1)
+            // Check if there is a previous location
+            if (location.state?.from) {
+                navigate(location.state.from);
+            } else {
+                navigate('/');
+            }
+            // navigate(-1)
             setLoading(false)
         } catch (error) {
             console.error(error);

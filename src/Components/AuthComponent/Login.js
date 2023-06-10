@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import GoogleIcon from '@mui/icons-material/Google';
 import { createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, updateProfile } from 'firebase/auth'
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Header from '../Header';
 
 function Login() {
     const navigate = useNavigate()
+    const location = useLocation();
     const [formData, setFormData] = useState({
         email: "",
         password: "",
@@ -33,7 +34,13 @@ function Login() {
             let token = await user.getIdToken()
             console.log("token ", token)
             localStorage.setItem('rfhLoginToken', token)
-            navigate(-1)
+            // Check if there is a previous location
+            if (location.state?.from) {
+                navigate(location.state.from);
+            } else {
+                navigate('/');
+            }
+            // navigate(-1)
             // setAuthToken(token)
         } catch (error) {
             console.log(error)
