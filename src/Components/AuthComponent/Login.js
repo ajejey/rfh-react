@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import GoogleIcon from '@mui/icons-material/Google';
 import { createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, updateProfile } from 'firebase/auth'
 import { Link, useNavigate } from 'react-router-dom';
+import Header from '../Header';
 
 function Login() {
     const navigate = useNavigate()
@@ -45,6 +46,7 @@ function Login() {
 
     return (
         <div>
+            <Header />
             <div style={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: 'center', }}>
                 <div style={{ padding: "3%", boxShadow: "4px 8px 29px -10px rgba(0,0,0,0.75)", borderRadius: "16px" }} >
                     <h2>Login</h2>

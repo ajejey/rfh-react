@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import GoogleIcon from '@mui/icons-material/Google';
 import { createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, updateProfile } from 'firebase/auth'
 import { Link, useNavigate } from 'react-router-dom';
+import Header from '../Header';
 
 function SignUp() {
     const navigate = useNavigate()
@@ -116,6 +117,7 @@ function SignUp() {
 
     return (
         <div>
+            <Header />
             <div style={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: 'center', }}>
                 <div style={{ padding: "3%", boxShadow: "4px 8px 29px -10px rgba(0,0,0,0.75)", borderRadius: "16px" }} >
                     <h2>Register</h2>
@@ -154,7 +156,7 @@ function SignUp() {
                             <p className="mb-6">
                                 Have a account?
                                 <Link
-                                    to="/sign-in"
+                                    to="/login"
                                     className="text-red-600 hover:text-red-700 transition duration-200 ease-in-out ml-1"
                                 >
                                     Sign in

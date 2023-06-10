@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { NavLink } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import logo from '../assets/images/Logo.jpg'
 
 
@@ -16,7 +16,8 @@ function Header() {
                             <span style={{ textAlign: "center" }}>Humanity</span>
                             <span style={{ textAlign: "center" }}>Responsible INDIAN Thought</span>
                         </div> */}
-                        <img src={logo} className="brand-img" alt="RFH Logo" />
+                        <Link to="/"><img src={logo} className="brand-img" alt="RFH Logo" /></Link>
+                        {/* <img src={logo} className="brand-img" alt="RFH Logo" /> */}
                     </div>
 
                     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02"

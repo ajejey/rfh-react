@@ -18,15 +18,8 @@ import SignUp from './Components/AuthComponent/SignUp';
 import IndexPage from './Components/Blog/IndexPage';
 import CreatePost from './Components/Blog/CreatePost';
 import PostPage from './Components/Blog/PostPage';
+import EditPost from './Components/Blog/EditPost';
 
-// {
-//   "reactSnap": {
-//     "puppeteerArgs": [
-//       "--no-sandbox",
-//       "--disable-setuid-sandbox"
-//     ]
-//   }
-// }
 
 function App() {
   ReactGA.initialize("G-F0XBYL4VY9")
@@ -38,7 +31,7 @@ function App() {
       <HelmetProvider>
         <Routes>
           <Route path='/' element={<Home />} />
-          <Route path="/sign-in" element={<Login />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/sign-up" element={<SignUp />} />
           <Route path='events/*' element={<EventsMain />} />
           <Route path='/gallery' element={<Gallery />} />
@@ -50,7 +43,8 @@ function App() {
           </Route>
           <Route path='/donate' element={<Donate />} />
           <Route path='/blog' element={<IndexPage />} />
-          <Route path='/post/:id' element={<PostPage />} />
+          <Route path='/post/:path' element={<PostPage />} />
+          <Route path='/edit/:path' element={<EditPost />} />
           <Route path='/create-post' element={<PrivateRoute />} >
             <Route path='/create-post' element={<CreatePost />} />
           </Route>
@@ -64,3 +58,12 @@ function App() {
 }
 
 export default App;
+
+// {
+//   "reactSnap": {
+//     "puppeteerArgs": [
+//       "--no-sandbox",
+//       "--disable-setuid-sandbox"
+//     ]
+//   }
+// }

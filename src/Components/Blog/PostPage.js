@@ -1,20 +1,22 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
-import useSWR from 'swr'
+import { useNavigate, useParams } from 'react-router-dom'
+import useSWR, { mutate } from 'swr'
 import Header from '../Header'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShareAlt } from '@fortawesome/free-solid-svg-icons';
+import { faPen, faShareAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
+import useAuthStatus from '../../CustomHooks/useAuthStatus';
+
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
 function PostPage() {
-    const { id } = useParams()
-    console.log("params", id)
-    console.log("${process.env.REACT_APP_BACKEND_BASE_URL}/blog-post/${id}", `${process.env.REACT_APP_BACKEND_BASE_URL}/blog-post/${id}`)
-    const { data, error, isLoading } = useSWR(`${process.env.REACT_APP_BACKEND_BASE_URL}/blog-post/${id}`, fetcher)
-    console.log("post", data)
+    const { path } = useParams()
+    const navigate = useNavigate()
+    const { loggedIn, checkingStatus } = useAuthStatus()
+    const { data, error, isLoading } = useSWR(`${process.env.REACT_APP_BACKEND_BASE_URL}/blog-post/${path}`, fetcher)
 
     const [isSharing, setIsSharing] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const handleShare = () => {
         if (!isSharing) {
@@ -24,7 +26,7 @@ function PostPage() {
                 navigator.share({
                     title: data?.data?.title,
                     text: 'Check out this blog post',
-                    url: `https://www.rupeeforhumanity.org/post/${id}`,
+                    url: `https://www.rupeeforhumanity.org/post/${path}`,
                 })
                     .then(() => console.log('Shared successfully'))
                     .catch((error) => console.error('Error sharing:', error))
@@ -32,6 +34,36 @@ function PostPage() {
             } else {
                 console.log('Web Share API not supported');
                 setIsSharing(false);
+            }
+        }
+    };
+
+    const handleEdit = () => {
+        navigate(`/edit/${path}`)
+    }
+
+    const handleDelete = async () => {
+        if (!isDeleting) {
+            if (window.confirm('Are you sure you want to delete this blog post?')) {
+                setIsDeleting(true);
+
+                try {
+                    const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/blog-post/${path}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        // Clear the cached data and navigate to the blog index page
+                        mutate(`${process.env.REACT_APP_BACKEND_BASE_URL}/blog-post`);
+                        navigate('/blog');
+                    } else {
+                        console.error('Failed to delete the blog post');
+                    }
+                } catch (error) {
+                    console.error('An error occurred while deleting the blog post:', error);
+                }
+
+                setIsDeleting(false);
             }
         }
     };
@@ -46,7 +78,7 @@ function PostPage() {
     return (
         <div>
             <Header />
-            <div className="container-md" >
+            <div className="container-md">
                 {isLoading && <div>Loading...</div>}
                 {error && <div>Error...</div>}
                 <h1 className='h1'>{data?.data?.title}</h1>
@@ -54,10 +86,18 @@ function PostPage() {
                 <br />
                 <small>{new Date(data?.data?.date).toDateString()}</small>
                 <br />
-                <div
-                    className="content"
-                    dangerouslySetInnerHTML={{ __html: data?.data?.content }}
-                />
+                {loggedIn && (
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+                        <button title='Edit this article' onClick={handleEdit} className='btn btn-dark'>
+                            <FontAwesomeIcon icon={faPen} />
+                        </button>
+                        <button title='Delete this article' onClick={handleDelete} className='btn btn-danger' disabled={isDeleting}>
+                            <FontAwesomeIcon icon={faTrash} />
+                        </button>
+                    </div>
+
+                )}
+                <div className="content" dangerouslySetInnerHTML={{ __html: data?.data?.content }} />
 
                 <button onClick={handleShare} className="btn btn-link">
                     <FontAwesomeIcon icon={faShareAlt} className="share-icon" />
@@ -67,7 +107,6 @@ function PostPage() {
 
                 <br />
                 <br />
-
             </div>
         </div>
     )
