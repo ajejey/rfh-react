@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
 import useSWR, { mutate } from "swr";
 import Editor from "./Editor";
@@ -22,6 +22,12 @@ export default function EditPost() {
 
     console.log("postInfo", postInfo);
 
+    useEffect(() => {
+        setTitle(postInfo.data.title);
+        setSummary(postInfo.data.summary);
+        setContent(postInfo.data.content);
+        setAuthor(postInfo.data.author);
+    }, [postInfo])
     if (!postInfo) {
         return (
             <div>
@@ -56,6 +62,7 @@ export default function EditPost() {
         setRedirect(true);
     };
 
+
     if (redirect) {
         return <Navigate to={`/post/${path}`} />;
     }
@@ -65,28 +72,32 @@ export default function EditPost() {
             <Header />
             <div className="container">
                 <form onSubmit={updatePost}>
+                    <label className="form-label" htmlFor="title">Title</label>
                     <input
                         type="title"
                         className='form-control mb-3'
                         placeholder={"Title"}
-                        value={title || postInfo.data.title}
+                        value={title}
                         onChange={(ev) => setTitle(ev.target.value)}
                     />
+                    <label className="form-label" htmlFor="summary">Summary</label>
                     <input
                         type="summary"
                         className='form-control mb-3'
                         placeholder={"Summary"}
-                        value={summary || postInfo.data.summary}
+                        value={summary}
                         onChange={(ev) => setSummary(ev.target.value)}
                     />
+                    <label className="form-label" htmlFor="author">Author</label>
                     <input
                         type="author"
                         className='form-control mb-3'
                         placeholder={"Author"}
-                        value={author || postInfo.data.author}
+                        value={author}
                         onChange={(ev) => setAuthor(ev.target.value)}
                     />
-                    <Editor onChange={setContent} value={content || postInfo.data.content} />
+
+                    <Editor onChange={setContent} value={content} />
                     <button style={{ marginTop: "5px" }}>Update post</button>
                 </form>
             </div>

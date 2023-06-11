@@ -50,6 +50,7 @@ export default function CreatePost() {
             <Header />
             <div className="container">
                 <form style={{ width: '100%', padding: '0 0 50px' }} onSubmit={createNewPost}>
+                    <label className='form-label' htmlFor="title">Title</label>
                     <input
                         type="title"
                         className='form-control'
@@ -58,6 +59,7 @@ export default function CreatePost() {
                         onChange={(ev) => setTitle(ev.target.value)}
                     />
                     <br />
+                    <label className='form-label' htmlFor="summary">Summary</label>
                     <input
                         type="summary"
                         className='form-control'
@@ -66,6 +68,7 @@ export default function CreatePost() {
                         onChange={(ev) => setSummary(ev.target.value)}
                     />
                     <br />
+                    <label className='form-label' htmlFor="author">Author</label>
                     <input
                         type="author"
                         className='form-control'
