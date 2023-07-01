@@ -16,6 +16,9 @@ function AdminHome() {
         'email',
         'mobNo',
         'PANno',
+        'cause',
+        'transactionNo',
+        'paymentMode',
         'donationAmount',
     ];
 
