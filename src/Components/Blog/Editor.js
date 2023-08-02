@@ -8,32 +8,6 @@ import { useRef } from 'react';
 export default function Editor({ value, onChange }) {
     const quillRef = useRef(null); // Ref to hold the Quill instance
 
-
-    const modules = {
-        toolbar: {
-            container: [
-                ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-                ['blockquote', 'code-block'],
-
-                [{ 'header': 1 }, { 'header': 2 }],               // custom button values
-                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                [{ 'script': 'sub' }, { 'script': 'super' }],      // superscript/subscript
-                [{ 'indent': '-1' }, { 'indent': '+1' }],          // outdent/indent
-                [{ 'direction': 'rtl' }],                         // text direction
-
-                [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
-                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-                [{ 'image': 'Upload Image' }],
-                [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
-                [{ 'font': [] }],
-                [{ 'align': [] }],
-
-                ['clean']                                         // remove formatting button
-            ]
-        },
-
-    };
-
     const imageHandler = async function (image) {
         const input = document.createElement('input');
         input.setAttribute('type', 'file');
@@ -57,12 +31,41 @@ export default function Editor({ value, onChange }) {
 
     }
 
+    const modules = {
+        toolbar: {
+            container: [
+                ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+                ['blockquote', 'code-block'],
+
+                [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                [{ 'script': 'sub' }, { 'script': 'super' }],      // superscript/subscript
+                [{ 'indent': '-1' }, { 'indent': '+1' }],          // outdent/indent
+                [{ 'direction': 'rtl' }],                         // text direction
+
+                [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                // [{ 'image': 'Upload Image' }],
+                [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+                [{ 'font': [] }],
+                [{ 'align': [] }],
+
+                ['clean']                                         // remove formatting button
+            ],
+
+        },
+
+    };
+
+
+
     // Custom handler for the "image" toolbar button
     const formats = [
         'bold', 'italic', 'underline', 'strike',
         'blockquote', 'code-block', 'header', 'list',
         'script', 'indent', 'direction', 'size',
-        'color', 'background', 'font', 'align', 'image' // Add 'image' to the formats array
+        'color', 'background', 'font', 'align',
+        // 'image' // Add 'image' to the formats array
     ];
 
 
