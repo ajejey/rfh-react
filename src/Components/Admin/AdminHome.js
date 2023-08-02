@@ -53,7 +53,7 @@ function AdminHome() {
         } catch (error) {
             console.error(error);
             setLoading(false);
-            alert(error);
+            // alert(error);
         }
     };
 
