@@ -10,6 +10,7 @@ function AdminHome() {
     const [tabNumber, setTabNumber] = useState(0);
     const { handleSubmit, register, reset } = useForm();
     const [downloadLink, setDownloadLink] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const body = [
         'fullName',
@@ -23,6 +24,7 @@ function AdminHome() {
     ];
 
     const handleDonationFormSubmit = async (data) => {
+        setLoading(true);
         const url = `${process.env.REACT_APP_BACKEND_BASE_URL}/create-receipt`;
 
         try {
@@ -45,11 +47,13 @@ function AdminHome() {
 
             // Set the download link state to make it available for rendering
             setDownloadLink(downloadLink);
-
+            setLoading(false);
             // Reset the form
             reset();
         } catch (error) {
             console.error(error);
+            setLoading(false);
+            alert(error);
         }
     };
 
@@ -87,7 +91,14 @@ function AdminHome() {
                             {...register('date')} // Register the 'date' field with react-hook-form
                         />
                     </div>
-                    <button type="submit" className="btn btn-primary">Submit</button>
+                    <button type="submit" className="btn btn-primary">
+                        {loading === true ?
+                            <div class="spinner-border text-light spinner-border-sm m-1" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div> :
+                            <span></span>}
+                        Submit
+                    </button>
                 </form>
                 <br />
                 {downloadLink && (
