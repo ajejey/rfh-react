@@ -1,5 +1,5 @@
 import { Tab, Tabs } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import useSWR from 'swr';
 import Header from '../Header';
@@ -11,6 +11,8 @@ function AdminHome() {
     const { handleSubmit, register, reset } = useForm();
     const [downloadLink, setDownloadLink] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [buttonDisabled, setButtonDisabled] = useState(true);
+    const downloadLinkRef = useRef(null);
 
     const body = [
         'fullName',
@@ -25,6 +27,7 @@ function AdminHome() {
 
     const handleDonationFormSubmit = async (data) => {
         setLoading(true);
+        setButtonDisabled(true);
         const url = `${process.env.REACT_APP_BACKEND_BASE_URL}/create-receipt`;
 
         try {
@@ -61,6 +64,19 @@ function AdminHome() {
         setTabNumber(newValue);
     };
 
+    const handleInputChange = () => {
+        setButtonDisabled(false);
+    };
+
+    useEffect(() => {
+        if (downloadLink) {
+            if (downloadLinkRef.current) {
+                downloadLinkRef.current.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+    }, [downloadLink])
+
     const today = new Date().toISOString().split('T')[0]; // Get today's date as default value
 
     return (
@@ -78,6 +94,7 @@ function AdminHome() {
                                 id={field}
                                 className="form-control"
                                 {...register(field)} // Register the field with react-hook-form
+                                onChange={handleInputChange} // Add onChange event handler to enable the submit button
                             />
                         </div>
                     ))}
@@ -89,9 +106,11 @@ function AdminHome() {
                             defaultValue={today} // Set today's date as the default value
                             className="form-control"
                             {...register('date')} // Register the 'date' field with react-hook-form
+                            onChange={handleInputChange} // Add onChange event handler to enable the submit button
+
                         />
                     </div>
-                    <button type="submit" className="btn btn-primary">
+                    <button type="submit" disabled={buttonDisabled} className="btn btn-primary">
                         {loading === true ?
                             <div class="spinner-border text-light spinner-border-sm m-1" role="status">
                                 <span class="visually-hidden">Loading...</span>
@@ -102,7 +121,7 @@ function AdminHome() {
                 </form>
                 <br />
                 {downloadLink && (
-                    <div>
+                    <div ref={downloadLinkRef}>
                         <p>Download the invoice:</p>
                         <div dangerouslySetInnerHTML={{ __html: downloadLink }} />
                     </div>
