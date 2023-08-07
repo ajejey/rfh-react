@@ -1,37 +1,70 @@
 import ReactQuill from 'react-quill'
 import 'react-quill/dist/quill.snow.css';
 import { storage } from '../../config/firebase-config';
-import { ref } from 'firebase/storage';
+import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import { async } from '@firebase/util';
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 
 export default function Editor({ value, onChange }) {
     const quillRef = useRef(null); // Ref to hold the Quill instance
 
-    const imageHandler = async function (image) {
+    const handleImageUpload = async () => {
         const input = document.createElement('input');
         input.setAttribute('type', 'file');
         input.setAttribute('accept', 'image/*');
         input.click();
+
         input.onchange = async () => {
             const file = input.files[0];
-            const storageRef = ref(storage, `images/${file.name}`);
-            const imageRef = storageRef.child(file.name);
-            await imageRef.put(file);
+            // Check if the file is an image
+            if (!file.type.startsWith('image/') || file.size > (1024 * 1024)) {
+                console.error('Invalid file type or size too large');
+                alert('Invalid file type or size too large. Please upload image of less than 1MB.');
+                return;
+            }
+            const storageRef = ref(getStorage(), `blog-images/${file.name}`);
 
-            const imageURL = await imageRef.getDownloadURL();
-            console.log("imageURL ", imageURL);
+            try {
+                // Convert image to WebP format with 70% compression quality
+                const convertedFile = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => {
+                        const img = new Image();
+                        img.src = reader.result;
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+                            ctx.drawImage(img, 0, 0);
+                            canvas.toBlob((blob) => {
+                                resolve(new File([blob], `${file.name}.webp`, { type: 'image/webp' }));
+                            }, 'image/webp', 0.7);
+                        };
+                    };
+                });
 
-            // Insert the image into the editor at the current cursor position
-            const quill = this.quillRef.getEditor();
-            const range = quill.getSelection(true);
-            quill.insertEmbed(range.index, 'image', imageURL);
-        }
+                // Upload converted image to Firebase Storage
+                const snapshot = await uploadBytes(storageRef, convertedFile);
+
+                // Get download URL of uploaded image
+                const imageUrl = await getDownloadURL(snapshot.ref);
+
+                // Insert image into Quill editor
+                const editor = quillRef.current.getEditor();
+                const range = editor.getSelection();
+                editor.insertEmbed(range.index, 'image', imageUrl);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+    };
 
 
-    }
 
-    const modules = {
+
+    const modules = useMemo(() => ({
         toolbar: {
             container: [
                 ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
@@ -45,17 +78,19 @@ export default function Editor({ value, onChange }) {
 
                 [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
                 [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-                // [{ 'image': 'Upload Image' }],
+                [{ 'image': 'Upload Image' }],
                 [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
                 [{ 'font': [] }],
                 [{ 'align': [] }],
 
                 ['clean']                                         // remove formatting button
             ],
+            handlers: {
+                image: handleImageUpload,
+            },
 
         },
-
-    };
+    }), []);
 
 
 
@@ -65,12 +100,13 @@ export default function Editor({ value, onChange }) {
         'blockquote', 'code-block', 'header', 'list',
         'script', 'indent', 'direction', 'size',
         'color', 'background', 'font', 'align',
-        // 'image' // Add 'image' to the formats array
+        'image' // Add 'image' to the formats array
     ];
 
 
     return (
         <div className="content">
+            <h2> asdf </h2>
             <ReactQuill
                 value={value}
                 theme={'snow'}

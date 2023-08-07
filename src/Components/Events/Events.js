@@ -5,9 +5,47 @@ import marathon from '../../assets/images/marathon.jpg'
 import runnersVector from '../../assets/images/RunnersVectors.svg'
 import { useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
+import { Badge, Box, Button, CardActions, CardHeader } from '@mui/material'
+import { Grid, Card, CardMedia, CardContent, Typography, Skeleton } from '@mui/material';
+import useSWR from 'swr';
+
+const fetcher = async (url) => {
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error('Failed to fetch events');
+    }
+    return response.json();
+};
 
 function Events() {
     const navigate = useNavigate()
+    const { data: eventData, error } = useSWR(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/events`, fetcher);
+
+    if (error) {
+        return <div>Error loading events</div>;
+    }
+
+    if (!eventData) {
+        // Render skeleton while data is being fetched
+        return (
+            <Grid container spacing={2}>
+                {[...Array(6)].map((_, index) => (
+                    <Grid item xs={12} sm={6} md={4} key={index}>
+                        <Card>
+                            <Skeleton variant="rectangular" height={140} />
+                            <CardContent>
+                                <Skeleton variant="text" />
+                                <Skeleton variant="text" />
+                                <Skeleton variant="text" />
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                ))}
+            </Grid>
+        );
+    }
+
+    const { events, pagination } = eventData;
 
 
     const handleRegisterClick = () => {
@@ -15,6 +53,10 @@ function Events() {
         navigate('/events/runforliteracy-2023')
     }
 
+    const handleCreateEvent = () => {
+        console.log("create event clicked to navigate")
+        navigate('/events/create-event')
+    }
 
 
     return (
@@ -58,37 +100,42 @@ function Events() {
 
             <section id="current-events">
                 <div className="container-md">
-                    <h2 className="h2" style={{ color: "#2f6e49", fontWeight: "700", paddingBottom: "2%" }}>Current Events</h2>
-
-
-                    <div className="card mb-3" style={{ maxWidth: "840px" }}>
-                        <div className="row g-3">
-                            <div className="col-md-4">
-                                <img src={marathon} className="img-fluid rounded-start" alt="RFH Marathon" />
-                            </div>
-                            <div className="col-md-8">
-                                <div className="card-body">
-                                    <h5 className="card-title h2">RFH 10K Run - Run for Literacy 2023</h5>
-                                    <span> <strong>Date:</strong>  April 29th & 30th  (Saturday & Sunday)</span><br />
-                                    <span><strong>Time:</strong>  Run anytime during the above dates</span><br />
-                                    <span><strong>Venue:</strong>  Run anywhere as per your comfort</span><br />
-                                    <p className="card-text">Virtual Marathon consisting of various catagories for the run.</p><br />
-                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                        <div>
-                                            <span className="card-text"><small style={{ color: "red" }}> <strong>Currently Live!</strong> </small></span><br />
-                                            <span className="card-text"><small style={{ color: "red" }}> <strong>Last Date to Register: March 25th</strong> </small></span>
-                                        </div>
-                                        <div>
-                                            <button onClick={handleRegisterClick} type="button"
-                                                className="btn btn-dark btn-lg download-button">Register</button>
-                                        </div>
-                                    </div>
-
-
-                                </div>
-                            </div>
-                        </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <h2 className="h2" style={{ color: "#2f6e49", fontWeight: "700", paddingBottom: "2%" }}>Current Events</h2>
+                        <Button variant='contained' color='secondary' onClick={handleCreateEvent}>Create Event</Button>
                     </div>
+
+                    <Grid container spacing={2}>
+                        {events.map((event) => (
+                            <Grid item xs={12} sm={6} md={4} key={event._id}>
+                                <Card>
+                                    <CardHeader
+                                        title={event.eventName}
+                                        subheader={new Date(event.startDate).toLocaleDateString('en-US', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric',
+                                        })}
+                                    />
+                                    <CardMedia component="img" image={event.image} alt={event.title} />
+                                    <CardContent>
+                                        <Typography variant="body2" color="text.secondary">
+                                            {event.description}
+                                        </Typography>
+                                    </CardContent>
+                                    <CardActions sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+                                        <Button color="secondary" sx={{ ml: 2 }}>
+                                            Volunteer
+                                        </Button>
+                                        <Button color="tertiary" sx={{ ml: 2 }}>
+                                            Donate
+                                        </Button>
+                                    </CardActions>
+                                </Card>
+                            </Grid>
+                        ))}
+                    </Grid>
+
                 </div>
 
             </section>
@@ -121,3 +168,34 @@ function Events() {
 }
 
 export default Events
+
+
+
+{/* <div className="card mb-3" style={{ maxWidth: "840px" }}>
+<div className="row g-3">
+    <div className="col-md-4">
+        <img src={marathon} className="img-fluid rounded-start" alt="RFH Marathon" />
+    </div>
+    <div className="col-md-8">
+        <div className="card-body">
+            <h5 className="card-title h2">RFH 10K Run - Run for Literacy 2023</h5>
+            <span> <strong>Date:</strong>  April 29th & 30th  (Saturday & Sunday)</span><br />
+            <span><strong>Time:</strong>  Run anytime during the above dates</span><br />
+            <span><strong>Venue:</strong>  Run anywhere as per your comfort</span><br />
+            <p className="card-text">Virtual Marathon consisting of various catagories for the run.</p><br />
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                    <span className="card-text"><small style={{ color: "red" }}> <strong>Currently Live!</strong> </small></span><br />
+                    <span className="card-text"><small style={{ color: "red" }}> <strong>Last Date to Register: March 25th</strong> </small></span>
+                </div>
+                <div>
+                    <button onClick={handleRegisterClick} type="button"
+                        className="btn btn-dark btn-lg download-button">Register</button>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+</div> */}

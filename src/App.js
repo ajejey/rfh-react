@@ -19,6 +19,8 @@ import IndexPage from './Components/Blog/IndexPage';
 import CreatePost from './Components/Blog/CreatePost';
 import PostPage from './Components/Blog/PostPage';
 import EditPost from './Components/Blog/EditPost';
+import { ThemeProvider } from '@mui/material';
+import theme from './theme/theme';
 
 
 function App() {
@@ -28,31 +30,34 @@ function App() {
 
   return (
     <div>
-      <HelmetProvider>
-        <Routes>
-          <Route path='/' element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/sign-up" element={<SignUp />} />
-          <Route path='events/*' element={<EventsMain />} />
-          <Route path='/gallery' element={<Gallery />} />
-          <Route path='/volunteer-register' element={<VolunteerForm />} />
-          <Route path='/verifyEmail/:id/:token' element={<EmailVerification />} />
-          <Route path='/payment-redirect' element={<PaymentRedirect />} />
-          <Route path='/admin' element={<PrivateRoute />} >
-            <Route path='/admin' element={<AdminHome />} />
-          </Route>
-          <Route path='/donate' element={<Donate />} />
-          <Route path='/blog' element={<IndexPage />} />
-          <Route path='/post/:path' element={<PostPage />} />
-          <Route path='/edit/:path' element={<EditPost />} />
-          <Route path='/create-post' element={<PrivateRoute />} >
-            <Route path='/create-post' element={<CreatePost />} />
-          </Route>
+      <ThemeProvider theme={theme}>
+        <HelmetProvider>
+          <Routes>
+            <Route path='/' element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/sign-up" element={<SignUp />} />
+            <Route path='events/*' element={<EventsMain />} />
+            <Route path='/gallery' element={<Gallery />} />
+            <Route path='/volunteer-register' element={<VolunteerForm />} />
+            <Route path='/verifyEmail/:id/:token' element={<EmailVerification />} />
+            <Route path='/payment-redirect' element={<PaymentRedirect />} />
+            <Route path='/admin' element={<PrivateRoute />} >
+              <Route path='/admin' element={<AdminHome />} />
+            </Route>
+            <Route path='/donate' element={<Donate />} />
+            <Route path='/blog' element={<IndexPage />} />
+            <Route path='/post/:path' element={<PostPage />} />
+            <Route path='/edit/:path' element={<EditPost />} />
+            <Route path='/create-post' element={<PrivateRoute />} >
+              <Route path='/create-post' element={<CreatePost />} />
+            </Route>
 
-          {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
+            {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
 
-        </Routes>
-      </HelmetProvider>
+          </Routes>
+        </HelmetProvider>
+      </ThemeProvider>
+
     </div>
   );
 }
