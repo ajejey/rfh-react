@@ -12,6 +12,7 @@ function AdminHome() {
     const [downloadLink, setDownloadLink] = useState(null);
     const [loading, setLoading] = useState(false);
     const [buttonDisabled, setButtonDisabled] = useState(true);
+    const [apiError, setApiError] = useState('');
     const downloadLinkRef = useRef(null);
 
     const body = [
@@ -56,7 +57,7 @@ function AdminHome() {
         } catch (error) {
             console.error(error);
             setLoading(false);
-            // alert(error);
+            setApiError(error);
         }
     };
 
@@ -119,6 +120,7 @@ function AdminHome() {
                         Submit
                     </button>
                 </form>
+                {apiError && <div className="alert alert-danger" role="alert">{apiError}</div>}
                 <br />
                 {downloadLink && (
                     <div ref={downloadLinkRef}>
