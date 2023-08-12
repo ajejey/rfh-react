@@ -7,10 +7,21 @@ import Header from './Header'
 import ReCAPTCHA from "react-google-recaptcha";
 import Login from './AuthComponent/Login';
 import { Helmet } from 'react-helmet-async';
+import useSWR from 'swr';
+
+const fetcher = async (url) => {
+    const response = await fetch(url);
+    console.log(response)
+    if (!response.ok) {
+        throw new Error('Failed to fetch events');
+    }
+    return response.json();
+}
 
 
 function VolunteerForm() {
     const { register, handleSubmit, getValues, setValue, reset, formState: { errors } } = useForm();
+    const { data: futureEventsData, error: futureEventsError } = useSWR(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/events/future-events`, fetcher);
     const navigate = useNavigate()
     const captchaRef = useRef(null)
     let [searchParams, setSearchParams] = useSearchParams();
@@ -26,6 +37,8 @@ function VolunteerForm() {
     const [user, setUser] = useState({});
     const [authToken, setAuthToken] = useState("")
     const [submitDialogOpen, setSubmitDialogOpen] = useState(false)
+
+    console.log("futureEvents ", futureEventsData, futureEventsError)
 
     const handleBloodDonor = (e) => {
         setBloodDonor(e.target.value)

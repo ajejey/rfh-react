@@ -4,6 +4,7 @@ import { storage } from '../../config/firebase-config';
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import { async } from '@firebase/util';
 import { useMemo, useRef } from 'react';
+import { convertToWebP } from '../../Constants/commonFunctions';
 
 export default function Editor({ value, onChange }) {
     const quillRef = useRef(null); // Ref to hold the Quill instance
@@ -26,24 +27,26 @@ export default function Editor({ value, onChange }) {
 
             try {
                 // Convert image to WebP format with 70% compression quality
-                const convertedFile = await new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.readAsDataURL(file);
-                    reader.onload = () => {
-                        const img = new Image();
-                        img.src = reader.result;
-                        img.onload = () => {
-                            const canvas = document.createElement('canvas');
-                            const ctx = canvas.getContext('2d');
-                            canvas.width = img.width;
-                            canvas.height = img.height;
-                            ctx.drawImage(img, 0, 0);
-                            canvas.toBlob((blob) => {
-                                resolve(new File([blob], `${file.name}.webp`, { type: 'image/webp' }));
-                            }, 'image/webp', 0.7);
-                        };
-                    };
-                });
+                // const convertedFile = await new Promise((resolve) => {
+                //     const reader = new FileReader();
+                //     reader.readAsDataURL(file);
+                //     reader.onload = () => {
+                //         const img = new Image();
+                //         img.src = reader.result;
+                //         img.onload = () => {
+                //             const canvas = document.createElement('canvas');
+                //             const ctx = canvas.getContext('2d');
+                //             canvas.width = img.width;
+                //             canvas.height = img.height;
+                //             ctx.drawImage(img, 0, 0);
+                //             canvas.toBlob((blob) => {
+                //                 resolve(new File([blob], `${file.name}.webp`, { type: 'image/webp' }));
+                //             }, 'image/webp', 0.7);
+                //         };
+                //     };
+                // });
+
+                const convertedFile = await convertToWebP(file)
 
                 // Upload converted image to Firebase Storage
                 const snapshot = await uploadBytes(storageRef, convertedFile);
@@ -106,7 +109,6 @@ export default function Editor({ value, onChange }) {
 
     return (
         <div className="content">
-            <h2> asdf </h2>
             <ReactQuill
                 value={value}
                 theme={'snow'}

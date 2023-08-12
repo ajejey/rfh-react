@@ -6,11 +6,15 @@ import { useForm } from 'react-hook-form';
 import useSWR, { mutate } from 'swr';
 import { storage } from '../../config/firebase-config';
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
+import Editor from '../Blog/Editor';
+import { useNavigate } from 'react-router-dom';
 
 function CreateEvent() {
+    const navigate = useNavigate();
     const { register, handleSubmit, getValues, setValue, reset, formState: { errors } } = useForm();
     const [image, setImage] = useState();
     const [imageInvalid, setImageInvalid] = useState(false);
+    const [description, setDescription] = useState('');
 
     // const onSubmit = async (formData) => {
     //     const file = image;
@@ -100,8 +104,11 @@ function CreateEvent() {
                     const downloadURL = await getDownloadURL(fileRef);
                     console.log("downloadURL ", downloadURL);
 
+                    let path = formData.eventName.replace(/\s+/g, "-").toLowerCase();
+
+
                     // Send the download URL to the backend API
-                    const data = { ...formData, image: downloadURL };
+                    const data = { ...formData, image: downloadURL, path, description };
                     const url = `${process.env.REACT_APP_BACKEND_BASE_URL}/api/events`;
 
                     const response = await fetch(url, {
@@ -120,6 +127,7 @@ function CreateEvent() {
                     mutate('/api/events');
 
                     reset();
+                    navigate('/events');
                 } catch (error) {
                     console.error(error);
                 }
@@ -135,7 +143,7 @@ function CreateEvent() {
     return (
         <div>
             <Header />
-            <div className="container-md">
+            <div className="container-md mb-5">
                 <h1 className='h1'>Create Event</h1>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Grid container spacing={2}>
@@ -153,7 +161,7 @@ function CreateEvent() {
                         </Grid>
                         <Grid item xs={12}>
                             <label htmlFor="description">Description</label> <br />
-                            <textarea
+                            {/* <textarea
                                 label="Description"
                                 name='description'
                                 className='form-control'
@@ -162,7 +170,8 @@ function CreateEvent() {
                                 helperText={errors.description && "This field is required"}
                                 type="text"
                                 rows="4"
-                            />
+                            /> */}
+                            <Editor value={description} onChange={setDescription} />
                         </Grid>
                         <Grid item xs={12}>
                             <label htmlFor="location">Location</label> <br />

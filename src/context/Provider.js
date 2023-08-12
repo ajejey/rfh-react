@@ -9,11 +9,15 @@ export const GlobalProvider = ({ children }) => {
     const [transaction, setTransaction] = useState(
         {}
     )
+    const [volunteeringEvent, setVolunteeringEvent] = useState("")
 
 
     return (
         <GlobalContext.Provider
-            value={{ transaction, setTransaction }} >
+            value={{
+                transaction, setTransaction,
+                volunteeringEvent, setVolunteeringEvent
+            }} >
             {children}
         </GlobalContext.Provider>
     )

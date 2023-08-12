@@ -8,6 +8,7 @@ import { Helmet } from 'react-helmet-async'
 import { Badge, Box, Button, CardActions, CardHeader } from '@mui/material'
 import { Grid, Card, CardMedia, CardContent, Typography, Skeleton } from '@mui/material';
 import useSWR from 'swr';
+import useAuthStatus from '../../CustomHooks/useAuthStatus'
 
 const fetcher = async (url) => {
     const response = await fetch(url);
@@ -18,34 +19,18 @@ const fetcher = async (url) => {
 };
 
 function Events() {
+    const { loggedIn, checkingStatus } = useAuthStatus();
     const navigate = useNavigate()
     const { data: eventData, error } = useSWR(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/events`, fetcher);
 
-    if (error) {
-        return <div>Error loading events</div>;
-    }
+    // if (error) {
+    //     return <div>Error loading events</div>;
+    // }
 
-    if (!eventData) {
-        // Render skeleton while data is being fetched
-        return (
-            <Grid container spacing={2}>
-                {[...Array(6)].map((_, index) => (
-                    <Grid item xs={12} sm={6} md={4} key={index}>
-                        <Card>
-                            <Skeleton variant="rectangular" height={140} />
-                            <CardContent>
-                                <Skeleton variant="text" />
-                                <Skeleton variant="text" />
-                                <Skeleton variant="text" />
-                            </CardContent>
-                        </Card>
-                    </Grid>
-                ))}
-            </Grid>
-        );
-    }
 
-    const { events, pagination } = eventData;
+    // const { events, pagination } = eventData;
+    const events = eventData?.events
+    const pagination = eventData?.pagination
 
 
     const handleRegisterClick = () => {
@@ -56,6 +41,11 @@ function Events() {
     const handleCreateEvent = () => {
         console.log("create event clicked to navigate")
         navigate('/events/create-event')
+    }
+
+    const handleEventLearnMore = (path) => {
+        console.log("learn more clicked to navigate")
+        navigate(`/events/${path}`)
     }
 
 
@@ -102,38 +92,52 @@ function Events() {
                 <div className="container-md">
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                         <h2 className="h2" style={{ color: "#2f6e49", fontWeight: "700", paddingBottom: "2%" }}>Current Events</h2>
-                        <Button variant='contained' color='secondary' onClick={handleCreateEvent}>Create Event</Button>
+                        {loggedIn && <Button variant='contained' color='secondary' onClick={handleCreateEvent}>Create Event</Button>}
                     </div>
 
+                    {!eventData && (
+                        <Grid container spacing={2}>
+                            {[...Array(6)].map((_, index) => (
+                                <Grid item xs={12} sm={6} md={4} key={index}>
+                                    <Card>
+                                        <Skeleton variant="rectangular" height={140} />
+                                        <CardContent>
+                                            <Skeleton variant="text" />
+                                            <Skeleton variant="text" />
+                                            <Skeleton variant="text" />
+                                        </CardContent>
+                                    </Card>
+                                </Grid>
+                            ))}
+                        </Grid>
+                    )}
+
                     <Grid container spacing={2}>
-                        {events.map((event) => (
-                            <Grid item xs={12} sm={6} md={4} key={event._id}>
-                                <Card>
-                                    <CardHeader
-                                        title={event.eventName}
-                                        subheader={new Date(event.startDate).toLocaleDateString('en-US', {
-                                            year: 'numeric',
-                                            month: 'long',
-                                            day: 'numeric',
-                                        })}
-                                    />
-                                    <CardMedia component="img" image={event.image} alt={event.title} />
-                                    <CardContent>
-                                        <Typography variant="body2" color="text.secondary">
-                                            {event.description}
-                                        </Typography>
-                                    </CardContent>
-                                    <CardActions sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-                                        <Button color="secondary" sx={{ ml: 2 }}>
-                                            Volunteer
-                                        </Button>
-                                        <Button color="tertiary" sx={{ ml: 2 }}>
-                                            Donate
-                                        </Button>
-                                    </CardActions>
-                                </Card>
-                            </Grid>
-                        ))}
+                        {events && events.length &&
+                            events.map((event) => (
+                                <Grid item xs={12} sm={6} md={4} key={event._id}>
+                                    <Card>
+                                        <CardHeader
+                                            title={event.eventName}
+                                            subheader={new Date(event.startDate).toLocaleDateString('en-US', {
+                                                year: 'numeric',
+                                                month: 'long',
+                                                day: 'numeric',
+                                            })}
+                                        />
+                                        <CardMedia component="img" image={event.image} alt={event.title} />
+                                        <CardContent>
+                                            {/* <Typography variant="body2" color="text.secondary">
+                                                {event.description}
+                                            </Typography> */}
+                                            {/* <br /> */}
+                                        </CardContent>
+                                        <CardActions sx={{ justifyContent: "flex-end" }}>
+                                            <Button variant="outlined" onClick={() => handleEventLearnMore(event.path)}>Learn more</Button>
+                                        </CardActions>
+                                    </Card>
+                                </Grid>
+                            ))}
                     </Grid>
 
                 </div>

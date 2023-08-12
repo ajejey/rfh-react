@@ -74,7 +74,8 @@ function Home() {
         // setOpen(false);
         setLoading(true)
         let formDataCopy = JSON.parse(JSON.stringify(formData))
-        formDataCopy = { ...formDataCopy, merchantTransactionId: generateTransactionId() }
+        // formDataCopy = { ...formDataCopy, merchantTransactionId: generateTransactionId() }
+        formDataCopy = { ...formDataCopy }
 
         // favDispatch({ type: "SET_TRANSACTION_ID", payload: formDataCopy })
         setTransaction({ ...formDataCopy })
@@ -93,7 +94,7 @@ function Home() {
             const data = await response.json();
             console.log("data.message", data, data.message);
             console.log("merchantTransactionId from backend ", data?.data?.merchantTransactionId)
-            localStorage.setItem('transactionID', data?.data?.merchantTransactionId);
+            localStorage.setItem('userEmail', data?.data?.email);
             setPaymentStatus(data.message)
             setPaymentLink(data?.data?.instrumentResponse?.redirectInfo?.url)
             // window.location.href = data?.data?.instrumentResponse?.redirectInfo?.url;
