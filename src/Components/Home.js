@@ -94,7 +94,8 @@ function Home() {
             const data = await response.json();
             console.log("data.message", data, data.message);
             console.log("merchantTransactionId from backend ", data?.data?.merchantTransactionId)
-            localStorage.setItem('userEmail', data?.data?.email);
+            localStorage.setItem('merchantTransactionId', data?.data?.merchantTransactionId
+            );
             setPaymentStatus(data.message)
             setPaymentLink(data?.data?.instrumentResponse?.redirectInfo?.url)
             // window.location.href = data?.data?.instrumentResponse?.redirectInfo?.url;
@@ -106,9 +107,9 @@ function Home() {
 
 
             const callCheckAPI = async () => {
-                let transactionID = localStorage.getItem('transactionID')
+                let merchantTransactionId = localStorage.getItem('merchantTransactionId')
                 // let transactionID = formDataCopy.merchantTransactionId
-                let body = { merchantTransactionId: transactionID }
+                let body = { merchantTransactionId: merchantTransactionId }
                 try {
                     const res = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/app/payment-status`, {
                         method: 'POST',

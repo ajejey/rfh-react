@@ -43,10 +43,9 @@ function PaymentRedirect() {
     useEffect(() => {
         setLoading(true)
         const fetchStatus = async () => {
-            // let transactionID = localStorage.getItem('transactionID')
-            // let body = { merchantTransactionId: transactionID }
-            let userEmail = localStorage.getItem('userEmail')
-            let body = { email: userEmail }
+            let merchantTransactionId = localStorage.getItem('merchantTransactionId')
+            let body = { merchantTransactionId: merchantTransactionId }
+
             try {
                 const res = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/app/payment-status`, {
                     method: 'POST',
