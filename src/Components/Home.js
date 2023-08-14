@@ -23,6 +23,8 @@ import CallIcon from '@mui/icons-material/Call';
 import { Helmet } from 'react-helmet-async';
 
 function Home() {
+    const abortController = new AbortController();
+    const signal = abortController.signal;
     const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
     const myRef = useRef(null)
     const navigate = useNavigate()
@@ -86,6 +88,7 @@ function Home() {
             const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/initiate-payment`, {
                 method: "POST",
                 timeout: 1200000,
+                signal: signal,
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -114,6 +117,7 @@ function Home() {
                     const res = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/app/payment-status`, {
                         method: 'POST',
                         timeout: 1200000,
+                        signal: signal,
                         headers: {
                             "Content-Type": "application/json",
                         },
@@ -133,6 +137,8 @@ function Home() {
                     // }
                 } catch (error) {
                     console.error(error);
+                    setLoading(false)
+                    setPaymentStatus(error)
                 }
             }
 
@@ -141,6 +147,8 @@ function Home() {
 
         } catch (error) {
             console.error(error);
+            setLoading(false);
+            setPaymentStatus(error)
         }
 
     }
@@ -158,6 +166,10 @@ function Home() {
             }
         } else {
             console.log("No Search Params")
+        }
+
+        return () => {
+            abortController.abort();
         }
 
     }, [])

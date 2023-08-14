@@ -13,7 +13,24 @@ function AdminHome() {
     const [loading, setLoading] = useState(false);
     const [buttonDisabled, setButtonDisabled] = useState(true);
     const [apiError, setApiError] = useState('');
+    const [downloadCSVLoading, setDownloadCSVLoading] = useState(false);
+    const [csvDownloadLink, setCsvDownloadLink] = useState(null);
     const downloadLinkRef = useRef(null);
+
+    const downloadCsv = async () => {
+        try {
+            setDownloadCSVLoading(true);
+            const backendUrl = `${process.env.REACT_APP_BACKEND_BASE_URL}/api/donations/csv`;
+            const response = await fetch(backendUrl);
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            setCsvDownloadLink(url);
+            setDownloadCSVLoading(false);
+        } catch (error) {
+            console.error(error);
+            setDownloadCSVLoading(false);
+        }
+    }
 
     const body = [
         'fullName',
@@ -84,7 +101,27 @@ function AdminHome() {
         <div>
             <Header />
             <div className="container-md">
-                <h1 className="h1">Admin</h1>
+                <h1 className="h1">Admin Panel</h1>
+                <hr />
+                <section className="mb-4">
+                    <h3>Generate Donations CSV</h3>
+                    <div className="d-flex justify-content-center align-items-center mt-3 gap-3">
+                        <button className="btn btn-primary mr-2" onClick={downloadCsv}>
+                            {downloadCSVLoading ? (
+                                <div className="spinner-border spinner-border-sm text-light" role="status"></div>
+                            ) : (
+                                'Generate CSV'
+                            )}
+                        </button>
+                        {csvDownloadLink && (
+                            <a href={csvDownloadLink} download="donations.csv">
+                                Download CSV
+                            </a>
+                        )}
+                    </div>
+                </section>
+                <hr />
+
                 <h3 className="h3">Update offline donations</h3>
                 <form onSubmit={handleSubmit(handleDonationFormSubmit)}>
                     {body.map((field) => (
