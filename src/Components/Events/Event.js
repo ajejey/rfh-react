@@ -1,6 +1,7 @@
 import React, { useContext } from 'react'
 import Header from '../Header'
 import useSWR from 'swr';
+import 'react-quill/dist/quill.snow.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -44,7 +45,11 @@ function Event() {
                 </div>
                 <div className='pt-3'>
                     <h3 className='h3'>Description</h3>
-                    <div dangerouslySetInnerHTML={{ __html: eventData?.description }}></div>
+                    <div className="ql-container ql-snow" style={{ position: "relative", border: "none" }}>
+                        <div className="ql-editor" data-gramm="false">
+                            <div dangerouslySetInnerHTML={{ __html: eventData?.description }} />
+                        </div>
+                    </div>
                 </div>
                 <div className='pt-4 d-flex justify-content-center gap-5'>
                     <Button variant='contained' color='primary'>Donate Online</Button>

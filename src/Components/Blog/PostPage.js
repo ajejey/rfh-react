@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import 'react-quill/dist/quill.snow.css';
 import { useNavigate, useParams } from 'react-router-dom'
 import useSWR, { mutate } from 'swr'
 import Header from '../Header'
@@ -97,7 +98,11 @@ function PostPage() {
                     </div>
 
                 )}
-                <div className="content" dangerouslySetInnerHTML={{ __html: data?.data?.content }} />
+                <div className="ql-container ql-snow" style={{ position: "relative", border: "none" }}>
+                    <div className="ql-editor" data-gramm="false">
+                        <div className="content" dangerouslySetInnerHTML={{ __html: data?.data?.content }} />
+                    </div>
+                </div>
 
                 <button onClick={handleShare} className="btn btn-link">
                     <FontAwesomeIcon icon={faShareAlt} className="share-icon" />
