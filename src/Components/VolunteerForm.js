@@ -108,6 +108,7 @@ function VolunteerForm() {
             const data = await response.json();
             console.log("captcha response ", data)
 
+            // 'Authorization': `Bearer ${authToken}`
             if (data?.data?.success === true) {
                 try {
                     const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/volunteer-form-submit`, {
@@ -115,7 +116,6 @@ function VolunteerForm() {
                         timeout: 1200000,
                         headers: {
                             "Content-Type": "application/json",
-                            'Authorization': `Bearer ${authToken}`
                         },
                         body: JSON.stringify(formValuesCopy),
                     });
@@ -262,6 +262,22 @@ function VolunteerForm() {
                         <br />
                         <hr />
                         <br />
+                        <div className="row">
+                            <div className="col-md-12">
+                                {/* futureEventsData dropdown */}
+                                <div className="form-group">
+                                    <label htmlFor="volunteeringEvent">Which Event do you want to volunteer for?</label>
+                                    <select {...register("volunteeringEvent", { required: false })} id="volunteeringEvent" className="form-select" aria-label="event select">
+                                        <option value="">select</option>
+                                        {futureEventsData && futureEventsData.length && futureEventsData?.map((event) => (
+                                            <option value={event.eventName}>{event.eventName}</option>
+                                        ))}
+                                    </select>
+                                    {errors.volunteeringEvent && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                </div>
+                            </div>
+                        </div>
+
                         <div className="row">
                             <div className="col-md-6">
                                 <div className="form-group">

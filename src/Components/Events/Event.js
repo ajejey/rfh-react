@@ -6,7 +6,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { GlobalContext } from '../../context/Provider';
-import { Button } from '@mui/material';
+import { Button, Dialog } from '@mui/material';
+import DonateDialog from '../DonateDialog/DonateDialog';
 
 const fetcher = async (url) => {
     const response = await fetch(url);
@@ -21,6 +22,15 @@ function Event() {
     const navigate = useNavigate()
     const { volunteeringEvent, setVolunteeringEvent } = useContext(GlobalContext)
     const { data: eventData, error } = useSWR(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/events/${path}`, fetcher);
+    const [open, setOpen] = React.useState(false);
+
+    const handleDonateClick = () => {
+        setOpen(true)
+    }
+
+    const handleClose = () => {
+        setOpen(false)
+    }
 
     const handleRegisterClick = (eventName) => {
         setVolunteeringEvent(eventName)
@@ -52,11 +62,14 @@ function Event() {
                     </div>
                 </div>
                 <div className='pt-4 d-flex justify-content-center gap-5'>
-                    <Button variant='contained' color='primary'>Donate Online</Button>
+                    <Button onClick={handleDonateClick} variant='contained' color='primary'>Donate Online</Button>
                     <Button color='primary' onClick={() => handleRegisterClick(eventData?.eventName)}>Volunteer for this event</Button>
                 </div>
             </div>
-        </div >
+            <Dialog open={open}>
+                <DonateDialog handleClose={handleClose} />
+            </Dialog>
+        </div>
     )
 }
 

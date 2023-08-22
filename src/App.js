@@ -21,6 +21,7 @@ import PostPage from './Components/Blog/PostPage';
 import EditPost from './Components/Blog/EditPost';
 import { ThemeProvider } from '@mui/material';
 import theme from './theme/theme';
+import ScrollToTop from './Components/ScrollToTop/ScrollToTop';
 
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
   return (
     <div>
       <ThemeProvider theme={theme}>
+        <ScrollToTop />
         <HelmetProvider>
           <Routes>
             <Route path='/' element={<Home />} />

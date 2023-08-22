@@ -61,6 +61,7 @@ function Home() {
     console.log("searchParams, ", Object.fromEntries([...searchParams]))
 
     const handleClose = () => {
+        abortController.abort();
         let params = {};
         setSearchParams(params);
         setOpen(false);
