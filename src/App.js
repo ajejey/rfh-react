@@ -22,6 +22,7 @@ import EditPost from './Components/Blog/EditPost';
 import { ThemeProvider } from '@mui/material';
 import theme from './theme/theme';
 import ScrollToTop from './Components/ScrollToTop/ScrollToTop';
+import NivanshFightSma from './Components/NivanshFightSma/NivanshFightSma';
 
 
 function App() {
@@ -47,6 +48,7 @@ function App() {
               <Route path='/admin' element={<AdminHome />} />
             </Route>
             <Route path='/donate' element={<Donate />} />
+            <Route path='/nivanshfightsma' element={<NivanshFightSma />} />
             <Route path='/blog' element={<IndexPage />} />
             <Route path='/post/:path' element={<PostPage />} />
             <Route path='/edit/:path' element={<EditPost />} />
