@@ -64,7 +64,7 @@ function DonateForm(props) {
             const callCheckAPI = async () => {
                 let merchantTransactionId = localStorage.getItem('merchantTransactionId')
                 // let transactionID = formDataCopy.merchantTransactionId
-                let body = { merchantTransactionId: merchantTransactionId }
+                let body = { merchantTransactionId: merchantTransactionId, cause: props?.cause || "" }
                 try {
                     const res = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/app/payment-status`, {
                         method: 'POST',
