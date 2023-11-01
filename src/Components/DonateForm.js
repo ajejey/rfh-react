@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { GlobalContext } from '../context/Provider';
 
-function DonateForm() {
+function DonateForm(props) {
     const abortController = new AbortController();
     const signal = abortController.signal;
     const navigate = useNavigate()
@@ -29,7 +29,7 @@ function DonateForm() {
         setLoading(true)
         let formDataCopy = JSON.parse(JSON.stringify(formData))
         // formDataCopy = { ...formDataCopy, merchantTransactionId: generateTransactionId() }
-        formDataCopy = { ...formDataCopy }
+        formDataCopy = { ...formDataCopy, volunteeringEvent: props?.volunteeringEvent || "" }
 
         // favDispatch({ type: "SET_TRANSACTION_ID", payload: formDataCopy })
         setTransaction({ ...formDataCopy })
