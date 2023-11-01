@@ -41,36 +41,40 @@ function PaymentRedirect() {
     }
 
     useEffect(() => {
-        setLoading(true)
-        const fetchStatus = async () => {
-            let merchantTransactionId = localStorage.getItem('merchantTransactionId')
-            let body = { merchantTransactionId: merchantTransactionId }
+        if (Object.keys(status).length === 0) {
+            setLoading(true)
+            const fetchStatus = async () => {
+                let merchantTransactionId = localStorage.getItem('merchantTransactionId')
+                let cause = localStorage.getItem('cause')
+                let body = { merchantTransactionId: merchantTransactionId, cause: cause }
 
-            try {
-                const res = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/app/payment-status`, {
-                    method: 'POST',
-                    timeout: 1200000,
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(body)
-                });
-                const data = await res.json();
-                console.log("data ", data)
+                try {
+                    const res = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/app/payment-status`, {
+                        method: 'POST',
+                        timeout: 1200000,
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(body)
+                    });
+                    const data = await res.json();
+                    console.log("data ", data)
 
-                setStatus(data);
-                setLoading(false)
+                    setStatus(data);
+                    setLoading(false)
 
-                // Check if payment is still pending
-                // if (data.success === true && data.data.state === 'PENDING') {
-                //     setTimeout(fetchStatus, 3000);
-                // }
-            } catch (error) {
-                console.error(error);
-            }
-        };
+                    // Check if payment is still pending
+                    // if (data.success === true && data.data.state === 'PENDING') {
+                    //     setTimeout(fetchStatus, 3000);
+                    // }
+                } catch (error) {
+                    console.error(error);
+                }
+            };
 
-        fetchStatus();
+            fetchStatus();
+
+        }
 
 
     }, []);

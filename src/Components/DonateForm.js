@@ -51,6 +51,7 @@ function DonateForm(props) {
             console.log("merchantTransactionId from backend ", data?.data?.merchantTransactionId)
             localStorage.setItem('merchantTransactionId', data?.data?.merchantTransactionId
             );
+            localStorage.setItem('cause', props?.cause || " ");
             setPaymentStatus(data.message)
             setPaymentLink(data?.data?.instrumentResponse?.redirectInfo?.url)
             // window.location.href = data?.data?.instrumentResponse?.redirectInfo?.url;
@@ -63,6 +64,7 @@ function DonateForm(props) {
 
             const callCheckAPI = async () => {
                 let merchantTransactionId = localStorage.getItem('merchantTransactionId')
+                let cause = localStorage.getItem('cause')
                 // let transactionID = formDataCopy.merchantTransactionId
                 let body = { merchantTransactionId: merchantTransactionId, cause: props?.cause || "" }
                 try {
@@ -94,7 +96,13 @@ function DonateForm(props) {
                 }
             }
 
-            setTimeout(callCheckAPI, 20000)
+            // function to return to home page
+            const returnToHome = () => {
+                navigate('/')
+            }
+
+            // setTimeout(callCheckAPI, 20000)
+            setTimeout(returnToHome, 20000)
 
 
         } catch (error) {
