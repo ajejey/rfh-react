@@ -41,7 +41,7 @@ function NivanshFightSma() {
                 </p>
 
                 <h2 className="h2">Donate</h2>
-                <DonateForm volunteeringEvent="Nivansh fights sma" />
+                <DonateForm cause="Nivansh fights sma" />
                 <footer>
                     <p style={{ textAlign: "center" }}>Save Nivansh fight SMA2</p>
 

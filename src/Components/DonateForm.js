@@ -29,7 +29,7 @@ function DonateForm(props) {
         setLoading(true)
         let formDataCopy = JSON.parse(JSON.stringify(formData))
         // formDataCopy = { ...formDataCopy, merchantTransactionId: generateTransactionId() }
-        formDataCopy = { ...formDataCopy, volunteeringEvent: props?.volunteeringEvent || "" }
+        formDataCopy = { ...formDataCopy, cause: props?.cause || "" }
 
         // favDispatch({ type: "SET_TRANSACTION_ID", payload: formDataCopy })
         setTransaction({ ...formDataCopy })
