@@ -109,6 +109,7 @@ function CreateEvent() {
 
                     // Send the download URL to the backend API
                     const data = { ...formData, image: downloadURL, path, description };
+                    console.log("data ", data);
                     const url = `${process.env.REACT_APP_BACKEND_BASE_URL}/api/events`;
 
                     const response = await fetch(url, {
@@ -161,16 +162,6 @@ function CreateEvent() {
                         </Grid>
                         <Grid item xs={12}>
                             <label htmlFor="description">Description</label> <br />
-                            {/* <textarea
-                                label="Description"
-                                name='description'
-                                className='form-control'
-                                {...register('description', { required: true })}
-                                error={errors.description}
-                                helperText={errors.description && "This field is required"}
-                                type="text"
-                                rows="4"
-                            /> */}
                             <Editor value={description} onChange={setDescription} />
                         </Grid>
                         <Grid item xs={12}>
@@ -185,7 +176,23 @@ function CreateEvent() {
                                 type="text"
                                 rows="2"
                             />
+                            
                         </Grid>
+                        {/* input google maps location */}
+                        <Grid item xs={12}>
+                            <label htmlFor="mapLocation">Google Maps Location Link</label> <br />
+                            <input
+                                label="Map Location"
+                                name='mapLocation'
+                                className='form-control'
+                                {...register('mapLocation', { required: true })}
+                                error={errors.mapLocation}
+                                helperText={errors.mapLocation && "This field is required"}
+                                type="text"
+                            />
+                        </Grid>
+                        
+
                         <Grid item xs={12}>
                             <label htmlFor="startDate">Start Date</label> <br />
                             <input

@@ -90,10 +90,10 @@ function Event() {
                     <DateRangeIcon color='tertiary' /> &nbsp;
                     {new Date(eventData?.startDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                 </span> <br />
-                <span style={{ fontWeight: 'bold', color: 'gray' }}>
+                <a href={eventData?.mapLocation} target="_blank" rel="noopener noreferrer" >
                     <LocationOnIcon color='tertiary' /> &nbsp;
                     {eventData?.location}
-                </span>
+                </a>
                 <div className="d-flex justify-content-center pt-4">
                     <img src={eventData?.image} className="img-fluid h-75" alt="Event details" />
                 </div>
