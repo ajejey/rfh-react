@@ -16,49 +16,7 @@ function CreateEvent() {
     const [imageInvalid, setImageInvalid] = useState(false);
     const [description, setDescription] = useState('');
 
-    // const onSubmit = async (formData) => {
-    //     const file = image;
-
-    //     // Check if the file is an image
-    //     if (!file.type.startsWith('image/') || file.size > (1024 * 1024)) {
-    //         console.error('Invalid file type or size too large');
-    //         setImageInvalid(true);
-    //         return;
-    //     }
-
-    //     // Create a URL for the uploaded file
-    //     const imageUrl = URL.createObjectURL(file);
-
-    //     // Create a new image element
-    //     const img = new Image();
-
-    //     // Set the image element's src to the URL
-    //     img.src = imageUrl;
-
-    //     // When the image is loaded, convert it to WebP format
-    //     img.onload = () => {
-    //         const canvas = document.createElement('canvas');
-
-    //         canvas.width = img.width;
-    //         canvas.height = img.height;
-
-    //         const ctx = canvas.getContext('2d');
-    //         ctx.drawImage(img, 0, 0);
-
-    //         canvas.toBlob((blob) => {
-    //             // Create a root reference to the storage bucket
-    //             const storage = getStorage();
-
-    //             // Create a reference to the file we want to upload
-    //             const fileRef = ref(storage, 'images/' + file.name);
-
-    //             uploadBytes(fileRef, blob).then((snapshot) => {
-    //                 console.log('Uploaded WebP image: ', snapshot);
-    //             })
-    //         }, 'image/webp', 0.7);
-    //     }
-
-    // }
+  
 
     const onSubmit = async (formData) => {
         const file = image;
