@@ -104,7 +104,13 @@ function DonateDialog({ handleClose }) {
                 }
             }
 
-            setTimeout(callCheckAPI, 20000)
+            // function to return to home page
+            const returnToHome = () => {
+                navigate('/')
+            }
+
+            // setTimeout(callCheckAPI, 20000)
+            setTimeout(returnToHome, 20000)
 
 
         } catch (error) {
