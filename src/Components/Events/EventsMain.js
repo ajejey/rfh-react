@@ -10,7 +10,8 @@ function EventsMain() {
         <div>
             <Routes>
                 <Route path='/' element={<Events />} />
-                <Route path='/runforliteracy-2023' element={<EventForm />} />
+                {/* <Route path='/runforliteracy-2023' element={<EventForm />} /> */}
+                <Route path='/rfh-juniors-run-2024' element={<EventForm />} />
                 <Route path='/create-event' element={<CreateEvent />} />
                 <Route path='/:path' element={<Event />} />
             </Routes>

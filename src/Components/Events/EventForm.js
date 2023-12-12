@@ -1,17 +1,18 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import Header from '../Header'
-import { useForm } from "react-hook-form";
+import { useForm, watch } from "react-hook-form";
 import { countries, indianStates } from '../../Constants/constants';
 import Dropzone from 'react-dropzone'
 import EventTwoToneIcon from '@mui/icons-material/EventTwoTone';
 import AccessTimeTwoToneIcon from '@mui/icons-material/AccessTimeTwoTone';
 import PlaceTwoToneIcon from '@mui/icons-material/PlaceTwoTone';
 import MilitaryTechTwoToneIcon from '@mui/icons-material/MilitaryTechTwoTone';
-import { Button } from '@mui/material';
+import { Button, Dialog } from '@mui/material';
 import { Helmet } from 'react-helmet-async';
+import tShirtGuide from '../../assets/images/tShirtGuide.jpeg'
 
 function EventForm() {
-    const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
+    const { register, handleSubmit, getValues, setValue, formState: { errors }, watch } = useForm();
     const myRef = useRef(null)
     const [submitted, setSubmitted] = useState(false)
     const [totalPrice, setTotalPrice] = useState(0)
@@ -19,6 +20,8 @@ function EventForm() {
     const [willPickUp, setWillPickUp] = useState("no")
     const [selectedCity, setSelectedCity] = useState("others")
     const [seeMore, setSeeMore] = useState(false)
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const [openTshirtGuide, setOpenTshirtGuide] = useState(false)
 
     const executeScroll = () => myRef.current.scrollIntoView()
 
@@ -37,6 +40,60 @@ function EventForm() {
         })
 
     }, [])
+    const calculateAge = (dob) => {
+        const today = new Date();
+        const birthDate = new Date(dob);
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+
+        return age;
+    };
+
+    const handleDateChange = () => {
+        const dob = watch('dob');
+        const age = calculateAge(dob);
+
+        // Update the category based on the age
+        if (age >= 3 && age <= 8) {
+            setSelectedCategory('Champs-Run');
+        } else if (age >= 9 && age <= 15) {
+            setSelectedCategory('Power-Run');
+        } else if (age >= 16 && age <= 21) {
+            setSelectedCategory('Bolts-Run');
+        } else {
+            setSelectedCategory('');
+        }
+    };
+
+    // Watch for changes in the 'dob' field
+    const dob = watch('dob');
+    const donation = watch('donation');
+
+    const handleDonationChange = (e) => {
+        const enteredValue = e.target.value;
+        setValue('donation', enteredValue);
+
+        // Clear the other input field when one is entered
+        setValue('customDonation', '');
+    };
+
+    useEffect(() => {
+        // Update the category whenever 'dob' changes
+        handleDateChange();
+    }, [dob]);
+
+    useEffect(() => {
+        setValue("category", selectedCategory)
+    }, [selectedCategory])
+
+    const handleCategoryChange = () => {
+        console.log("selectedCategory ", selectedCategory)
+    }
+
 
     console.log("submitted ", submitted)
     const onSubmit = (data) => {
@@ -139,7 +196,7 @@ function EventForm() {
     return (
         <div style={{ backgroundColor: "#040002", color: "lightgray", minHeight: "100vh" }}>
             <Helmet>
-                <title>Run for Literacy 2023 | Rupee For Humanity</title>
+                <title>RFH Juniors run 2024 | Rupee For Humanity</title>
             </Helmet>
             <Header />
             <main>
@@ -147,7 +204,7 @@ function EventForm() {
                     <section id="registration-form">
                         <div className="container-md">
                             <h1 className="h1" style={{ fontWeight: "800" }}>
-                                RFH 10K Run - Run for Literacy 2023 <br /> <span className='highlight' style={{ cursor: "pointer" }} onClick={executeScroll}>Virtual Run</span>
+                                RFH Juniors run 2024 <br /> <span className='highlight' style={{ cursor: "pointer" }} onClick={executeScroll}>Virtual Run</span>
                             </h1>
                             <div className="row">
                                 <div className="col-md-4">
@@ -173,8 +230,7 @@ function EventForm() {
                                 ladder of developed nations.
                             </p>
                             <p>
-                                We are proud to host the event again this year “RFH 10K Run - Run for Literacy 2023” – this time its
-                                virtual run but the excitement and cause is solid as always.
+                                We are proud to host the event again this year <b>“RFH Juniors run 2024”!</b>
                             </p>
 
                             {seeMore === true && expandedText()}
@@ -248,51 +304,8 @@ function EventForm() {
 
                                 <form onSubmit={handleSubmit(onSubmit)}>
                                     <h2 className="form-header">Registration Form</h2>
-                                    <div className="row">
-                                        <div className="col-md-6">
-                                            <div className="form-group">
-                                                <label htmlFor="first">Select Category<span style={{ color: "red" }}>*</span></label>
-                                                <select {...register("category", { required: true })} className="form-select" aria-label="Default select example">
-                                                    <option value="">select</option>
-                                                    <option value="3k-Fun-Run-2023">3k - Fun Run</option>
-                                                    <option value="5k-Super-Run-2023">5k - Super Run</option>
-                                                    <option value="10k-Challenge-Run-2023">10k - Challenge Run</option>
-                                                </select>
-                                                {errors.category && <p style={{ color: "red" }}>This field is mandatory</p>}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="row">
-                                        <div className="col-md-6">
-                                            <div className="form-group">
-                                                <label htmlFor="need-tee">Do you want to opt for T-Shirt?  <span style={{ color: "red" }}>*</span>
-                                                </label>
-                                                <select {...register("needTShirt", { required: true, onChange: (e) => handleNeedTee(e) })} id="need-tee" className="form-select"
-                                                    aria-label="do you want to opt for T-Shirt">
-                                                    <option value="">select</option>
-                                                    <option value="yes">Yes</option>
-                                                    <option value="no">No</option>
-                                                </select>
-                                                {errors.needTShirt && <p style={{ color: "red" }}>This field is mandatory</p>}
-                                            </div>
-                                        </div>
-                                        <div className="col-md-6">
-                                            <div className="form-group">
-                                                <label htmlFor="tee-size">T-Shirt Size {needTee === "no" ? <span></span> : <span style={{ color: "red" }}>*</span>}</label>
-                                                <select disabled={needTee === "no"} {...register("TshirtSize", { required: needTee === "no" ? false : true })} id="tee-size" className="form-select" aria-label="T-Shirt Size">
-                                                    <option value="">select</option>
-                                                    <option value="XSmall">X-Small</option>
-                                                    <option value="Small">Small</option>
-                                                    <option value="Medium">Medium</option>
-                                                    <option value="Large">Large</option>
-                                                    <option value="X-Large">X-Large</option>
-                                                    <option value="XX-Large">XX-Large</option>
-                                                </select>
-                                                {errors.TshirtSize && <p style={{ color: "red" }}>This field is mandatory</p>}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="row">
+
+                                    {/* <div className="row">
                                         <div className="col-md-12">
                                             <div className="form-group">
                                                 <label htmlFor="need-tee">Do you want to pick up yout T-Shirt yourself? (Only in Bengaluru, Hyderabad, and Chennai)  {needTee === "no" ? <span></span> : <span style={{ color: "red" }}>*</span>}
@@ -306,7 +319,7 @@ function EventForm() {
                                                 {errors.selfPickUp && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> */}
                                     <div className="row">
                                         <div className="col-md-12">
                                             <div className="form-group">
@@ -353,7 +366,7 @@ function EventForm() {
                                             <div className="form-group">
                                                 <label htmlFor="bloodGroup">Blood Group <span style={{ color: "red" }}>*</span></label>
                                                 <input {...register("bloodGroup", { required: true })} type="text" className="form-control" id="bloodGroup" placeholder="Blood Group" />
-                                                {errors.dob && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                                {errors.bloodGroup && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
                                         </div>
 
@@ -445,6 +458,164 @@ function EventForm() {
                                             </div>
                                         </div>
                                     </div>
+
+                                    {/* Run Name	Age group	Distance
+Champs Run	3-8 years	800 meters
+Power Run	9-15 years	1.5 kms
+Bolts Run	16-21 years	2.5 kms */}
+
+
+                                    <div className="row">
+                                        <div className="col-md-6">
+                                            <div className="form-group">
+                                                <label htmlFor="category">Select Category<span style={{ color: "red" }}>*</span></label>
+                                                <select id="category" {...register("category", { required: true, onChange: handleCategoryChange })} value={selectedCategory} className="form-select" aria-label="Select Category" readOnly >
+                                                    <option value="">select</option>
+                                                    <option value="Champs-Run">Champs Run</option>
+                                                    <option value="Power-Run">Power Run</option>
+                                                    <option value="Bolts-Run">Bolts Run</option>
+                                                </select>
+                                                {errors.category && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                            </div>
+                                        </div>
+                                        {selectedCategory === 'Champs-Run' &&
+                                            <div className="col-md-6">
+                                                <div className="form-group">
+                                                    <label htmlFor='parent-name'>Accompanying parent name </label>
+                                                    <input {...register("parentName")} className="form-control" type="text" name="parent-name" id="parent-name" />
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                    <div className="row">
+                                        {/* <div className="col-md-6">
+                                            <div className="form-group">
+                                                <label htmlFor="need-tee">Do you want to opt for T-Shirt?  <span style={{ color: "red" }}>*</span>
+                                                </label>
+                                                <select {...register("needTShirt", { required: true, onChange: (e) => handleNeedTee(e) })} id="need-tee" className="form-select"
+                                                    aria-label="do you want to opt for T-Shirt">
+                                                    <option value="">select</option>
+                                                    <option value="yes">Yes</option>
+                                                    <option value="no">No</option>
+                                                </select>
+                                                {errors.needTShirt && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                            </div>
+                                        </div> */}
+                                        <div className="col-md-6">
+                                            <div className="form-group">
+                                                <label htmlFor="tee-size">T-Shirt Size  <span style={{ color: "red" }}>*</span></label>
+                                                <select {...register("TshirtSize", { required: true })} id="tee-size" className="form-select" aria-label="T-Shirt Size">
+                                                    <option value="">select</option>
+                                                    <option value="XSmall">X-Small</option>
+                                                    <option value="Small">Small</option>
+                                                    <option value="Medium">Medium</option>
+                                                    <option value="Large">Large</option>
+                                                    <option value="X-Large">X-Large</option>
+                                                    <option value="XX-Large">XX-Large</option>
+                                                </select>
+                                                {errors.TshirtSize && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                            </div>
+                                        </div>
+                                        <div onClick={() => setOpenTshirtGuide(true)} className="col-md-6" style={{ display: 'flex', alignItems: "flex-end", textDecoration: "underline", cursor: "pointer" }}>
+                                            T-shirt size guide
+                                        </div>
+                                        <Dialog open={openTshirtGuide} onClose={() => setOpenTshirtGuide(false)} >
+                                            <img src={tShirtGuide} alt="RFH Tshirt Guide" />
+                                        </Dialog>
+                                    </div>
+                                    {/* New row for additional T-shirt question */}
+                                    <div className="row">
+                                        <div className="col-md-6">
+                                            <div className="form-group">
+                                                <label htmlFor="additionalTshirt">Do you need additional T-shirt? <span style={{ color: "red" }}>*</span></label>
+                                                <select {...register("additionalTshirt", { required: true })} id="additionalTshirt" className="form-select" aria-label="Additional T-shirt">
+                                                    <option value="">select</option>
+                                                    <option value="Yes">Yes</option>
+                                                    <option value="No">No</option>
+                                                </select>
+                                                {errors.additionalTshirt && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                            </div>
+                                        </div>
+                                        {/* Dropdown for quantity if Yes is selected */}
+                                        {watch('additionalTshirt') === 'Yes' && (
+                                            <div className="col-md-6">
+                                                <div className="form-group">
+                                                    <label htmlFor="quantity">Quantity <span style={{ color: "red" }}>*</span></label>
+                                                    <select {...register("quantity", { required: true })} id="quantity" className="form-select" aria-label="Quantity">
+                                                        <option value="">select</option>
+                                                        <option value="1">1</option>
+                                                        <option value="2">2</option>
+                                                        <option value="3">3</option>
+                                                        <option value="4">4</option>
+                                                        <option value="5">5</option>
+                                                        <option value="6">6</option>
+                                                    </select>
+                                                    {errors.quantity && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* New row for T-shirt sizes if additional T-shirts are selected */}
+                                    {watch('additionalTshirt') === 'Yes' && (
+                                        <div className="row">
+                                            <div className="col-md-6">
+                                                <div className="form-group">
+                                                    <label htmlFor="additionalTshirtSize">Select T-Shirt Size for Additional T-shirts <span style={{ color: "red" }}>*</span></label>
+                                                    <select {...register("additionalTshirtSize", { required: true })} id="additionalTshirtSize" className="form-select" aria-label="Additional T-shirt Size">
+                                                        <option value="">select</option>
+                                                        <option value="XSmall">X-Small</option>
+                                                        <option value="Small">Small</option>
+                                                        <option value="Medium">Medium</option>
+                                                        <option value="Large">Large</option>
+                                                        <option value="X-Large">X-Large</option>
+                                                        <option value="XX-Large">XX-Large</option>
+                                                    </select>
+                                                    {errors.additionalTshirtSize && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* New row for donation question */}
+                                    <div className="row">
+                                        <div className="col-md-6">
+                                            <div className="form-group">
+                                                <label htmlFor="donation">Do you wish to donate for Rupee For Humanity for a noble cause? <span style={{ color: "red" }}>*</span></label>
+                                                <input
+                                                    {...register("donation", { required: true })}
+                                                    type="number"
+                                                    className="form-control"
+                                                    id="donation"
+                                                    placeholder="Enter your amount"
+                                                    onChange={handleDonationChange}
+                                                />
+                                                {errors.donation && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                            </div>
+                                        </div>
+                                        <div className="col-md-6">
+                                            <div className="form-group">
+                                                <label htmlFor="customDonation">Or select from the dropdown <span style={{ color: "red" }}>*</span></label>
+                                                <select
+                                                    {...register("donation", { required: true })}
+                                                    id="customDonation"
+                                                    className="form-select"
+                                                    aria-label="Donation"
+                                                    onChange={handleDonationChange}
+                                                >
+                                                    <option value="">select</option>
+                                                    <option value="1">1</option>
+                                                    <option value="10">10</option>
+                                                    <option value="50">50</option>
+                                                    <option value="100">100</option>
+                                                    <option value="200">200</option>
+                                                    <option value="500">500</option>
+                                                </select>
+                                                {errors.donation && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <br />
                                     <hr />
                                     <br />
