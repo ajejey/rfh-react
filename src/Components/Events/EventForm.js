@@ -97,17 +97,48 @@ function EventForm() {
 
 
     console.log("submitted ", submitted)
+
+    function calculateTotalPrice(formData) {
+        // Get the current date
+        const currentDate = new Date();
+
+        // Set the registration fee based on the current date
+        const registrationFee = currentDate < new Date("2024-12-31") ? 499 : 599;
+        console.log("registrationFee ", registrationFee)
+        // Calculate the total price
+        let totalPrice = registrationFee;
+
+        // Add INR 200 for every additional T-shirt
+        if (formData.additionalTshirtQuantity) {
+            console.log("formData.additionalTshirtQuantity ", formData.additionalTshirtQuantity)
+            const additionalTshirtCost = Number(formData.additionalTshirtQuantity) * 200;
+            totalPrice += additionalTshirtCost;
+        }
+
+        console.log("totalPrice ", totalPrice)
+
+        // Add the donation amount
+        if (formData.donation) {
+            totalPrice += parseInt(formData.donation, 10);
+        }
+
+        console.log("totalPrice ", totalPrice)
+
+        return totalPrice;
+    }
+
     const onSubmit = (data) => {
         console.log(data);
         setSubmitted(!submitted)
-        let price = 250;
-        if (getValues("needTShirt") === "yes") {
-            price = 210 + price
-        }
-        if (getValues("selfPickUp") === "no") {
-            price = 150 + price
-        }
-        setTotalPrice(price)
+        const totalPrice = calculateTotalPrice(data);
+        // let price = 250;
+        // if (getValues("needTShirt") === "yes") {
+        //     price = 210 + price
+        // }
+        // if (getValues("selfPickUp") === "no") {
+        //     price = 150 + price
+        // }
+        setTotalPrice(totalPrice)
     }
 
     const handleSelfPickupChange = (e) => {
@@ -497,7 +528,7 @@ Bolts Run	16-21 years	2.5 kms */}
                                                 <div className="form-group">
                                                     <label htmlFor='parent-name'>Accompanying parent name <span style={{ color: "red" }}>*</span></label>
                                                     <input {...register("parentName", { required: selectedCategory === 'Champs-Run' })} className="form-control" type="text" name="parent-name" id="parent-name" />
-                                                {errors.parentName && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                                    {errors.parentName && <p style={{ color: "red" }}>This field is mandatory</p>}
                                                 </div>
                                             </div>
                                         }
@@ -555,8 +586,8 @@ Bolts Run	16-21 years	2.5 kms */}
                                         {watch('additionalTshirt') === 'Yes' && (
                                             <div className="col-md-6">
                                                 <div className="form-group">
-                                                    <label htmlFor="quantity">Quantity <span style={{ color: "red" }}>*</span></label>
-                                                    <select {...register("quantity", { required: true })} id="quantity" className="form-select" aria-label="Quantity">
+                                                    <label htmlFor="additionalTshirtQuantity">Quantity <span style={{ color: "red" }}>*</span></label>
+                                                    <select {...register("additionalTshirtQuantity", { required: true })} id="additionalTshirtQuantity" className="form-select" aria-label="additionalTshirtQuantity">
                                                         <option value="">select</option>
                                                         <option value="1">1</option>
                                                         <option value="2">2</option>
@@ -565,7 +596,7 @@ Bolts Run	16-21 years	2.5 kms */}
                                                         <option value="5">5</option>
                                                         <option value="6">6</option>
                                                     </select>
-                                                    {errors.quantity && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                                    {errors.additionalTshirtQuantity && <p style={{ color: "red" }}>This field is mandatory</p>}
                                                 </div>
                                             </div>
                                         )}
@@ -598,7 +629,7 @@ Bolts Run	16-21 years	2.5 kms */}
                                             <div className="form-group">
                                                 <label htmlFor="donation">Do you wish to donate for Rupee For Humanity for a noble cause? <span style={{ color: "red" }}>*</span></label>
                                                 <input
-                                                    {...register("donation", { required: true })}
+                                                    {...register("donation", { required: !watch('customDonation') })}
                                                     type="number"
                                                     className="form-control"
                                                     id="donation"
@@ -612,7 +643,7 @@ Bolts Run	16-21 years	2.5 kms */}
                                             <div className="form-group">
                                                 <label htmlFor="customDonation">Or select from the dropdown <span style={{ color: "red" }}>*</span></label>
                                                 <select
-                                                    {...register("donation", { required: true })}
+                                                    {...register("customDonation", { required: !watch('donation') })}
                                                     id="customDonation"
                                                     className="form-select"
                                                     aria-label="Donation"
@@ -655,7 +686,7 @@ Bolts Run	16-21 years	2.5 kms */}
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <div className="row">
                                         <div className="col-md-12">
                                             <div className="form-group">
@@ -674,7 +705,7 @@ Bolts Run	16-21 years	2.5 kms */}
                                             </div>
                                         </div>
                                     </div>
-                                    
+
 
                                     {/* <div className="row">
                                         <div className="col-md-12">
@@ -760,12 +791,12 @@ Bolts Run	16-21 years	2.5 kms */}
                                         <td>{getValues("mobNo")}</td>
                                     </tr>
                                     <tr>
-                                        <td className="fs-6">Need T-shirt </td>
-                                        <td> {getValues("needTShirt")}  </td>
-                                    </tr>
-                                    <tr>
                                         <td className="fs-6">T-shirt Size </td>
                                         <td> {getValues("TshirtSize")}  </td>
+                                    </tr>
+                                    <tr>
+                                        <td className="fs-6">Need additional T-shirt </td>
+                                        <td> {getValues("additionalTshirtQuantity")}  </td>
                                     </tr>
                                     <tr>
                                         <td className="fs-6">Total Cost </td>
@@ -792,15 +823,15 @@ Bolts Run	16-21 years	2.5 kms */}
                                             <tbody>
                                                 <tr>
                                                     <td> {getValues("category")} </td>
-                                                    <td className="fs-6"> INR 250</td>
+                                                    <td className="fs-6"> INR {new Date() < new Date("2024-12-31") ? 499 : 599}</td>
                                                 </tr>
                                                 <tr>
                                                     <td className="fs-6">T-shirt</td>
-                                                    <td> {getValues("needTShirt") === "yes" ? "INR 210" : 0} </td>
+                                                    <td> INR {getValues("additionalTshirt") === "Yes" ? getValues("additionalTshirtQuantity") * 200 : 0} </td>
                                                 </tr>
                                                 <tr>
-                                                    <td className="fs-6">Courier charges</td>
-                                                    <td>{getValues("selfPickUp") !== "no" ? 0 : " INR 150"}</td>
+                                                    <td className="fs-6">Donation</td>
+                                                    <td> INR {getValues("donation") === "" ? 0 : getValues("donation")}</td>
                                                 </tr>
                                                 <tr>
                                                     <td className="fs-6">Total </td>
