@@ -7,6 +7,7 @@ import EventTwoToneIcon from '@mui/icons-material/EventTwoTone';
 import AccessTimeTwoToneIcon from '@mui/icons-material/AccessTimeTwoTone';
 import PlaceTwoToneIcon from '@mui/icons-material/PlaceTwoTone';
 import MilitaryTechTwoToneIcon from '@mui/icons-material/MilitaryTechTwoTone';
+import HowToRegIcon from '@mui/icons-material/HowToReg';
 import { Button, Dialog } from '@mui/material';
 import { Helmet } from 'react-helmet-async';
 import tShirtGuide from '../../assets/images/tShirtGuide.jpeg'
@@ -58,7 +59,7 @@ function EventForm() {
         const age = calculateAge(dob);
 
         // Update the category based on the age
-        if (age >= 3 && age <= 8) {
+        if (age >= 0 && age <= 8) {
             setSelectedCategory('Champs-Run');
         } else if (age >= 9 && age <= 15) {
             setSelectedCategory('Power-Run');
@@ -179,9 +180,9 @@ function EventForm() {
                     schools and various other sources.
                 </p>
                 <p>
-                    As a part of this initiative, we conducted ‘RFH 10K Run - Run for Literacy’ last 5 years at Cubbon
+                    As a part of this initiative, we conducted ‘RFH 10K Run - Run for Literacy’ Literacy’ from 2014-2019 at Cubbon
                     park, Bangalore and from the contributions of kind hearts like you, we were able to sponsor
-                    education for ~180 underprivileged kids from various places including stationary, books and school
+                    education for ~280 underprivileged kids from various places including stationary, books and school
                     uniforms.
                 </p>
 
@@ -208,19 +209,18 @@ function EventForm() {
                             </h1>
                             <div className="row">
                                 <div className="col-md-4">
-                                    <span> <strong><EventTwoToneIcon /> Date:</strong>  April 29th & 30th  (Saturday & Sunday)  </span>
+                                    <span> <strong><EventTwoToneIcon /> Date:</strong>  Feb 11th 2024 (Sunday)   </span>
                                 </div>
                                 <div className="col-md-4">
-                                    <span><strong> <AccessTimeTwoToneIcon /> Time:</strong>  Run anytime during the above dates</span>
+                                    <span><strong> <AccessTimeTwoToneIcon /> Time:</strong>  7:00 AM IST </span>
                                 </div>
                                 <div className="col-md-4">
-                                    <span><strong> <PlaceTwoToneIcon /> Venue:</strong>  Run anywhere as per your comfort</span>
+                                    <span><strong> <PlaceTwoToneIcon /> Venue: </strong><a style={{ color: "lightgray" }} href="https://maps.app.goo.gl/eRJjvw1mJxrQXef5A" target="_blank" rel="noopener noreferrer">DSCE, Bengaluru</a> </span>
                                 </div>
                             </div>
 
-                            <span> <MilitaryTechTwoToneIcon /> Virtual Marathon consisting of various catagories for the run.</span><br />
 
-                            <span ><small style={{ color: "red" }}> <strong>Last Date to Register: March 25th</strong> </small></span><br />
+                            <span ><small style={{ color: "red" }}> <strong>Last Date to Register: Jan 26th 2024</strong> </small></span><br />
                             <br />
 
                             <p>
@@ -245,56 +245,70 @@ function EventForm() {
                                 <table className="table" style={{ backgroundColor: "#040002", color: "lightgray" }}>
                                     <thead>
                                         <tr>
-                                            <th className="fs-6" scope="col">Run Category</th>
-                                            <th scope="col">Racer Kit</th>
-                                            <th scope="col">Price</th>
+                                            <th className="fs-6" scope="col">Run Name</th>
+                                            <th scope="col">Age Group</th>
+                                            <th scope="col">Distance</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td className="fs-6">3k - Fun Run</td>
-                                            <td>E-Certificate <span style={{ color: "red" }}>*</span> </td>
-                                            <td>INR 250</td>
+                                            <td className="fs-6">Champs Run</td>
+                                            <td>3-8 years</td>
+                                            <td>800 meters</td>
                                         </tr>
                                         <tr>
-                                            <td className="fs-6">5k - Super Run</td>
-                                            <td>E-Certificate <span style={{ color: "red" }}>*</span> </td>
-                                            <td>INR 250</td>
+                                            <td className="fs-6">Power Run</td>
+                                            <td>9-15 years</td>
+                                            <td>1.5 kms</td>
                                         </tr>
                                         <tr>
-                                            <td className="fs-6">10k - Challenge Run</td>
-                                            <td>E-Certificate <span style={{ color: "red" }}>*</span> </td>
-                                            <td>INR 250</td>
+                                            <td className="fs-6">Bolts Run</td>
+                                            <td>16-21 years</td>
+                                            <td>2.5 kms</td>
                                         </tr>
                                     </tbody>
                                 </table>
-                                <div style={{ display: "flex", justifyContent: "space-between" }}>
+
+                                {/* <div style={{ display: "flex", justifyContent: "space-between" }}>
                                     <div>
-                                        {/* <b>T-shirt</b> : INR 210/- <br />
+                                        <b>T-shirt</b> : INR 210/- <br />
                                         <b>Courier charges anywhere in India</b> : INR 150/- <br />
                                         <b>Self Pickup available only in Bengaluru, Hyderabad, Chennai</b> <br />
-                                        <small>Above items are optional and are not applicable for runners outside India</small><br /> */}
+                                        <small>Above items are optional and are not applicable for runners outside India</small><br />
                                         <small style={{ color: "red" }}>* Upon upload of the screenshot of your running activity in portal</small>
                                     </div>
+                                </div> */}
+                                <div className="mt-4">
+                                    <p>
+                                        Each participant receives T-shirt, Medal, Bib, Finisher certificate, Breakfast and witnesses the noble cause of Rupee For Humanity.
+                                    </p>
+                                    <ul>
+                                        <li><strong>Champs run:</strong> Should be accompanied by a parent/guardian.</li>
+                                        <li><strong>Parents:</strong> Can opt for T-shirt for them with an additional cost of 200/- INR per T-shirt.</li>
+                                        <li><strong>Breakfast:</strong> Only for participants. Parents can buy from the food vendor on the venue.</li>
+                                    </ul>
                                 </div>
-                                <div className="row mt-4">
-                                    <div className="col-md-6">
-                                        <table className="table" style={{ backgroundColor: "#040002", color: "lightgray" }}>
-                                            <tbody>
-                                                <tr>
-                                                    <td>T-Shirt Price</td>
-                                                    <td>INR 210/-</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Courier charges anywere in India</td>
-                                                    <td>INR 150/-</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Self Pickup available only in Bengaluru, Hyderabad, Chennai</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                        <small>Above items are optional and are not applicable for runners outside India</small><br />
+
+                                <div className="mt-4">
+                                    <p>
+                                        For any more information about sponsorship / registration / queries, you can reach out to the below organizers:
+                                    </p>
+                                    <ul>
+                                        <li>Deepthi @ <a href="tel:+91-9986387435">+91-99863 87435</a></li>
+                                        <li>Sripada @ <a href="tel:+91-9964046022">+91-99640 46022</a></li>
+                                        <li>Raghu @ <a href="tel:+91-9164358027">+91-91643 58027</a></li>
+                                    </ul>
+                                </div>
+
+                                <div className="container d-flex justify-content-center align-items-center ">
+                                    <div className="bg-dark text-light p-4 rounded border border-warning shadow">
+                                        <h4 className="mb-3 font-weight-bold">Special Early Bird Offer!</h4>
+                                        <p className="lead">
+                                            Registration Fee: INR{' '}
+                                            <span className="text-decoration-line-through" style={{ color: "#999", textDecorationThickness: "2px" }}>599/-</span>{' '}
+                                            <span className="text-warning">499/-</span>
+                                        </p>
+                                        <p className="font-italic">Early Bird offer: Lasts till Dec 31st</p>
                                     </div>
                                 </div>
 
@@ -475,14 +489,15 @@ Bolts Run	16-21 years	2.5 kms */}
                                                     <option value="Power-Run">Power Run</option>
                                                     <option value="Bolts-Run">Bolts Run</option>
                                                 </select>
-                                                {errors.category && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                                {errors.category && <p style={{ color: "red" }}>This field is mandatory. Make sure your age is less than 21 to be eligible </p>}
                                             </div>
                                         </div>
                                         {selectedCategory === 'Champs-Run' &&
                                             <div className="col-md-6">
                                                 <div className="form-group">
-                                                    <label htmlFor='parent-name'>Accompanying parent name </label>
-                                                    <input {...register("parentName")} className="form-control" type="text" name="parent-name" id="parent-name" />
+                                                    <label htmlFor='parent-name'>Accompanying parent name <span style={{ color: "red" }}>*</span></label>
+                                                    <input {...register("parentName", { required: selectedCategory === 'Champs-Run' })} className="form-control" type="text" name="parent-name" id="parent-name" />
+                                                {errors.parentName && <p style={{ color: "red" }}>This field is mandatory</p>}
                                                 </div>
                                             </div>
                                         }
@@ -625,6 +640,14 @@ Bolts Run	16-21 years	2.5 kms */}
                                     <div className="row">
                                         <div className="col-md-6">
                                             <div className="form-group">
+                                                <label htmlFor="emergency-name">Emergency Contact Name <span style={{ color: "red" }}>*</span></label>
+                                                <input {...register("emergencyName", { required: true })} className="form-control" type="text"
+                                                    id="emergency-name" />
+                                                {errors.emergencyNo && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                            </div>
+                                        </div>
+                                        <div className="col-md-6">
+                                            <div className="form-group">
                                                 <label htmlFor="emergency-number">Emergency Contact Number <span style={{ color: "red" }}>*</span></label>
                                                 <input {...register("emergencyNo", { required: true })} className="form-control" type="text"
                                                     id="emergency-number" />
@@ -632,26 +655,28 @@ Bolts Run	16-21 years	2.5 kms */}
                                             </div>
                                         </div>
                                     </div>
+                                    
                                     <div className="row">
-                                        <div className="form-group">
-                                            <label htmlFor="illness">Please describe if you have any health issues <span style={{ color: "red" }}>*</span></label>
-                                            <textarea {...register("illness", { required: true })} className="form-control" id="illness" rows="3" />
-                                            {errors.illness && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                        <div className="col-md-12">
+                                            <div className="form-group">
+                                                <label htmlFor="reference">How did you come to know about this event? <span style={{ color: "red" }}>*</span></label>
+                                                <textarea rows={2} {...register("reference", { required: true })} className="form-control" type="text-field" id="reference" />
+                                                {errors.reference && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="row">
                                         <div className="col-md-12">
                                             <div className="form-group">
-                                                <label htmlFor="reference">How did you come to know about this event? <span style={{ color: "red" }}>*</span></label>
-                                                <input {...register("reference", { required: true })} className="form-control" type="text" id="reference" />
-                                                {errors.reference && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                                <label htmlFor="idNumber">Please enter a valid Govt ID Number (Eg: Aadhar, pancard) <br /> <small>Your data is safe with us</small> <span style={{ color: "red" }}>*</span></label>
+                                                <input {...register("idNumber", { required: true })} className="form-control" type="text" id="idNumber" />
+                                                {errors.idNumber && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
                                         </div>
                                     </div>
-                                    <br />
-                                    <hr />
-                                    <br />
-                                    <div className="row">
+                                    
+
+                                    {/* <div className="row">
                                         <div className="col-md-12">
                                             <div className="form-group">
                                                 <label htmlFor="inputFile">Please upload an ID proof (Aadhar Card or Pan Card)<span style={{ color: "red" }}>*</span></label>
@@ -667,7 +692,7 @@ Bolts Run	16-21 years	2.5 kms */}
                                                 </Dropzone>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> */}
                                     <br />
                                     <hr />
                                     <br />
