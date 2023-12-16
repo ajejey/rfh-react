@@ -13,33 +13,7 @@ import { Helmet } from 'react-helmet-async';
 import tShirtGuide from '../../assets/images/tShirtGuide.jpeg'
 
 function EventForm() {
-    const { register, control, handleSubmit, getValues, setValue, formState: { errors }, watch } = useForm({
-        defaultValues: {
-            "fullName": "Amit Sharma",
-            "gender": "male",
-            "dob": "2020-05-15",
-            "bloodGroup": "B+",
-            "address": "456 Street, Apt 789",
-            "city": "Bengaluru",
-            "otherCity": "",
-            "state": "Karnataka",
-            "country": "India",
-            "nationality": "Indian",
-            "mobNo": "9876543210",
-            "email": "amit.sharma@example.com",
-            "category": "Champs-Run",
-            "parentName": "Sita Sharma",
-            "TshirtSize": "30",
-            "additionalTshirt": "No",
-            "donation": "0",
-            "emergencyNo": "9998887770",
-            "illness": "None",
-            "reference": "Colleague",
-            "AgreeTnC": true,
-            "emergencyName": "Priya Sharma",
-            "idNumber": "IN1234567"
-          }          
-    });
+    const { register, control, handleSubmit, getValues, setValue, formState: { errors }, watch } = useForm();
     const myRef = useRef(null)
     const [submitted, setSubmitted] = useState(false)
     const [totalPrice, setTotalPrice] = useState(0)
@@ -53,8 +27,8 @@ function EventForm() {
     const [paymentLoading, setPaymentLoading] = useState(false)
     const selectedCategoryWatch = useWatch({ control, name: 'category' });
 
-    const DISCOUNT_PRICE = process.env.REACT_APP_BACKEND_BASE_URL === "http://localhost:4000" ? 499 : 1
-    const PRICE = process.env.REACT_APP_BACKEND_BASE_URL === "http://localhost:4000" ? 599 : 1
+    const DISCOUNT_PRICE = 499
+    const PRICE = 599
 
     const executeScroll = () => myRef.current.scrollIntoView()
 
