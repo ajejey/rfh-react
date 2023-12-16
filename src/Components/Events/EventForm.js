@@ -142,7 +142,7 @@ function EventForm() {
     }
 
     const handlePaymentClick = async () => {
-        // setDisablePaymentButton(true)
+        setDisablePaymentButton(true)
         setPaymentLoading(true)
         setValue("totalPrice", totalPrice)
         setValue("marathonName", "RFH Juniors run 2024")
@@ -167,11 +167,12 @@ function EventForm() {
             // window.location.href = data?.data?.instrumentResponse?.redirectInfo?.url;
 
             window.open(
-                data?.data?.instrumentResponse?.redirectInfo?.url,
-                // '_blank' // <- This is what makes it open in a new window.
+                data?.data?.instrumentResponse?.redirectInfo?.url
             );
+            
         } catch (error) {
             console.log("error ", error)
+            setPaymentLoading(false)
         }
 
     }
