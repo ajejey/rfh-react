@@ -876,7 +876,7 @@ function EventForm() {
                                             <tbody>
                                                 <tr>
                                                     <td> {getValues("category")} </td>
-                                                    <td className="fs-6"> INR {new Date() < new Date("2024-12-31") ? {DISCOUNT_PRICE} : {PRICE}}</td>
+                                                    <td className="fs-6"> INR {new Date() < new Date("2024-12-31") ? DISCOUNT_PRICE : PRICE}</td>
                                                 </tr>
                                                 <tr>
                                                     <td className="fs-6">T-shirt</td>
