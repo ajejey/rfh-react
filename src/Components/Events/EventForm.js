@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import Header from '../Header'
-import { useForm, watch } from "react-hook-form";
+import { useForm, useWatch, watch } from "react-hook-form";
 import { countries, indianStates } from '../../Constants/constants';
 import Dropzone from 'react-dropzone'
 import EventTwoToneIcon from '@mui/icons-material/EventTwoTone';
@@ -13,7 +13,33 @@ import { Helmet } from 'react-helmet-async';
 import tShirtGuide from '../../assets/images/tShirtGuide.jpeg'
 
 function EventForm() {
-    const { register, handleSubmit, getValues, setValue, formState: { errors }, watch } = useForm();
+    const { register, control, handleSubmit, getValues, setValue, formState: { errors }, watch } = useForm({
+        defaultValues: {
+            "fullName": "Amit Sharma",
+            "gender": "male",
+            "dob": "2020-05-15",
+            "bloodGroup": "B+",
+            "address": "456 Street, Apt 789",
+            "city": "Bengaluru",
+            "otherCity": "",
+            "state": "Karnataka",
+            "country": "India",
+            "nationality": "Indian",
+            "mobNo": "9876543210",
+            "email": "amit.sharma@example.com",
+            "category": "Champs-Run",
+            "parentName": "Sita Sharma",
+            "TshirtSize": "30",
+            "additionalTshirt": "No",
+            "donation": "0",
+            "emergencyNo": "9998887770",
+            "illness": "None",
+            "reference": "Colleague",
+            "AgreeTnC": true,
+            "emergencyName": "Priya Sharma",
+            "idNumber": "IN1234567"
+          }          
+    });
     const myRef = useRef(null)
     const [submitted, setSubmitted] = useState(false)
     const [totalPrice, setTotalPrice] = useState(0)
@@ -23,6 +49,12 @@ function EventForm() {
     const [seeMore, setSeeMore] = useState(false)
     const [selectedCategory, setSelectedCategory] = useState('');
     const [openTshirtGuide, setOpenTshirtGuide] = useState(false)
+    const [disablePaymentButton, setDisablePaymentButton] = useState(false)
+    const [paymentLoading, setPaymentLoading] = useState(false)
+    const selectedCategoryWatch = useWatch({ control, name: 'category' });
+
+    const DISCOUNT_PRICE = process.env.REACT_APP_BACKEND_BASE_URL === "http://localhost:4000" ? 499 : 1
+    const PRICE = process.env.REACT_APP_BACKEND_BASE_URL === "http://localhost:4000" ? 599 : 1
 
     const executeScroll = () => myRef.current.scrollIntoView()
 
@@ -73,6 +105,7 @@ function EventForm() {
     // Watch for changes in the 'dob' field
     const dob = watch('dob');
     const donation = watch('donation');
+    const categoryWatch = watch('category');
 
     const handleDonationChange = (e) => {
         const enteredValue = e.target.value;
@@ -103,7 +136,7 @@ function EventForm() {
         const currentDate = new Date();
 
         // Set the registration fee based on the current date
-        const registrationFee = currentDate < new Date("2024-12-31") ? 499 : 599;
+        const registrationFee = currentDate < new Date("2024-12-31") ? DISCOUNT_PRICE : PRICE;
         console.log("registrationFee ", registrationFee)
         // Calculate the total price
         let totalPrice = registrationFee;
@@ -131,14 +164,42 @@ function EventForm() {
         console.log(data);
         setSubmitted(!submitted)
         const totalPrice = calculateTotalPrice(data);
-        // let price = 250;
-        // if (getValues("needTShirt") === "yes") {
-        //     price = 210 + price
-        // }
-        // if (getValues("selfPickUp") === "no") {
-        //     price = 150 + price
-        // }
         setTotalPrice(totalPrice)
+    }
+
+    const handlePaymentClick = async () => {
+        // setDisablePaymentButton(true)
+        setPaymentLoading(true)
+        setValue("totalPrice", totalPrice)
+        setValue("marathonName", "RFH Juniors run 2024")
+        try {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/initiate-payment`, {
+                method: "POST",
+                timeout: 1200000,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(getValues()),
+            });
+            const data = await response.json();
+            console.log("data ", data)
+            console.log("data.message", data, data.message);
+            console.log("merchantTransactionId from backend ", data?.data?.merchantTransactionId)
+            localStorage.setItem('merchantTransactionId', data?.data?.merchantTransactionId
+            );
+            localStorage.setItem('cause', "RFH Juniors run 2024");
+            // setPaymentStatus(data.message)
+            // setPaymentLink(data?.data?.instrumentResponse?.redirectInfo?.url)
+            // window.location.href = data?.data?.instrumentResponse?.redirectInfo?.url;
+
+            window.open(
+                data?.data?.instrumentResponse?.redirectInfo?.url,
+                // '_blank' // <- This is what makes it open in a new window.
+            );
+        } catch (error) {
+            console.log("error ", error)
+        }
+
     }
 
     const handleSelfPickupChange = (e) => {
@@ -336,8 +397,8 @@ function EventForm() {
                                         <h4 className="mb-3 font-weight-bold">Special Early Bird Offer!</h4>
                                         <p className="lead">
                                             Registration Fee: INR{' '}
-                                            <span className="text-decoration-line-through" style={{ color: "#999", textDecorationThickness: "2px" }}>599/-</span>{' '}
-                                            <span className="text-warning">499/-</span>
+                                            <span className="text-decoration-line-through" style={{ color: "#999", textDecorationThickness: "2px" }}>{PRICE}/-</span>{' '}
+                                            <span className="text-warning">{DISCOUNT_PRICE}/-</span>
                                         </p>
                                         <p className="font-italic">Early Bird offer: Lasts till Dec 31st</p>
                                     </div>
@@ -503,18 +564,11 @@ function EventForm() {
                                             </div>
                                         </div>
                                     </div>
-
-                                    {/* Run Name	Age group	Distance
-Champs Run	3-8 years	800 meters
-Power Run	9-15 years	1.5 kms
-Bolts Run	16-21 years	2.5 kms */}
-
-
                                     <div className="row">
                                         <div className="col-md-6">
                                             <div className="form-group">
                                                 <label htmlFor="category">Select Category<span style={{ color: "red" }}>*</span></label>
-                                                <select id="category" {...register("category", { required: true, onChange: handleCategoryChange })} value={selectedCategory} className="form-select" aria-label="Select Category" readOnly >
+                                                <select id="category" {...register("category", { required: true, onChange: handleCategoryChange })} value={getValues("category")}  className="form-select" aria-label="Select Category" readOnly >
                                                     <option value="">select</option>
                                                     <option value="Champs-Run">Champs Run</option>
                                                     <option value="Power-Run">Power Run</option>
@@ -523,15 +577,15 @@ Bolts Run	16-21 years	2.5 kms */}
                                                 {errors.category && <p style={{ color: "red" }}>This field is mandatory. Make sure your age is less than 21 to be eligible </p>}
                                             </div>
                                         </div>
-                                        {selectedCategory === 'Champs-Run' &&
+                                        {/* {watch('category') === 'Champs-Run' && ( */}
                                             <div className="col-md-6">
                                                 <div className="form-group">
-                                                    <label htmlFor='parent-name'>Accompanying parent name <span style={{ color: "red" }}>*</span></label>
-                                                    <input {...register("parentName", { required: selectedCategory === 'Champs-Run' })} className="form-control" type="text" name="parent-name" id="parent-name" />
+                                                    <label htmlFor='parentName'>Accompanying parent name <span style={{ color: "red" }}>*</span></label>
+                                                    <input {...register("parentName", { required: true })} className="form-control" type="text" name="parentName" id="parentName" />
                                                     {errors.parentName && <p style={{ color: "red" }}>This field is mandatory</p>}
                                                 </div>
                                             </div>
-                                        }
+                                        {/* )}  */}
                                     </div>
                                     <div className="row">
                                         {/* <div className="col-md-6">
@@ -552,12 +606,18 @@ Bolts Run	16-21 years	2.5 kms */}
                                                 <label htmlFor="tee-size">T-Shirt Size  <span style={{ color: "red" }}>*</span></label>
                                                 <select {...register("TshirtSize", { required: true })} id="tee-size" className="form-select" aria-label="T-Shirt Size">
                                                     <option value="">select</option>
-                                                    <option value="XSmall">X-Small</option>
-                                                    <option value="Small">Small</option>
-                                                    <option value="Medium">Medium</option>
-                                                    <option value="Large">Large</option>
-                                                    <option value="X-Large">X-Large</option>
-                                                    <option value="XX-Large">XX-Large</option>
+                                                    <option value="24">24</option>
+                                                    <option value="26">26</option>
+                                                    <option value="28">28</option>
+                                                    <option value="30">30</option>
+                                                    <option value="32">32</option>
+                                                    <option value="34">34</option>
+                                                    <option value="36">36</option>
+                                                    <option value="38">38</option>
+                                                    <option value="40">40</option>
+                                                    <option value="42">42</option>
+                                                    <option value="44">44</option>
+                                                    <option value="46">46</option>
                                                 </select>
                                                 {errors.TshirtSize && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
@@ -605,18 +665,11 @@ Bolts Run	16-21 years	2.5 kms */}
                                     {/* New row for T-shirt sizes if additional T-shirts are selected */}
                                     {watch('additionalTshirt') === 'Yes' && (
                                         <div className="row">
-                                            <div className="col-md-6">
+                                            <div className="col-md-12">
                                                 <div className="form-group">
-                                                    <label htmlFor="additionalTshirtSize">Select T-Shirt Size for Additional T-shirts <span style={{ color: "red" }}>*</span></label>
-                                                    <select {...register("additionalTshirtSize", { required: true })} id="additionalTshirtSize" className="form-select" aria-label="Additional T-shirt Size">
-                                                        <option value="">select</option>
-                                                        <option value="XSmall">X-Small</option>
-                                                        <option value="Small">Small</option>
-                                                        <option value="Medium">Medium</option>
-                                                        <option value="Large">Large</option>
-                                                        <option value="X-Large">X-Large</option>
-                                                        <option value="XX-Large">XX-Large</option>
-                                                    </select>
+                                                    <label htmlFor="additionalTshirtSize">Please write T-Shirt Sizes for Additional T-shirts with comma seperation <span style={{ color: "red" }}>*</span></label>
+                                                    <textarea {...register("additionalTshirtSize", { required: true })} id="additionalTshirtSize" className="form-control" aria-label="Additional T-shirt Size"></textarea>
+
                                                     {errors.additionalTshirtSize && <p style={{ color: "red" }}>This field is mandatory</p>}
                                                 </div>
                                             </div>
@@ -671,17 +724,17 @@ Bolts Run	16-21 years	2.5 kms */}
                                     <div className="row">
                                         <div className="col-md-6">
                                             <div className="form-group">
-                                                <label htmlFor="emergency-name">Emergency Contact Name <span style={{ color: "red" }}>*</span></label>
+                                                <label htmlFor="emergencyName">Emergency Contact Name <span style={{ color: "red" }}>*</span></label>
                                                 <input {...register("emergencyName", { required: true })} className="form-control" type="text"
-                                                    id="emergency-name" />
+                                                    id="emergencyName" />
                                                 {errors.emergencyNo && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
                                         </div>
                                         <div className="col-md-6">
                                             <div className="form-group">
-                                                <label htmlFor="emergency-number">Emergency Contact Number <span style={{ color: "red" }}>*</span></label>
+                                                <label htmlFor="emergencyNo">Emergency Contact Number <span style={{ color: "red" }}>*</span></label>
                                                 <input {...register("emergencyNo", { required: true })} className="form-control" type="text"
-                                                    id="emergency-number" />
+                                                    id="emergencyNo" />
                                                 {errors.emergencyNo && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
                                         </div>
@@ -806,7 +859,7 @@ Bolts Run	16-21 years	2.5 kms */}
                             </table>
                             <div style={{ display: "flex", justifyContent: "flex-end", gap: "16px" }}>
                                 <button className="btn btn-secondary" onClick={handleEditClick}>Edit</button>
-                                <button className="btn btn-dark">Make Payment</button>
+                                <button className="btn btn-dark" onClick={handlePaymentClick} disabled={disablePaymentButton} >Make Payment</button>
                             </div>
 
                         </div>
@@ -823,7 +876,7 @@ Bolts Run	16-21 years	2.5 kms */}
                                             <tbody>
                                                 <tr>
                                                     <td> {getValues("category")} </td>
-                                                    <td className="fs-6"> INR {new Date() < new Date("2024-12-31") ? 499 : 599}</td>
+                                                    <td className="fs-6"> INR {new Date() < new Date("2024-12-31") ? {DISCOUNT_PRICE} : {PRICE}}</td>
                                                 </tr>
                                                 <tr>
                                                     <td className="fs-6">T-shirt</td>
@@ -839,7 +892,7 @@ Bolts Run	16-21 years	2.5 kms */}
                                                 </tr>
                                             </tbody>
                                         </table>
-                                        <button type="button" className="w-100 btn btn-dark btn-lg btn-outline-primary">Make Payment</button>
+                                        <button onClick={handlePaymentClick} disabled={disablePaymentButton} type="button" className="w-100 btn btn-dark btn-lg btn-outline-primary">Make Payment</button>
                                     </div>
                                 </div>
                             </div>

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import logo from '../assets/images/Logo.jpg'
 import { GlobalContext } from '../context/Provider'
 
-function PaymentRedirect() {
+function PaymentRedirect({path = '/app/payment-status'}) {
     const navigate = useNavigate()
     const { transaction, setTransaction } = useContext(GlobalContext)
     const [paymentStatus, setPaymentStatus] = useState("")
@@ -49,7 +49,7 @@ function PaymentRedirect() {
                 let body = { merchantTransactionId: merchantTransactionId, cause: cause }
 
                 try {
-                    const res = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/app/payment-status`, {
+                    const res = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}${path}`, {
                         method: 'POST',
                         timeout: 1200000,
                         headers: {
