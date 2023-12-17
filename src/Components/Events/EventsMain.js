@@ -12,7 +12,7 @@ function EventsMain() {
             <Routes>
                 <Route path='/' element={<Events />} />
                 {/* <Route path='/runforliteracy-2023' element={<EventForm />} /> */}
-                <Route path='/rfh-juniors-run-2024' element={<EventForm />} />
+                {/* <Route path='/rfh-juniors-run-2024' element={<EventForm />} /> */}
                 <Route path='/create-event' element={<CreateEvent />} />
                 <Route path='/payment-redirect' element={<PaymentRedirect path='/api/marathons/payment-status' />} />
                 <Route path='/:path' element={<Event />} />

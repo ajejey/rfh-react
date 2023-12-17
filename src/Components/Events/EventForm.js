@@ -25,10 +25,11 @@ function EventForm() {
     const [openTshirtGuide, setOpenTshirtGuide] = useState(false)
     const [disablePaymentButton, setDisablePaymentButton] = useState(false)
     const [paymentLoading, setPaymentLoading] = useState(false)
-    const selectedCategoryWatch = useWatch({ control, name: 'category' });
+    const category = watch('category');
 
     const DISCOUNT_PRICE = 499
     const PRICE = 599
+    const ADDITIONAL_TSHIRT_PRICE = 249
 
     const executeScroll = () => myRef.current.scrollIntoView()
 
@@ -115,10 +116,10 @@ function EventForm() {
         // Calculate the total price
         let totalPrice = registrationFee;
 
-        // Add INR 200 for every additional T-shirt
+        // Add INR ADDITIONAL_TSHIRT_PRICE for every additional T-shirt
         if (formData.additionalTshirtQuantity) {
             console.log("formData.additionalTshirtQuantity ", formData.additionalTshirtQuantity)
-            const additionalTshirtCost = Number(formData.additionalTshirtQuantity) * 200;
+            const additionalTshirtCost = Number(formData.additionalTshirtQuantity) * ADDITIONAL_TSHIRT_PRICE;
             totalPrice += additionalTshirtCost;
         }
 
@@ -135,6 +136,12 @@ function EventForm() {
     }
 
     const onSubmit = (data) => {
+        if (data.donation === 'custom') {
+            data.donation = data.customDonation;
+            setValue("donation", data.customDonation)
+        }
+        delete data.customDonation;
+
         console.log(data);
         setSubmitted(!submitted)
         const totalPrice = calculateTotalPrice(data);
@@ -169,7 +176,7 @@ function EventForm() {
             window.open(
                 data?.data?.instrumentResponse?.redirectInfo?.url
             );
-            
+
         } catch (error) {
             console.log("error ", error)
             setPaymentLoading(false)
@@ -181,10 +188,6 @@ function EventForm() {
         console.log("selfPickUp e.target.value ", e.target.value)
         setWillPickUp(e.target.value)
     }
-
-    // "Bengaluru">Bengaluru</option>
-    //                                                 <option value="Hyderabad">Hyderabad</option>
-    //                                                 <option value="Chennai"
 
     const handleCityChange = (e) => {
         setSelectedCity(e.target.value)
@@ -272,7 +275,8 @@ function EventForm() {
                     <section id="registration-form">
                         <div className="container-md">
                             <h1 className="h1" style={{ fontWeight: "800" }}>
-                                RFH Juniors run 2024 <br /> <span className='highlight' style={{ cursor: "pointer" }} onClick={executeScroll}>Virtual Run</span>
+                                RFH Juniors run 2024 <br />
+                                {/* <span className='highlight' style={{ cursor: "pointer" }} onClick={executeScroll}>Virtual Run</span> */}
                             </h1>
                             <div className="row">
                                 <div className="col-md-4">
@@ -287,7 +291,7 @@ function EventForm() {
                             </div>
 
 
-                            <span ><small style={{ color: "red" }}> <strong>Last Date to Register: Jan 26th 2024</strong> </small></span><br />
+                            <span ><small style={{ color: "#ff7675" }}> <strong>Last Date to Register: Jan 26th 2024</strong> </small></span><br />
                             <br />
 
                             <p>
@@ -351,7 +355,7 @@ function EventForm() {
                                     </p>
                                     <ul>
                                         <li><strong>Champs run:</strong> Should be accompanied by a parent/guardian.</li>
-                                        <li><strong>Parents:</strong> Can opt for T-shirt for them with an additional cost of 200/- INR per T-shirt.</li>
+                                        <li><strong>Parents:</strong> Can opt for T-shirt for them with an additional price of {ADDITIONAL_TSHIRT_PRICE}/- INR per T-shirt.</li>
                                         <li><strong>Breakfast:</strong> Only for participants. Parents can buy from the food vendor on the venue.</li>
                                     </ul>
                                 </div>
@@ -361,9 +365,9 @@ function EventForm() {
                                         For any more information about sponsorship / registration / queries, you can reach out to the below organizers:
                                     </p>
                                     <ul>
-                                        <li>Deepthi @ <a href="tel:+91-9986387435">+91-99863 87435</a></li>
-                                        <li>Sripada @ <a href="tel:+91-9964046022">+91-99640 46022</a></li>
-                                        <li>Raghu @ <a href="tel:+91-9164358027">+91-91643 58027</a></li>
+                                        <li>Deepthi @ <a href="tel:+91-9986387435" style={{ color: "#f39c12" }}>+91-99863 87435</a></li>
+                                        <li>Sripada @ <a href="tel:+91-9964046022" style={{ color: "#f39c12" }}>+91-99640 46022</a></li>
+                                        <li>Raghu @ <a href="tel:+91-9164358027" style={{ color: "#f39c12" }}>+91-91643 58027</a></li>
                                     </ul>
                                 </div>
 
@@ -409,15 +413,6 @@ function EventForm() {
                                                 {errors.fullName && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
                                         </div>
-
-                                        {/* <div className="col-md-6">
-                                            <div className="form-group">
-                                                <label htmlFor="last">Last Name <span style={{ color: "red" }}>*</span></label>
-                                                <input {...register("lastName", { required: true })} type="text" className="form-control" placeholder="" id="last" />
-                                                {errors.lastName && <p style={{ color: "red" }}>This field is mandatory</p>}
-                                            </div>
-                                        </div> */}
-
                                     </div>
 
 
@@ -436,13 +431,7 @@ function EventForm() {
                                                 {errors.gender && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
                                         </div>
-                                        <div className="col-md-4">
-                                            <div className="form-group">
-                                                <label htmlFor="date">Date of Birth <span style={{ color: "red" }}>*</span></label>
-                                                <input {...register("dob", { required: true })} type="date" className="form-control" id="date" placeholder="date" />
-                                                {errors.dob && <p style={{ color: "red" }}>This field is mandatory</p>}
-                                            </div>
-                                        </div>
+
                                         <div className="col-md-4">
                                             <div className="form-group">
                                                 <label htmlFor="bloodGroup">Blood Group <span style={{ color: "red" }}>*</span></label>
@@ -542,17 +531,27 @@ function EventForm() {
                                     <div className="row">
                                         <div className="col-md-6">
                                             <div className="form-group">
+                                                <label htmlFor="date">Date of Birth <span style={{ color: "red" }}>*</span></label>
+                                                <input {...register("dob", { required: true })} type="date" className="form-control" id="date" placeholder="date" />
+                                                {errors.dob && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="row">
+                                        <div className="col-md-6">
+                                            <div className="form-group">
                                                 <label htmlFor="category">Select Category<span style={{ color: "red" }}>*</span></label>
-                                                <select id="category" {...register("category", { required: true, onChange: handleCategoryChange })} value={getValues("category")}  className="form-select" aria-label="Select Category" readOnly >
-                                                    <option value="">select</option>
+                                                <input type='text' id="category" {...register("category", { required: true })} value={getValues("category")} className="form-select" aria-label="Select Category" readOnly />
+                                                {/* <option value="">select</option>
                                                     <option value="Champs-Run">Champs Run</option>
                                                     <option value="Power-Run">Power Run</option>
                                                     <option value="Bolts-Run">Bolts Run</option>
-                                                </select>
+                                                </select> */}
                                                 {errors.category && <p style={{ color: "red" }}>This field is mandatory. Make sure your age is less than 21 to be eligible </p>}
                                             </div>
                                         </div>
-                                        {/* {watch('category') === 'Champs-Run' && ( */}
+                                        {category === 'Champs-Run' && (
                                             <div className="col-md-6">
                                                 <div className="form-group">
                                                     <label htmlFor='parentName'>Accompanying parent name <span style={{ color: "red" }}>*</span></label>
@@ -560,7 +559,7 @@ function EventForm() {
                                                     {errors.parentName && <p style={{ color: "red" }}>This field is mandatory</p>}
                                                 </div>
                                             </div>
-                                        {/* )}  */}
+                                        )}
                                     </div>
                                     <div className="row">
                                         {/* <div className="col-md-6">
@@ -653,41 +652,27 @@ function EventForm() {
 
                                     {/* New row for donation question */}
                                     <div className="row">
-                                        <div className="col-md-6">
-                                            <div className="form-group">
-                                                <label htmlFor="donation">Do you wish to donate for Rupee For Humanity for a noble cause? <span style={{ color: "red" }}>*</span></label>
-                                                <input
-                                                    {...register("donation", { required: !watch('customDonation') })}
-                                                    type="number"
-                                                    className="form-control"
-                                                    id="donation"
-                                                    placeholder="Enter your amount"
-                                                    onChange={handleDonationChange}
-                                                />
-                                                {errors.donation && <p style={{ color: "red" }}>This field is mandatory</p>}
-                                            </div>
+                                        <div className="form-group">
+                                            <label htmlFor="donation">Do you wish to donate for Rupee For Humanity for a noble cause?</label>
+                                            <select id="donation" {...register("donation", { required: false })} value={getValues("donation")} className="form-select" aria-label="Select Donation" >
+                                                <option value="">select</option>
+                                                <option value="1">1</option>
+                                                <option value="10">10</option>
+                                                <option value="50">50</option>
+                                                <option value="100">100</option>
+                                                <option value="200">200</option>
+                                                <option value="500">500</option>
+                                                <option value="custom">Custom</option>
+                                            </select>
+                                            {errors.donation && <p style={{ color: "red" }}>This field is mandatory</p>}
                                         </div>
-                                        <div className="col-md-6">
+                                        {donation === 'custom' && (
                                             <div className="form-group">
-                                                <label htmlFor="customDonation">Or select from the dropdown <span style={{ color: "red" }}>*</span></label>
-                                                <select
-                                                    {...register("customDonation", { required: !watch('donation') })}
-                                                    id="customDonation"
-                                                    className="form-select"
-                                                    aria-label="Donation"
-                                                    onChange={handleDonationChange}
-                                                >
-                                                    <option value="">select</option>
-                                                    <option value="1">1</option>
-                                                    <option value="10">10</option>
-                                                    <option value="50">50</option>
-                                                    <option value="100">100</option>
-                                                    <option value="200">200</option>
-                                                    <option value="500">500</option>
-                                                </select>
-                                                {errors.donation && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                                <label htmlFor='customDonation'>Enter Custom Donation Amount</label>
+                                                <input {...register("customDonation", { required: true })} className="form-control" type="number" name="customDonation" id="customDonation" />
+                                                {errors.customDonation && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
-                                        </div>
+                                        )}
                                     </div>
 
                                     <br />
@@ -827,7 +812,7 @@ function EventForm() {
                                         <td> {getValues("additionalTshirtQuantity")}  </td>
                                     </tr>
                                     <tr>
-                                        <td className="fs-6">Total Cost </td>
+                                        <td className="fs-6">Total Price </td>
                                         <td> <b>INR {totalPrice}/-</b>   </td>
                                     </tr>
                                 </tbody>
@@ -843,7 +828,7 @@ function EventForm() {
                             <div className="row m-3">
                                 <div className="card bg-dark mb-4 rounded-3 shadow-sm">
                                     <div className="card-header py-3 text-center">
-                                        <h4 className="my-0 fw-normal">Cost Breakup</h4>
+                                        <h4 className="my-0 fw-normal">Price Breakup</h4>
                                     </div>
                                     <div className="card-body">
                                         <table className="table" style={{ color: "lightgray" }}>
@@ -855,7 +840,7 @@ function EventForm() {
                                                 </tr>
                                                 <tr>
                                                     <td className="fs-6">T-shirt</td>
-                                                    <td> INR {getValues("additionalTshirt") === "Yes" ? getValues("additionalTshirtQuantity") * 200 : 0} </td>
+                                                    <td> INR {getValues("additionalTshirt") === "Yes" ? getValues("additionalTshirtQuantity") * ADDITIONAL_TSHIRT_PRICE : 0} </td>
                                                 </tr>
                                                 <tr>
                                                     <td className="fs-6">Donation</td>
