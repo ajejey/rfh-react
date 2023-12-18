@@ -182,7 +182,7 @@ function PaymentRedirect({path = '/app/payment-status'}) {
                             Download Invoice
                         </button> */}
 
-                        {(!loading && status.message === 'Your payment is successful.') && <a href={`data:application/pdf;base64,${status?.data?.pdfBase64}`} download={`RFH_Run-${status?.data?.data?.merchantTransactionId}.pdf`} target='_blank' rel='noreferrer' >Download Invoice</a>}
+                        {(!loading && status.message === 'Your payment is successful.') && <a href={`data:application/pdf;base64,${status?.data?.pdfBase64}`} download={`${status?.data?.data?.merchantTransactionId}.pdf`} target='_blank' rel='noreferrer' >Download Invoice</a>}
 
                     </div>
                     <p  style={{ color: "#ff7675" }}> <small><i>Please check your email for the receipt</i></small> </p>
