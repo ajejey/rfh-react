@@ -145,7 +145,9 @@ function EventForm() {
         delete data.customDonation;
         if(data.additionalTshirt === 'No'){
             setValue("additionalTshirtQuantity", "0")
+            data.additionalTshirtQuantity = "0"
             setValue("additionalTshirtSize", "")
+            data.additionalTshirtSize = ""
         }
 
         console.log(data);
