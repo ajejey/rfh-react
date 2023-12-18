@@ -50,7 +50,7 @@ function App() {
             </Route>
             <Route path='/donate' element={<Donate />} />
             <Route path='/nivanshfightsma' element={<NivanshFightSma />} />
-            {/* <Route path='/rfh-juniors-run-2024' element={<EventForm />} /> */}
+            <Route path='/rfh-juniors-run-2024' element={<EventForm />} />
             <Route path='/blog' element={<IndexPage />} />
             <Route path='/post/:path' element={<PostPage />} />
             <Route path='/edit/:path' element={<EditPost />} />
