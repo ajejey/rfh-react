@@ -113,7 +113,7 @@ function EventForm() {
         const currentDate = new Date();
 
         // Set the registration fee based on the current date
-        const registrationFee = currentDate < new Date("2024-12-31") ? DISCOUNT_PRICE : PRICE;
+        const registrationFee = currentDate < new Date("2024-01-06") ? DISCOUNT_PRICE : PRICE;
         console.log("registrationFee ", registrationFee)
         // Calculate the total price
         let totalPrice = registrationFee;
@@ -387,7 +387,7 @@ function EventForm() {
                                             <span className="text-decoration-line-through" style={{ color: "#999", textDecorationThickness: "2px" }}>{PRICE}/-</span>{' '}
                                             <span className="text-warning">{DISCOUNT_PRICE}/-</span>
                                         </p>
-                                        <p className="font-italic">Early Bird offer: Lasts till Dec 31st</p>
+                                        <p className="font-italic">Early Bird offer: Lasts till Jan 6th 2024</p>
                                     </div>
                                 </div>
 
@@ -884,7 +884,7 @@ function EventForm() {
                                             <tbody>
                                                 <tr>
                                                     <td> {getValues("category")} </td>
-                                                    <td className="fs-6"> INR {new Date() < new Date("2024-12-31") ? DISCOUNT_PRICE : PRICE}</td>
+                                                    <td className="fs-6"> INR {new Date() < new Date("2024-01-06") ? DISCOUNT_PRICE : PRICE}</td>
                                                 </tr>
                                                 <tr>
                                                     <td className="fs-6">T-shirt</td>
