@@ -517,9 +517,14 @@ function EventForm() {
                                     <div className="row">
                                         <div className="col-md-4">
                                             <div className="form-group">
-                                                <label htmlFor="mobile">Mobile No. <span style={{ color: "red" }}>*</span></label>
-                                                <input {...register("mobNo", { required: true })} className="form-control" type="tel" id="mobile" />
-                                                {errors.mobNo && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                                <label htmlFor="mobile">Mobile No. <small>(10 digit number)</small> <span style={{ color: "red" }}>*</span></label>
+                                                <input {...register("mobNo", {
+                                                    required: true, pattern: {
+                                                        value: /^[0-9]{10}$/, // Allows exactly 10 numeric characters
+                                                        message: "Invalid mobile number",
+                                                    },
+                                                })} className="form-control" type="tel" id="mobile" />
+                                                {errors.mobNo && <p style={{ color: "red" }}>{errors.mobNo.message}</p>}
                                             </div>
                                         </div>
                                         <div className="col-md-4">
@@ -543,7 +548,7 @@ function EventForm() {
                                     <div className="row">
                                         <div className="col-md-6">
                                             <div className="form-group">
-                                                <label htmlFor="category">Select Category<span style={{ color: "red" }}>*</span></label>
+                                                <label htmlFor="category">Select Category <small> <i>(Auto-populated based on your age)</i> </small> <span style={{ color: "red" }}>*</span></label>
                                                 <input type='text' id="category" {...register("category", { required: true })} value={getValues("category")} className="form-select" aria-label="Select Category" readOnly />
                                                 {/* <option value="">select</option>
                                                     <option value="Champs-Run">Champs Run</option>
@@ -664,13 +669,13 @@ function EventForm() {
                                                 <option value="100">100</option>
                                                 <option value="200">200</option>
                                                 <option value="500">500</option>
-                                                <option value="custom">Custom</option>
+                                                <option value="custom">Other</option>
                                             </select>
                                             {errors.donation && <p style={{ color: "red" }}>This field is mandatory</p>}
                                         </div>
                                         {donation === 'custom' && (
                                             <div className="form-group">
-                                                <label htmlFor='customDonation'>Enter Custom Donation Amount</label>
+                                                <label htmlFor='customDonation'>Enter other Donation Amount</label>
                                                 <input {...register("customDonation", { required: true })} className="form-control" type="number" name="customDonation" id="customDonation" />
                                                 {errors.customDonation && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
@@ -711,7 +716,7 @@ function EventForm() {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="row">
+                                    {/* <div className="row">
                                         <div className="col-md-12">
                                             <div className="form-group">
                                                 <label htmlFor="idNumber">Please enter a valid Govt ID Number (Eg: Aadhar, pancard) <br /> <small>Your data is safe with us</small> <span style={{ color: "red" }}>*</span></label>
@@ -719,7 +724,7 @@ function EventForm() {
                                                 {errors.idNumber && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> */}
 
 
                                     {/* <div className="row">
@@ -746,14 +751,16 @@ function EventForm() {
                                     <br />
                                     <div className="form-group">
                                         <textarea
-                                            defaultValue="&#x2022; Please choose category carefully, confirmed registration are non-refundable, nontransferable and cannot be modified.
-                                        &#x2022; Provide us correct mobile number &amp; email address that you can assess regularly, as this will be our primary resources of contacting you during the run up to the event.
-                                        &#x2022; By registering you agree that running 10K is an extreme sport and can be injures to body and health. You take full responsibility for participating in the RFH 10k Run and do not hold the organizing committee of RFH 10K Run, Rupee for Humanity or other organizing person or entities responsible of any injury or accident.
-                                        &#x2022; You also assume all risks associated with participating in this event including, but not limited to falls, contact with other participants, the effects of the weather, including high heat or humidity, traffic and the condition of the road, arson or terrorist threats and all others risks associated with public event.
-                                        &#x2022; You agree that organizing committee, Rupee for Humanity and associated companies or entities that organize the run shall not be liable for any loss, damage, illness or injury that might occur as a result of participating in the event.
-                                        &#x2022; You confirm that, in the event of adverse weather conditions, major incidents or threats on the day, the organizers reserve the right to stop/ cancel/ postpone the Event.
-                                        &#x2022; You understand that confirmed registrations and merchandise order are non-refundable, non-transferable and cannot be modified. The organizers reserve the right to reject any application without providing reasons. Any amount collected from rejected applications alone will be refundable in full (excluding bank charges wherever applicable).
-                                        &#x2022; The organizer will contact the participant only by email &amp; text msg. Any notice or msg sent to the email or mobile number registered with the organizers shell be deemed as received by the participants."
+                                            defaultValue="&#x2022; All registration are non-refundable, nontransferable and cannot be modified. 
+                                            &#x2022; Provide us correct mobile number &amp; email address that you can assess regularly, as this will be our primary resources of contacting you during the run up to the event.
+                                            &#x2022; By registering you agree that participating is an extreme sport and can be injures to body and health. You take full responsibility for participating in the RFH Juniors Run and do not hold the organizing committee of RFH 10K Run, Rupee for Humanity or other organizing person or entities responsible of any injury or accident. 
+                                            &#x2022; For Champs run, parent/guardian holds complete responsbility for safery measurements of your own kids.  You take full responsibility for participating in the RFH Juniors Run and do not hold the organizing committee of RFH 10K Run, Rupee for Humanity or other organizing person or entities responsible of any injury or accident. 
+                                            &#x2022; You also assume all risks associated with participating in this event including, but not limited to falls, contact with other participants, the effects of the weather, including high heat or humidity, traffic and the condition of the road, arson or terrorist threats and all others risks associated with public event. Atleast one parent/guardinan must accompany for kids participating in Champs run. You cannot carry the kid while running and if happens, you are not eligible for trophies but can complete the run and collect medal for the kids. RFH volunteers will monitor in the entire track and there words will be final on the event day.                 
+                                            &#x2022; You agree that organizing committee, Rupee for Humanity and associated companies or entities that organize the run shall not be liable for any loss, damage, illness or injury that might occur as a result of participating in the event.
+                                            &#x2022; You confirm that, in the event of adverse weather conditions, major incidents or threats on the day, the organizers reserve the right to stop/ cancel/ postpone the Event.
+                                            &#x2022; You understand that confirmed registrations and merchandise order are non-refundable, non-transferable and cannot be modified. The organizers reserve the right to reject any application without providing reasons. Any amount collected from rejected applications alone will be refundable in full (excluding bank charges wherever applicable).
+                                            &#x2022; The organizer will contact the participant only by email &amp; text msg. Any notice or message sent to the email or mobile number registered with the organizers shell be deemed as received by the participants.
+                                            &#x2022; Please remember you are participating for fun + noble cause run. So do not rush or panic and enjoy every moment of the event."
                                             className="form-control"
                                             style={{ fontSize: "0.8rem" }}
                                             id="address"
