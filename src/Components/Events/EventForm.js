@@ -594,7 +594,7 @@ function EventForm() {
                                                     <option value="Power-Run">Power Run</option>
                                                     <option value="Bolts-Run">Bolts Run</option>
                                                 </select> */}
-                                                {errors.category && <p style={{ color: "red" }}>This field is mandatory. Make sure your age is less than 21 to be eligible </p>}
+                                                {errors.category && <p><span  style={{ color: "red" }}>This field is mandatory.</span> <span style={{ color: "#f39c12" }}>Make sure your age is less than 21 to be eligible</span>  </p>}
                                             </div>
                                         </div>
                                         {category === 'Champs-Run' && (
@@ -823,7 +823,7 @@ function EventForm() {
                                     </div>
 
                                     <div className="d-grid gap-2">
-                                        <button className="btn btn-dark" type="submit">Submit</button>
+                                        <button className="btn btn-primary" type="submit">Submit</button>
                                     </div>
                                 </form>
 
@@ -867,7 +867,7 @@ function EventForm() {
                             </table>
                             <div style={{ display: "flex", justifyContent: "flex-end", gap: "16px" }}>
                                 <button className="btn btn-secondary" onClick={handleEditClick}>Edit</button>
-                                <button className="btn btn-dark" onClick={handlePaymentClick} disabled={disablePaymentButton} >Make Payment</button>
+                                <button className="btn btn-primary" onClick={handlePaymentClick} disabled={disablePaymentButton} >Make Payment</button>
                             </div>
 
                         </div>
@@ -900,7 +900,7 @@ function EventForm() {
                                                 </tr>
                                             </tbody>
                                         </table>
-                                        <button onClick={handlePaymentClick} disabled={disablePaymentButton} type="button" className="w-100 btn btn-dark btn-lg btn-outline-primary">Make Payment</button>
+                                        <button onClick={handlePaymentClick} disabled={disablePaymentButton} type="button" className="w-100 btn btn-lg btn-primary">Make Payment</button>
                                     </div>
                                 </div>
                             </div>
