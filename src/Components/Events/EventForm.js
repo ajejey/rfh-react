@@ -27,8 +27,10 @@ function EventForm() {
     const [paymentLoading, setPaymentLoading] = useState(false)
     const category = watch('category');
 
-    const DISCOUNT_PRICE = 499
-    const PRICE = 599
+    // const DISCOUNT_PRICE = 499
+    // const PRICE = 599
+    const DISCOUNT_PRICE = 1
+    const PRICE = 1
     const ADDITIONAL_TSHIRT_PRICE = 249
 
     const executeScroll = () => myRef.current.scrollIntoView()
