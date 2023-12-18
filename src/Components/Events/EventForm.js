@@ -143,6 +143,10 @@ function EventForm() {
             setValue("donation", data.customDonation)
         }
         delete data.customDonation;
+        if(data.additionalTshirt === 'No'){
+            setValue("additionalTshirtQuantity", "0")
+            setValue("additionalTshirtSize", "")
+        }
 
         console.log(data);
         setSubmitted(!submitted)
@@ -434,13 +438,31 @@ function EventForm() {
                                             </div>
                                         </div>
 
-                                        <div className="col-md-4">
+                                        {/* <div className="col-md-4">
                                             <div className="form-group">
                                                 <label htmlFor="bloodGroup">Blood Group <span style={{ color: "red" }}>*</span></label>
                                                 <input {...register("bloodGroup", { required: true })} type="text" className="form-control" id="bloodGroup" placeholder="Blood Group" />
                                                 {errors.bloodGroup && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
+                                        </div> */}
+                                        <div className="col-md-4">
+                                            <div className="form-group">
+                                                <label htmlFor="bloodGroup">Blood Group <span style={{ color: "red" }}>*</span></label>
+                                                <select {...register("bloodGroup", { required: true })} className="form-select" id="bloodGroup" aria-label="Blood Group">
+                                                    <option value="">Select</option>
+                                                    <option value="A+">A+</option>
+                                                    <option value="A-">A-</option>
+                                                    <option value="B+">B+</option>
+                                                    <option value="B-">B-</option>
+                                                    <option value="AB+">AB+</option>
+                                                    <option value="AB-">AB-</option>
+                                                    <option value="O+">O+</option>
+                                                    <option value="O-">O-</option>
+                                                </select>
+                                                {errors.bloodGroup && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                            </div>
                                         </div>
+
 
                                     </div>
 
@@ -538,11 +560,26 @@ function EventForm() {
                                     <div className="row">
                                         <div className="col-md-6">
                                             <div className="form-group">
-                                                <label htmlFor="date">Date of Birth <span style={{ color: "red" }}>*</span></label>
-                                                <input {...register("dob", { required: true })} type="date" className="form-control" id="date" placeholder="date" />
+                                                <label htmlFor="date">
+                                                    Date of Birth
+                                                    <small>
+                                                        <i>(eligible only if born after 2002)</i>
+                                                    </small>{" "}
+                                                    <span style={{ color: "red" }}>*</span>
+                                                </label>
+                                                <input
+                                                    {...register("dob", { required: true })}
+                                                    type="date"
+                                                    className="form-control"
+                                                    id="date"
+                                                    placeholder="date"
+                                                    max={new Date().toISOString().split("T")[0]} // Set max date to today
+                                                    min="2002-01-01" // Set min date to January 1, 2002
+                                                />
                                                 {errors.dob && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
                                         </div>
+
                                     </div>
 
                                     <div className="row">
