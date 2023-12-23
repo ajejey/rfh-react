@@ -24,6 +24,8 @@ import theme from './theme/theme';
 import ScrollToTop from './Components/ScrollToTop/ScrollToTop';
 import NivanshFightSma from './Components/NivanshFightSma/NivanshFightSma';
 import EventForm from './Components/Events/EventForm';
+import AdminMain from './Components/Admin/AdminMain';
+import ForgotPassword from './Components/AuthComponent/ForgotPassword';
 
 
 function App() {
@@ -39,15 +41,16 @@ function App() {
           <Routes>
             <Route path='/' element={<Home />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/sign-up" element={<SignUp />} />
+            {/* <Route path="/sign-up" element={<SignUp />} /> */}
+            <Route path='/forgot-password' element={<ForgotPassword />} />
             <Route path='events/*' element={<EventsMain />} />
             <Route path='/gallery' element={<Gallery />} />
             <Route path='/volunteer-register' element={<VolunteerForm />} />
             <Route path='/verifyEmail/:id/:token' element={<EmailVerification />} />
             <Route path='/payment-redirect' element={<PaymentRedirect />} />
-            <Route path='/admin' element={<PrivateRoute />} >
-              <Route path='/admin' element={<AdminHome />} />
-            </Route>
+            {/* <Route path='/admin/*' element={<PrivateRoute />} > */}
+              <Route path='admin/*' element={<AdminMain />} />
+            {/* </Route> */}
             <Route path='/donate' element={<Donate />} />
             <Route path='/nivanshfightsma' element={<NivanshFightSma />} />
             <Route path='/rfh-juniors-run-2024' element={<EventForm />} />

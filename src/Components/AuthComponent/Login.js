@@ -78,7 +78,7 @@ function Login() {
                         <br />
                         <br />
                         <div className="flex justify-between whitespace-nowrap text-sm sm:text-lg">
-                            <p className="mb-6">
+                            {/* <p className="mb-6">
                                 Don't have a account?
                                 <Link
                                     to="/sign-up"
@@ -86,7 +86,7 @@ function Login() {
                                 >
                                     Register
                                 </Link>
-                            </p>
+                            </p> */}
                             <p>
                                 <Link
                                     to="/forgot-password"

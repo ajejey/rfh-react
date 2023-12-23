@@ -5,6 +5,7 @@ import useSWR from 'swr';
 import Header from '../Header';
 import EventParticipants from './EventParticipents';
 import VolunteerList from './VolunteerList';
+import { Link } from 'react-router-dom';
 
 function AdminHome() {
     const [tabNumber, setTabNumber] = useState(0);
@@ -119,6 +120,10 @@ function AdminHome() {
                             </a>
                         )}
                     </div>
+                </section>
+                <section className="mb-4">
+                    <h3>Get All Donations</h3>
+                    <Link to="/admin/get-all-donations">Download donations receipt table</Link>
                 </section>
                 <hr />
 
