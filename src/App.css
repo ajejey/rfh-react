@@ -579,6 +579,20 @@ div.content li {
   margin-bottom: 10px;
 }
 
+.banner {
+  font-size: 1.2rem;
+  background-color: #2f6e49; /* Set your desired background color */
+  color: #fff; /* Set your desired text color */
+  text-align: center;
+  padding: 20px 10px 10px;
+}
+
+.banner a {
+  color: #fff; /* Set your desired link color */
+  text-decoration: none;
+  font-weight: bold;
+}
+
 @keyframes gradient {
   0% {
     background-position: 0% 50%;
