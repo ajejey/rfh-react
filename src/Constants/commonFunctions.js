@@ -21,3 +21,9 @@ export const convertToWebP = async (file) => {
         };
     });
 };
+
+export const convertCamelCase = (camelCasedString) => {
+    const spacedString = camelCasedString.replace(/([A-Z])/g, ' $1').trim();
+    return spacedString.charAt(0).toUpperCase() + spacedString.slice(1);
+};
+

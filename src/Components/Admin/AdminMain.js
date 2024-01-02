@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import AdminHome from './AdminHome'
 import GetAllDonations from './GetAllDonations'
 import useAuthStatus from '../../CustomHooks/useAuthStatus'
+import EventParticipants from './EventParticipents'
 
 const AdminMain = () => {
     console.log("admin main")
@@ -45,6 +46,7 @@ const AdminMain = () => {
             <Routes>
                 <Route path='/' element={<AdminHome />} />
                 <Route path='/get-all-donations' element={<GetAllDonations />} />
+                <Route path='/marathon-participants' element={<EventParticipants />} />
 
             </Routes>
         </div>

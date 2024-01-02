@@ -104,6 +104,12 @@ function AdminHome() {
             <div className="container-md">
                 <h1 className="h1">Admin Panel</h1>
                 <hr />
+                <section>
+                    <h3>See all Marathon Participants</h3>
+                    <Link to="/admin/marathon-participants">See all participants</Link>
+                    <br />
+                    <hr />
+                </section>
                 <section className="mb-4">
                     <h3>Generate Donations CSV</h3>
                     <div className="d-flex justify-content-center align-items-center mt-3 gap-3">
