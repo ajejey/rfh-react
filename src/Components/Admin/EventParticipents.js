@@ -6,6 +6,7 @@ import useSWR from 'swr';
 import Header from '../Header';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { convertCamelCase } from '../../Constants/commonFunctions';
+import CSVDownloader from '../CSVDownloader';
 
 
 const StyledFormControl = styled(FormControl)(({ theme }) => ({
@@ -123,6 +124,10 @@ function EventParticipants() {
                 </FormControl>
             </div>
             {marathonData && (
+                <div>
+                    <div>
+                    <CSVDownloader data={marathonData.map((item) => { return {date: new Date(item.date).toLocaleString() ,merchantTransactionId: item.merchantTransactionId , ...item.userDetails }})} filename="RFH_juniors_participants" />
+                </div>
                 <div style={{ width: '100%', overflowX: "auto"}}>
                    <table>
                     <thead>
@@ -148,6 +153,8 @@ function EventParticipants() {
                     </tbody>
                 </table> 
                 </div>
+                </div>
+                
                 
             )}
 
