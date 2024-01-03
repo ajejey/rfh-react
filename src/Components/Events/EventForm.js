@@ -383,11 +383,16 @@ function EventForm() {
                                 <div className="container d-flex justify-content-center align-items-center ">
                                     <div className="bg-dark text-light p-4 rounded border border-warning shadow">
                                         <h4 className="mb-3 font-weight-bold">Special Early Bird Offer!</h4>
-                                        <p className="lead">
+
+                                        {new Date() < new Date(DISCOUNT_DATE) ? (
+                                            <p className="lead">
                                             Registration Fee: INR{' '}
                                             <span className="text-decoration-line-through" style={{ color: "#999", textDecorationThickness: "2px" }}>{PRICE}/-</span>{' '}
                                             <span className="text-warning">{DISCOUNT_PRICE}/-</span>
                                         </p>
+                                        ) : (
+                                            <p className="lead">Registration Fee:  <span className="text-warning">INR {PRICE}/-</span> </p>
+                                        )}                                        
                                         <p className="font-italic">Early Bird offer: Lasts till {new Date(DISCOUNT_DATE).toLocaleDateString(undefined, dateOptions)}</p>
                                     </div>
                                 </div>
