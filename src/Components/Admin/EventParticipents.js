@@ -126,7 +126,7 @@ function EventParticipants() {
             {marathonData && (
                 <div>
                     <div>
-                    <CSVDownloader data={marathonData.map((item) => { return {date: new Date(item.date).toLocaleString() ,merchantTransactionId: item.merchantTransactionId , ...item.userDetails }})} filename="RFH_juniors_participants" />
+                    <CSVDownloader data={marathonData.map((item) => { return {date: new Date(item.date).toLocaleString() ,merchantTransactionId: item?.merchantTransactionId , ...item?.userDetails, paymentStatus: item?.paymentDetails?.code, phonePeTransactionId: item?.paymentDetails?.data?.transactionId }})} filename="RFH_juniors_participants" />
                 </div>
                 <div style={{ width: '100%', overflowX: "auto"}}>
                    <table>
@@ -136,6 +136,8 @@ function EventParticipants() {
                             {marathonData[16] && Object.keys(marathonData[16]?.userDetails).map((key) => (
                                 <th style={{ border: '1px solid black',  padding: '4px', minWidth: '100px'}} key={key}>{convertCamelCase(key)}</th>
                             ))}
+                            <th style={{ border: '1px solid black',  padding: '4px', minWidth: '100px'}}>Payment status code</th>
+                            <th>PhonePe transactionId</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -146,6 +148,8 @@ function EventParticipants() {
                                 {Object.keys(item?.userDetails).map((key) => (
                                     <td style={{ border: '1px solid black',  padding: '4px'}} key={key}>{item?.userDetails[key]}</td>
                                 ))}
+                                <td style={{ border: '1px solid black',  padding: '4px'}}>{item?.paymentDetails?.code}</td>
+                                <td style={{ border: '1px solid black',  padding: '4px'}}>{item?.paymentDetails?.data?.transactionId}</td>
                             </tr>
                             
                         ))}
