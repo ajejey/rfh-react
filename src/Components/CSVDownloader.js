@@ -1,5 +1,6 @@
 import React from 'react';
 import Papa from 'papaparse';
+import { Button } from '@mui/material';
 
 const CSVDownloader = ({ data, filename }) => {
   const downloadCSV = () => {
@@ -24,9 +25,9 @@ const CSVDownloader = ({ data, filename }) => {
   };
 
   return (
-    <button onClick={downloadCSV}>
+    <Button onClick={downloadCSV}>
       Download CSV
-    </button>
+    </Button>
   );
 };
 

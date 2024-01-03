@@ -283,3 +283,10 @@ export const indianStates = [
     { name: 'Uttarakhand', code: 'UK' },
     { name: 'West Bengal', code: 'WB' }
 ]
+
+export const dateOptions = {
+    weekday: 'short',
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  };
