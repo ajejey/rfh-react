@@ -32,7 +32,7 @@ function EventForm() {
     // const DISCOUNT_PRICE = 1
     // const PRICE = 1
     const ADDITIONAL_TSHIRT_PRICE = 249
-    const DISCOUNT_DATE = new Date("2024-01-11")
+    const DISCOUNT_DATE = new Date("2024-01-19")
 
     const executeScroll = () => myRef.current.scrollIntoView()
 
