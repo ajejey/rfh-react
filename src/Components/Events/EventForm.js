@@ -11,6 +11,8 @@ import HowToRegIcon from '@mui/icons-material/HowToReg';
 import { Button, Dialog } from '@mui/material';
 import { Helmet } from 'react-helmet-async';
 import tShirtGuide from '../../assets/images/tShirtGuide.jpeg'
+import { toast } from 'sonner';
+
 
 function EventForm() {
     const { register, control, handleSubmit, getValues, setValue, formState: { errors }, watch } = useForm();
@@ -144,7 +146,7 @@ function EventForm() {
             setValue("donation", data.customDonation)
         }
         delete data.customDonation;
-        if(data.additionalTshirt === 'No'){
+        if (data.additionalTshirt === 'No') {
             setValue("additionalTshirtQuantity", "0")
             data.additionalTshirtQuantity = "0"
             setValue("additionalTshirtSize", "")
@@ -158,8 +160,7 @@ function EventForm() {
     }
 
     const handlePaymentClick = async () => {
-        setDisablePaymentButton(true)
-        setPaymentLoading(true)
+
         setValue("totalPrice", totalPrice)
         setValue("marathonName", "RFH Juniors run 2024")
         try {
@@ -181,7 +182,8 @@ function EventForm() {
             // setPaymentStatus(data.message)
             // setPaymentLink(data?.data?.instrumentResponse?.redirectInfo?.url)
             // window.location.href = data?.data?.instrumentResponse?.redirectInfo?.url;
-
+            setDisablePaymentButton(true)
+            setPaymentLoading(true)
             window.open(
                 data?.data?.instrumentResponse?.redirectInfo?.url
             );
@@ -189,6 +191,8 @@ function EventForm() {
         } catch (error) {
             console.log("error ", error)
             setPaymentLoading(false)
+            setDisablePaymentButton(false)
+            toast.error('Something went wrong. Please try again. ');
         }
 
     }
@@ -386,13 +390,13 @@ function EventForm() {
 
                                         {new Date() < new Date(DISCOUNT_DATE) ? (
                                             <p className="lead">
-                                            Registration Fee: INR{' '}
-                                            <span className="text-decoration-line-through" style={{ color: "#999", textDecorationThickness: "2px" }}>{PRICE}/-</span>{' '}
-                                            <span className="text-warning">{DISCOUNT_PRICE}/-</span>
-                                        </p>
+                                                Registration Fee: INR{' '}
+                                                <span className="text-decoration-line-through" style={{ color: "#999", textDecorationThickness: "2px" }}>{PRICE}/-</span>{' '}
+                                                <span className="text-warning">{DISCOUNT_PRICE}/-</span>
+                                            </p>
                                         ) : (
                                             <p className="lead">Registration Fee:  <span className="text-warning">INR {PRICE}/-</span> </p>
-                                        )}                                        
+                                        )}
                                         <p className="font-italic">Early Bird offer: Lasts till {new Date(DISCOUNT_DATE).toLocaleDateString(undefined, dateOptions)}</p>
                                     </div>
                                 </div>
@@ -600,7 +604,7 @@ function EventForm() {
                                                     <option value="Power-Run">Power Run</option>
                                                     <option value="Bolts-Run">Bolts Run</option>
                                                 </select> */}
-                                                {errors.category && <p><span  style={{ color: "red" }}>This field is mandatory.</span> <span style={{ color: "#f39c12" }}>Make sure your age is less than 21 to be eligible</span>  </p>}
+                                                {errors.category && <p><span style={{ color: "red" }}>This field is mandatory.</span> <span style={{ color: "#f39c12" }}>Make sure your age is less than 21 to be eligible</span>  </p>}
                                             </div>
                                         </div>
                                         {category === 'Champs-Run' && (

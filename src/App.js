@@ -26,6 +26,7 @@ import NivanshFightSma from './Components/NivanshFightSma/NivanshFightSma';
 import EventForm from './Components/Events/EventForm';
 import AdminMain from './Components/Admin/AdminMain';
 import ForgotPassword from './Components/AuthComponent/ForgotPassword';
+import { Toaster } from 'sonner'
 
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
   return (
     <div>
       <ThemeProvider theme={theme}>
+        <Toaster richColors />
         <ScrollToTop />
         <HelmetProvider>
           <Routes>
@@ -49,7 +51,7 @@ function App() {
             <Route path='/verifyEmail/:id/:token' element={<EmailVerification />} />
             <Route path='/payment-redirect' element={<PaymentRedirect />} />
             {/* <Route path='/admin/*' element={<PrivateRoute />} > */}
-              <Route path='admin/*' element={<AdminMain />} />
+            <Route path='admin/*' element={<AdminMain />} />
             {/* </Route> */}
             <Route path='/donate' element={<Donate />} />
             <Route path='/nivanshfightsma' element={<NivanshFightSma />} />
