@@ -176,7 +176,7 @@ function EventForm() {
             console.log("data ", data)
             console.log("data.message", data, data.message);
             if(data.success === false){
-                toast.error('There was an error. Please try later or Contact Raghu @ +91-9164358027 ');
+                toast.error('There was an error. Please try later or Contact Raghu @ +91-9164358027 ', { duration: 50000 });
                 return
             }
             console.log("merchantTransactionId from backend ", data?.data?.merchantTransactionId)

@@ -37,7 +37,7 @@ function App() {
   return (
     <div>
       <ThemeProvider theme={theme}>
-        <Toaster richColors />
+        <Toaster richColors closeButton />
         <ScrollToTop />
         <HelmetProvider>
           <Routes>
