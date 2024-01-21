@@ -175,6 +175,10 @@ function EventForm() {
             const data = await response.json();
             console.log("data ", data)
             console.log("data.message", data, data.message);
+            if(data.success === false){
+                toast.error('There was an error. Please try later or Contact Raghu @ +91-9164358027 ');
+                return
+            }
             console.log("merchantTransactionId from backend ", data?.data?.merchantTransactionId)
             localStorage.setItem('merchantTransactionId', data?.data?.merchantTransactionId
             );
@@ -192,7 +196,7 @@ function EventForm() {
             console.log("error ", error)
             setPaymentLoading(false)
             setDisablePaymentButton(false)
-            toast.error('Something went wrong. Please try again. ');
+            toast.error('Something went wrong. Please try later or Raghu @ +91-91643 58027');
         }
 
     }
