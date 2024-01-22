@@ -17,7 +17,7 @@ import CountUp from 'react-countup';
 import VisibilitySensor from 'react-visibility-sensor';
 import { Dialog, Button, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Fab } from '@mui/material'
 import { useForm } from 'react-hook-form'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { GlobalContext } from '../context/Provider'
 import CallIcon from '@mui/icons-material/Call';
 import { Helmet } from 'react-helmet-async';
@@ -500,6 +500,7 @@ function Home() {
 
             <footer id="footer">
                 <p>© Copyright 2023 Rupee for Humanity</p>
+                <Link to="/privacy-policy" >Privacy Policy</Link>
             </footer>
 
         </div>

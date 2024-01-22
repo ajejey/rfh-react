@@ -27,6 +27,7 @@ import EventForm from './Components/Events/EventForm';
 import AdminMain from './Components/Admin/AdminMain';
 import ForgotPassword from './Components/AuthComponent/ForgotPassword';
 import { Toaster } from 'sonner'
+import PrivacyPolicy from './Components/PrivacyPolicy/PrivacyPolicy';
 
 
 function App() {
@@ -48,6 +49,7 @@ function App() {
             <Route path='events/*' element={<EventsMain />} />
             <Route path='/gallery' element={<Gallery />} />
             <Route path='/volunteer-register' element={<VolunteerForm />} />
+            <Route path='/privacy-policy' element={<PrivacyPolicy />} />
             <Route path='/verifyEmail/:id/:token' element={<EmailVerification />} />
             <Route path='/payment-redirect' element={<PaymentRedirect />} />
             {/* <Route path='/admin/*' element={<PrivateRoute />} > */}
