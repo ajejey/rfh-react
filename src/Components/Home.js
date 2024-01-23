@@ -500,7 +500,10 @@ function Home() {
 
             <footer id="footer">
                 <p>© Copyright 2023 Rupee for Humanity</p>
-                <Link to="/privacy-policy" >Privacy Policy</Link>
+                <div style={{ display: "flex", justifyContent: "center", gap: "16px" }}>
+                <Link to="/refund-policy" >Refund Policy</Link>
+                <Link to="/terms-and-conditions" >Terms and Conditions</Link>
+                </div>
             </footer>
 
         </div>
