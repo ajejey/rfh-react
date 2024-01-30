@@ -30,7 +30,7 @@ function EventForm() {
     const category = watch('category');
 
     const DISCOUNT_PRICE = 499
-    const PRICE = 599
+    const PRICE = 299
     // const DISCOUNT_PRICE = 1
     // const PRICE = 1
     const ADDITIONAL_TSHIRT_PRICE = 249
@@ -308,7 +308,7 @@ function EventForm() {
                             </div>
 
 
-                            <span ><small style={{ color: "#ff7675" }}> <strong>Last Date to Register: Jan 26th 2024</strong> </small></span><br />
+                            <span ><small style={{ color: "#ff7675" }}> <strong>Last Date to Register: Feb 6th 2024</strong> </small></span><br />
                             <br />
 
                             <p>
@@ -368,11 +368,11 @@ function EventForm() {
                                 </div> */}
                                 <div className="mt-4">
                                     <p>
-                                        Each participant receives T-shirt, Medal, Bib, Finisher certificate, Breakfast and witnesses the noble cause of Rupee For Humanity.
+                                        Each participant receives Medal, Bib, Finisher certificate, Breakfast and witnesses the noble cause of Rupee For Humanity.
                                     </p>
                                     <ul>
                                         <li><strong>Champs run:</strong> Should be accompanied by a parent/guardian.</li>
-                                        <li><strong>Parents:</strong> Can opt for T-shirt for them with an additional price of {ADDITIONAL_TSHIRT_PRICE}/- INR per T-shirt.</li>
+                                        {/* <li><strong>Parents:</strong> Can opt for T-shirt for them with an additional price of {ADDITIONAL_TSHIRT_PRICE}/- INR per T-shirt.</li> */}
                                         <li><strong>Breakfast:</strong> Only for participants. Parents can buy from the food vendor on the venue.</li>
                                     </ul>
                                 </div>
@@ -621,7 +621,7 @@ function EventForm() {
                                             </div>
                                         )}
                                     </div>
-                                    <div className="row">
+                                    <div className="row d-none">
                                         {/* <div className="col-md-6">
                                             <div className="form-group">
                                                 <label htmlFor="need-tee">Do you want to opt for T-Shirt?  <span style={{ color: "red" }}>*</span>
@@ -638,7 +638,7 @@ function EventForm() {
                                         <div className="col-md-6">
                                             <div className="form-group">
                                                 <label htmlFor="tee-size">T-Shirt Size  <span style={{ color: "red" }}>*</span></label>
-                                                <select {...register("TshirtSize", { required: true })} id="tee-size" className="form-select" aria-label="T-Shirt Size">
+                                                <select {...register("TshirtSize", { required: false })} id="tee-size" className="form-select" aria-label="T-Shirt Size">
                                                     <option value="">select</option>
                                                     <option value="24">24</option>
                                                     <option value="26">26</option>
@@ -664,11 +664,11 @@ function EventForm() {
                                         </Dialog>
                                     </div>
                                     {/* New row for additional T-shirt question */}
-                                    <div className="row">
+                                    <div className="row d-none">
                                         <div className="col-md-6">
                                             <div className="form-group">
                                                 <label htmlFor="additionalTshirt">Do you need additional T-shirt? <span style={{ color: "red" }}>*</span></label>
-                                                <select {...register("additionalTshirt", { required: true })} id="additionalTshirt" className="form-select" aria-label="Additional T-shirt">
+                                                <select {...register("additionalTshirt", { required: false })} id="additionalTshirt" className="form-select" aria-label="Additional T-shirt">
                                                     <option value="">select</option>
                                                     <option value="Yes">Yes</option>
                                                     <option value="No">No</option>
@@ -681,7 +681,7 @@ function EventForm() {
                                             <div className="col-md-6">
                                                 <div className="form-group">
                                                     <label htmlFor="additionalTshirtQuantity">Quantity <span style={{ color: "red" }}>*</span></label>
-                                                    <select {...register("additionalTshirtQuantity", { required: true })} id="additionalTshirtQuantity" className="form-select" aria-label="additionalTshirtQuantity">
+                                                    <select {...register("additionalTshirtQuantity", { required: false })} id="additionalTshirtQuantity" className="form-select" aria-label="additionalTshirtQuantity">
                                                         <option value="">select</option>
                                                         <option value="1">1</option>
                                                         <option value="2">2</option>
@@ -702,7 +702,7 @@ function EventForm() {
                                             <div className="col-md-12">
                                                 <div className="form-group">
                                                     <label htmlFor="additionalTshirtSize">Please write T-Shirt Sizes for Additional T-shirts with comma seperation <span style={{ color: "red" }}>*</span></label>
-                                                    <textarea {...register("additionalTshirtSize", { required: true })} id="additionalTshirtSize" className="form-control" aria-label="Additional T-shirt Size"></textarea>
+                                                    <textarea {...register("additionalTshirtSize", { required: false })} id="additionalTshirtSize" className="form-control" aria-label="Additional T-shirt Size"></textarea>
 
                                                     {errors.additionalTshirtSize && <p style={{ color: "red" }}>This field is mandatory</p>}
                                                 </div>
