@@ -308,7 +308,7 @@ function EventForm() {
                             </div>
 
 
-                            <span ><small style={{ color: "#ff7675" }}> <strong>Last Date to Register: Feb 6th 2024</strong> </small></span><br />
+                            <span ><small style={{ color: "#ff7675" }}> <strong>Last Date to Register: Feb 10th 2024</strong> </small></span><br />
                             <br />
 
                             <p>
@@ -837,7 +837,7 @@ function EventForm() {
                                     </div>
 
                                     <div className="d-grid gap-2">
-                                        <button className="btn btn-primary" type="submit">Submit</button>
+                                        <button className="btn btn-primary" type="submit" disabled={new Date().toLocaleString("en-US", {timeZone: "Asia/Kolkata"}) > new Date("2024-02-10T23:59:00+05:30").toLocaleString("en-US", {timeZone: "Asia/Kolkata"})}>Submit</button>
                                     </div>
                                 </form>
 
