@@ -1,7 +1,6 @@
 import './App.css';
 import { Route, Routes } from 'react-router-dom';
 import Home from './Components/Home';
-import Gallery from './Components/Gallery';
 import EventsMain from './Components/Events/EventsMain';
 import VolunteerForm from './Components/VolunteerForm';
 import PaymentRedirect from './Components/PaymentRedirect';
@@ -29,6 +28,7 @@ import ForgotPassword from './Components/AuthComponent/ForgotPassword';
 import { Toaster } from 'sonner'
 import PrivacyPolicy from './Components/PrivacyPolicy/PrivacyPolicy';
 import TermsAndConditions from './Components/PrivacyPolicy/TermsAndConditions';
+import Gallery from './Components/Gallery/Gallery';
 
 
 function App() {
