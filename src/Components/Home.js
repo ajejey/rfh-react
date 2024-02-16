@@ -180,9 +180,9 @@ function Home() {
             <Helmet>
                 <title>Rupee For Humanity</title>
             </Helmet>
-            <div class="banner">
+            {/* <div class="banner">
                 <p>New marathon event for Juniors. <a href="https://www.rupeeforhumanity.org/rfh-juniors-run-2024">Register now!</a></p>
-            </div>
+            </div> */}
             <Header />
             <section id="title">
                 <div className="hero-text background">
