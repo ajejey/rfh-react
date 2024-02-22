@@ -38,6 +38,10 @@ function Header() {
                             <li className="nav-item">
                                 <NavLink to="/gallery" className={({ isActive }) => (isActive ? 'nav-link active1' : 'nav-link')} preventScrollReset={true}>Gallery</NavLink>
                             </li>
+                            {/* Our Team */}
+                            <li className="nav-item">
+                                <NavLink to="/our-team" className={({ isActive }) => (isActive ? 'nav-link active1' : 'nav-link')} preventScrollReset={true}>Our Team</NavLink>
+                            </li>
                             <li className="nav-item">
                                 <NavLink to="/volunteer-register" className={({ isActive }) => (isActive ? 'nav-link active1' : 'nav-link')} preventScrollReset={true}>Volunteer</NavLink>
                             </li>

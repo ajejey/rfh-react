@@ -29,6 +29,7 @@ import { Toaster } from 'sonner'
 import PrivacyPolicy from './Components/PrivacyPolicy/PrivacyPolicy';
 import TermsAndConditions from './Components/PrivacyPolicy/TermsAndConditions';
 import Gallery from './Components/Gallery/Gallery';
+import OurTeamMain from './Components/OurTeam/OurTeamMain';
 
 
 function App() {
@@ -48,6 +49,7 @@ function App() {
             {/* <Route path="/sign-up" element={<SignUp />} /> */}
             <Route path='/forgot-password' element={<ForgotPassword />} />
             <Route path='events/*' element={<EventsMain />} />
+            <Route path='our-team/*' element={<OurTeamMain />} />
             <Route path='/gallery' element={<Gallery />} />
             <Route path='/volunteer-register' element={<VolunteerForm />} />
             <Route path='/refund-policy' element={<PrivacyPolicy />} />
