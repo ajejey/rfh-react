@@ -149,10 +149,11 @@ const OurTeam = () => {
                                         {member.designation}
                                     </Typography>
                                     <Typography variant="body1" component="p">
-                                      <small><b>Favorite Quote:</b></small> <br /> {member.quote}
+                                       {member.quote}
                                     </Typography>
+                                    <br />
                                     <Typography variant="body2" component="p">
-                                      <small><b>Background: </b></small> <br /> {member.background}
+                                      {member.background}
                                     </Typography>
 
                                 </CardContent>
