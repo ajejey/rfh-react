@@ -148,14 +148,13 @@ const OurTeam = () => {
                                     <Typography variant="body2" color="text.secondary">
                                         {member.designation}
                                     </Typography>
-                                    <Typography variant="body1" component="p">
-                                       {member.quote}
-                                    </Typography>
-                                    <br />
                                     <Typography variant="body2" component="p">
                                       {member.background}
                                     </Typography>
-
+                                    <Typography variant="body1" component="p">
+                                       {member.quote}
+                                    </Typography>
+                                    
                                 </CardContent>
                                 {loggedIn && (
                                     <CardActions disableSpacing sx={{ justifyContent: 'flex-end' }}>
