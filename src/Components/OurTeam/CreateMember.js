@@ -12,7 +12,8 @@ const CreateMember = () => {
         designation: '',
         photoUrl: '',
         background: '',
-        quote: ''
+        quote: '',
+        sortPosition: 0
     });
     const [urls, setUrls] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -46,7 +47,8 @@ const CreateMember = () => {
             designation: member.designation,
             photoUrl: urls[0],
             background: member.background,
-            quote: member.quote
+            quote: member.quote,
+            sortPosition: member.sortPosition
         };
     
         try {
@@ -149,6 +151,11 @@ const CreateMember = () => {
                     <div className="mb-3">
                         <label className="form-label">Quote</label>
                         <textarea rows="3" name="quote" value={member.quote} onChange={handleChange} className="form-control" />
+                    </div>
+                    {/* sort position */}
+                    <div className='mb-3'>
+                        <label className='form-label'>Sort Position</label>
+                        <input type="number" name="sortPosition" value={member.sortPosition} onChange={handleChange} className="form-control" />
                     </div>
                     <button type="submit" className="btn btn-primary" disabled={isAPILoading}>
                         {isAPILoading ? (
