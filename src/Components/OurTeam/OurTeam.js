@@ -120,7 +120,7 @@ const OurTeam = () => {
     return (
         <div>
             <Header />
-            <div className="container-md">
+            <div className="container-md mb-5">
                 <h1 className="h1">Meet Our Team</h1>
                 {loggedIn && (
                     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginBottom: '12px' }}>
