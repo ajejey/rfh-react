@@ -138,7 +138,7 @@ const OurTeam = () => {
                                     component="img"
                                     alt={member.name}
                                     // height="340"
-                                    sx={{ objectFit: 'cover', maxHeight: '240px' }}
+                                    sx={{ objectFit: 'contain', maxHeight: '340px' }}
                                     image={member.photoUrl}
                                 />
                                 <CardContent>
