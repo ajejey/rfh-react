@@ -105,6 +105,18 @@ function Event() {
                         </div>
                     </div>
                 </div>
+                {eventData?.pdf && (
+                    <div className="pt-4">
+                        <h3 className="h3">Event Document</h3>
+                        <iframe
+                            title="Event Document"
+                            src={eventData?.pdf}
+                            style={{ width: "100%", height: "90vh" }}
+                            allowFullScreen
+                        ></iframe>
+                    </div>
+                )}
+            
                 <div className='pt-4 d-flex justify-content-center gap-5'>
                     <Button onClick={handleDonateClick} variant='contained' color='primary'>Donate Online</Button>
                     <Button color='primary' onClick={() => handleRegisterClick(eventData?.eventName)}>Volunteer for this event</Button>

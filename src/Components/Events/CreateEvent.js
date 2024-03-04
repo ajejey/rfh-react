@@ -5,9 +5,11 @@ import { TextField, Button, Grid } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import useSWR, { mutate } from 'swr';
 import { storage } from '../../config/firebase-config';
-import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
+import { getDownloadURL, getStorage, ref, uploadBytes, } from 'firebase/storage';
 import Editor from '../Blog/Editor';
 import { useNavigate } from 'react-router-dom';
+import { CircularProgress } from '@mui/material';
+import { uploadToFireBase } from '../../Constants/commonFunctions';
 
 function CreateEvent() {
     const navigate = useNavigate();
@@ -15,8 +17,10 @@ function CreateEvent() {
     const [image, setImage] = useState();
     const [imageInvalid, setImageInvalid] = useState(false);
     const [description, setDescription] = useState('');
+    const [pdf, setPdf] = useState('');
+    const [pdfLoading, setPdfLoading] = useState(false);
 
-  
+    const [pdfInvalid, setPdfInvalid] = useState(false);
 
     const onSubmit = async (formData) => {
         const file = image;
@@ -99,6 +103,26 @@ function CreateEvent() {
         setImage(e.target.files[0]);
     }
 
+    // Assuming you have imported the uploadToFireBase function
+
+    const handlePdfChange = async (e) => {
+        const file = e.target.files[0];
+
+        try {
+            setPdfLoading(true); // Set pdfLoading to true when the file upload begins
+            // Upload the file to Firebase using the uploadToFireBase function
+            const downloadURL = await uploadToFireBase(file);
+            console.log('File uploaded successfully. URL:', downloadURL);
+            setValue('pdf', downloadURL);
+        } catch (error) {
+            console.error('Error uploading file:', error);
+        } finally {
+            setPdfLoading(false); // Set pdfLoading to false when the file upload completes or encounters an error
+        }
+    };
+
+
+
     return (
         <div>
             <Header />
@@ -134,7 +158,7 @@ function CreateEvent() {
                                 type="text"
                                 rows="2"
                             />
-                            
+
                         </Grid>
                         {/* input google maps location */}
                         <Grid item xs={12}>
@@ -149,7 +173,7 @@ function CreateEvent() {
                                 type="text"
                             />
                         </Grid>
-                        
+
 
                         <Grid item xs={12}>
                             <label htmlFor="startDate">Start Date</label> <br />
@@ -168,6 +192,12 @@ function CreateEvent() {
                             <label htmlFor='image'>Image</label> <br />
                             <input className='form-control' type="file" name='image' onChange={handleFileChange} accept='image/*' />
                             {imageInvalid && <small style={{ color: "red" }}>Invalid file type or size too large. Please upload image file less than 1MB</small>}
+                        </Grid>
+                        <Grid item xs={12}>
+                            <label htmlFor='pdf'>PDF</label> <br />
+                            <input className='form-control' type="file" name='pdf' onChange={handlePdfChange} accept='application/pdf' />
+                            {pdfLoading && <CircularProgress style={{ marginTop: '10px' }} />} 
+                            {pdfInvalid && <small style={{ color: "red" }}>Invalid file type.</small>}
                         </Grid>
                         <Grid item xs={12}>
                             <Button variant="contained" type="submit">Submit</Button>
