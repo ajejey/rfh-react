@@ -570,10 +570,10 @@ h1 {
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
 
-div.content p {
+/* div.content p {
   line-height: 1.7rem;
   margin: 30px 0;
-}
+} */
 
 div.content li {
   margin-bottom: 10px;

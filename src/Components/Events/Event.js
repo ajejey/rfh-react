@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react'
 import Header from '../Header'
 import useSWR, { mutate } from 'swr';
 import 'react-quill/dist/quill.snow.css';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { GlobalContext } from '../../context/Provider';
@@ -11,6 +11,7 @@ import DonateDialog from '../DonateDialog/DonateDialog';
 import useAuthStatus from '../../CustomHooks/useAuthStatus';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { Helmet } from 'react-helmet-async';
 
 const fetcher = async (url) => {
     const response = await fetch(url);
@@ -70,19 +71,25 @@ function Event() {
 
     return (
         <div>
+            <Helmet>
+                <title>{`RFH | ${eventData?.eventName}`}</title>
+                <meta name="description" content={eventData?.description} />
+                <meta property="og:title" content={eventData?.eventName} />
+                <meta property="og:description" content={eventData?.description} />
+                {eventData?.image && <meta property="og:image" content={eventData?.image} />}
+            </Helmet>
             <Header />
             <div className='container-md mb-5'>
                 <div>
                     {loggedIn && (
                         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-                            {/* <button title='Edit this article' onClick={handleEdit} className='btn btn-dark'>
-                            <FontAwesomeIcon icon={faPen} />
-                        </button> */}
-                            <button title='Delete this event' onClick={handleDelete} className='btn btn-danger' disabled={isDeleting}>
+                            <Link to={`/events/edit-event/${path}`} title="Edit this event" className="btn btn-dark">
+                                <FontAwesomeIcon icon={faPen} />
+                            </Link>
+                            <button title="Delete this event" onClick={handleDelete} className="btn btn-danger" disabled={isDeleting}>
                                 <FontAwesomeIcon icon={faTrash} />
                             </button>
                         </div>
-
                     )}
                 </div>
                 <h1 className="h1">{eventData?.eventName}</h1>
@@ -116,14 +123,14 @@ function Event() {
                         ></iframe>
                     </div>
                 )}
-            
+
                 <div className='pt-4 d-flex justify-content-center gap-5'>
                     <Button onClick={handleDonateClick} variant='contained' color='primary'>Donate Online</Button>
                     <Button color='primary' onClick={() => handleRegisterClick(eventData?.eventName)}>Volunteer for this event</Button>
                 </div>
             </div>
             <Dialog open={open}>
-                <DonateDialog handleClose={handleClose} />
+                <DonateDialog handleClose={handleClose} eventData={eventData} />
             </Dialog>
         </div>
     )

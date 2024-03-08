@@ -1,5 +1,5 @@
 import { Button, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material'
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { GlobalContext } from '../../context/Provider';
 import { useNavigate } from 'react-router-dom';
@@ -14,13 +14,19 @@ const fetcher = async (url) => {
     return response.json();
 }
 
-function DonateDialog({ handleClose }) {
+function DonateDialog({ handleClose, eventData = {} }) {
     const abortController = new AbortController();
     const signal = abortController.signal;
     const navigate = useNavigate()
     const { data: futureEventsData, error: futureEventsError } = useSWR(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/events/future-events`, fetcher);
 
-    const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm();
+    const defaultValues = {
+        volunteeringEvent: eventData?.eventName || '',
+      };
+
+      const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm({
+        defaultValues,
+      });
     const { transaction, setTransaction } = useContext(GlobalContext)
     const [paymentStatus, setPaymentStatus] = useState("")
     const [paymentLink, setPaymentLink] = useState("")
@@ -61,6 +67,7 @@ function DonateDialog({ handleClose }) {
             console.log("merchantTransactionId from backend ", data?.data?.merchantTransactionId)
             localStorage.setItem('merchantTransactionId', data?.data?.merchantTransactionId
             );
+            localStorage.setItem('cause', formDataCopy?.volunteeringEvent);
             setPaymentStatus(data.message)
             setPaymentLink(data?.data?.instrumentResponse?.redirectInfo?.url)
             // window.location.href = data?.data?.instrumentResponse?.redirectInfo?.url;
@@ -121,6 +128,7 @@ function DonateDialog({ handleClose }) {
 
     }
 
+
     return (
         <>
             <DialogTitle>Donate to Rupee For Humanity</DialogTitle>
@@ -154,7 +162,7 @@ function DonateDialog({ handleClose }) {
                         <select {...register("volunteeringEvent", { required: false })} id="volunteeringEvent" className="form-select" aria-label="event select">
                             <option value="">select</option>
                             {futureEventsData && futureEventsData.length && futureEventsData?.map((event) => (
-                                <option value={event.eventName}>{event.eventName}</option>
+                                <option key={event._id} value={event.eventName}>{event.eventName}</option>
                             ))}
                         </select>
                         {errors.volunteeringEvent && <p style={{ color: "red" }}>This field is mandatory</p>}
