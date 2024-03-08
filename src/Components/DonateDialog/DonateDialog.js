@@ -21,12 +21,17 @@ function DonateDialog({ handleClose, eventData = {} }) {
     const { data: futureEventsData, error: futureEventsError } = useSWR(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/events/future-events`, fetcher);
 
     const defaultValues = {
-        volunteeringEvent: eventData?.eventName || '',
-      };
+        cause: eventData?.eventName || '',
+    };
 
-      const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm({
+    const { register, handleSubmit, getValues, setValue, formState: { errors } } = useForm({
         defaultValues,
-      });
+    });
+
+    useEffect(() => {
+        setValue('cause', eventData?.eventName || '');
+    }, [eventData, setValue, getValues]); // Added setValue as a dependency
+
     const { transaction, setTransaction } = useContext(GlobalContext)
     const [paymentStatus, setPaymentStatus] = useState("")
     const [paymentLink, setPaymentLink] = useState("")
@@ -157,7 +162,7 @@ function DonateDialog({ handleClose, eventData = {} }) {
                         <input {...register("PANno", { required: true })} type="text" className="form-control" id="PANno" />
                         {errors.PANno && <p style={{ color: "red" }}>This field is mandatory</p>}
                     </div>
-                    <div className="form-group">
+                    {/* <div className="form-group">
                         <label htmlFor="volunteeringEvent">Which Event do you want to volunteer for?</label>
                         <select {...register("volunteeringEvent", { required: false })} id="volunteeringEvent" className="form-select" aria-label="event select">
                             <option value="">select</option>
@@ -166,7 +171,19 @@ function DonateDialog({ handleClose, eventData = {} }) {
                             ))}
                         </select>
                         {errors.volunteeringEvent && <p style={{ color: "red" }}>This field is mandatory</p>}
+                    </div> */}
+                    <div className="form-group">
+                        <label htmlFor="cause">Cause</label>
+                        <input
+                            {...register('cause')}
+                            value={eventData?.eventName || ''}
+                            type="text"
+                            className="form-control"
+                            id="cause"
+                            readOnly
+                        />
                     </div>
+
                     <div className="form-group">
                         <label htmlFor="donationAmount">Amount you would like to Donate <span style={{ color: "red" }}>*</span></label>
                         <input {...register("donationAmount", { required: true })} type="number" className="form-control" id="donationAmount" />
