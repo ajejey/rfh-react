@@ -114,7 +114,7 @@ function Events() {
 
                     <Grid container spacing={2}>
                         {events && events.length &&
-                            events.map((event) => (
+                            events.filter(event => new Date(event.startDate) >= new Date()).sort((a, b) => new Date(b.startDate) - new Date(a.startDate)).map((event) => (
                                 <Grid item xs={12} sm={6} md={4} key={event._id}>
                                     <Card>
                                         <CardHeader
@@ -144,7 +144,40 @@ function Events() {
 
             </section>
 
-            <section id="past-events" >
+            <section id="past-events">
+            <div className="container-md">
+            <h2 className="h2" style={{ color: "#fff4de", fontWeight: "700", paddingBottom: "2%" }}>Past Events</h2>
+            <Grid container spacing={2}>
+                {events && events.length &&
+                    events.filter(event => new Date(event.startDate) < new Date()).sort((a, b) => new Date(b.startDate) - new Date(a.startDate)).map((event) => (
+                        <Grid item xs={12} sm={6} md={4} key={event._id}>
+                            <Card>
+                                <CardHeader
+                                    title={event.eventName}
+                                    subheader={new Date(event.startDate).toLocaleDateString('en-US', {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric',
+                                    })}
+                                />
+                                <CardMedia component="img" image={event.image} alt={event.title} />
+                                <CardContent>
+                                    {/* <Typography variant="body2" color="text.secondary">
+                                {event.description}
+                            </Typography> */}
+                                    {/* <br /> */}
+                                </CardContent>
+                                <CardActions sx={{ justifyContent: "flex-end" }}>
+                                    <Button variant="outlined" onClick={() => handleEventLearnMore(event.path)}>Learn more</Button>
+                                </CardActions>
+                            </Card>
+                        </Grid>
+                    ))}
+                    </Grid>
+                </div>
+            </section>
+
+            {/* <section id="past-events" >
                 <div className="container-md">
                     <h2 className="h2" style={{ color: "#fff4de", fontWeight: "700", paddingBottom: "2%" }}>Past Events</h2>
 
@@ -166,7 +199,7 @@ function Events() {
                         </div>
                     </div>
                 </div>
-            </section>
+            </section> */}
         </div>
     )
 }
