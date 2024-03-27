@@ -77,8 +77,14 @@ function Event() {
                 <meta name="description" content={eventData?.description} />
                 <meta property="og:title" content={eventData?.eventName} />
                 <meta property="og:description" content={eventData?.description} />
-                {eventData?.image && <meta property="og:image" content={eventData?.image} />}
+                {eventData?.image && <meta property="og:image" itemProp='image' content={eventData?.image} />}
+                <meta property="og:url" content={window.location.href} />
+                <meta property="og:type" content="website" />
+                <meta itemprop="name" content={eventData?.eventName} />
+                <meta itemprop="description" content={eventData?.description} />
+                {eventData?.image && <meta itemprop="image" content={eventData?.image} />}
             </Helmet>
+
             <Header />
             <div className='container-md mb-5'>
                 <div>
@@ -108,10 +114,10 @@ function Event() {
                 <div className='pt-3'>
                     <h3 className='h3'>Description</h3>
                     {/* <div className="ql-container ql-snow" style={{ position: "relative", border: "none" }}>*/}
-                        <div className="ck-content" data-gramm="false"> 
-                            <div dangerouslySetInnerHTML={{ __html: eventData?.description }} />
-                        </div>
-                   {/*  </div> */}
+                    <div className="ck-content" data-gramm="false">
+                        <div dangerouslySetInnerHTML={{ __html: eventData?.description }} />
+                    </div>
+                    {/*  </div> */}
                 </div>
                 {eventData?.pdf && (
                     <div className="pt-4">
