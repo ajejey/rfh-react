@@ -116,7 +116,7 @@ function Events() {
                         {events && events.length &&
                             events.filter(event => new Date(event.startDate) >= new Date()).sort((a, b) => new Date(b.startDate) - new Date(a.startDate)).map((event) => (
                                 <Grid item xs={12} sm={6} md={4} key={event._id}>
-                                    <Card>
+                                    <Card onClick={() => handleEventLearnMore(event.path)} style={{ cursor: "pointer" }}>
                                         <CardHeader
                                             title={event.eventName}
                                             subheader={new Date(event.startDate).toLocaleDateString('en-US', {
@@ -132,9 +132,9 @@ function Events() {
                                             </Typography> */}
                                             {/* <br /> */}
                                         </CardContent>
-                                        <CardActions sx={{ justifyContent: "flex-end" }}>
+                                        {/* <CardActions sx={{ justifyContent: "flex-end" }}>
                                             <Button variant="outlined" onClick={() => handleEventLearnMore(event.path)}>Learn more</Button>
-                                        </CardActions>
+                                        </CardActions> */}
                                     </Card>
                                 </Grid>
                             ))}
@@ -151,7 +151,7 @@ function Events() {
                 {events && events.length &&
                     events.filter(event => new Date(event.startDate) < new Date()).sort((a, b) => new Date(b.startDate) - new Date(a.startDate)).map((event) => (
                         <Grid item xs={12} sm={6} md={4} key={event._id}>
-                            <Card>
+                            <Card onClick={() => handleEventLearnMore(event.path)} style={{ cursor: "pointer" }} >
                                 <CardHeader
                                     title={event.eventName}
                                     subheader={new Date(event.startDate).toLocaleDateString('en-US', {
@@ -167,9 +167,9 @@ function Events() {
                             </Typography> */}
                                     {/* <br /> */}
                                 </CardContent>
-                                <CardActions sx={{ justifyContent: "flex-end" }}>
+                                {/* <CardActions sx={{ justifyContent: "flex-end" }}>
                                     <Button variant="outlined" onClick={() => handleEventLearnMore(event.path)}>Learn more</Button>
-                                </CardActions>
+                                </CardActions> */}
                             </Card>
                         </Grid>
                     ))}

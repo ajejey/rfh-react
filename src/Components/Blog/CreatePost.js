@@ -4,6 +4,7 @@ import { Navigate } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
 import Editor from './Editor';
 import Header from '../Header';
+import CkEditor from './CkEditor';
 
 export default function CreatePost() {
     const [title, setTitle] = useState('');
@@ -77,7 +78,8 @@ export default function CreatePost() {
                         onChange={(ev) => setAuthor(ev.target.value)}
                     />
                     <br />
-                    <Editor value={content} onChange={setContent} />
+                    {/* <Editor value={content} onChange={setContent} /> */}
+                    <CkEditor value={content} onChange={setContent} />
                     <button style={{ marginTop: '5px' }}>Create post</button>
                     {/* {error && <div>Error: {error.message}</div>} */}
                 </form>

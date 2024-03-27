@@ -6,6 +6,7 @@ import Header from '../Header'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faShareAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
 import useAuthStatus from '../../CustomHooks/useAuthStatus';
+import '../Blog/ckStyles.css'
 
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
@@ -98,11 +99,11 @@ function PostPage() {
                     </div>
 
                 )}
-                <div className="ql-container ql-snow" style={{ position: "relative", border: "none" }}>
-                    <div className="ql-editor" data-gramm="false">
+                {/* <div className="ql-container ql-snow" style={{ position: "relative", border: "none" }}> */}
+                    <div className="ck-content" data-gramm="false">
                         <div className="content" dangerouslySetInnerHTML={{ __html: data?.data?.content }} />
                     </div>
-                </div>
+                {/* </div> */}
 
                 <button onClick={handleShare} className="btn btn-link">
                     <FontAwesomeIcon icon={faShareAlt} className="share-icon" />

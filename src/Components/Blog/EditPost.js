@@ -4,6 +4,7 @@ import useSWR, { mutate } from "swr";
 import Editor from "./Editor";
 import Header from "../Header";
 import Skeleton from "react-loading-skeleton";
+import CkEditor from "./CkEditor";
 
 const fetcher = (url) => fetch(url).then((res) => res.json());
 
@@ -97,7 +98,7 @@ export default function EditPost() {
                         onChange={(ev) => setAuthor(ev.target.value)}
                     />
 
-                    <Editor onChange={setContent} value={content} />
+                    <CkEditor onChange={setContent} value={content} />
                     <button style={{ marginTop: "5px" }}>Update post</button>
                 </form>
             </div>

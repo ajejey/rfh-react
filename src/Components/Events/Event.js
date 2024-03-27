@@ -12,6 +12,7 @@ import useAuthStatus from '../../CustomHooks/useAuthStatus';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { Helmet } from 'react-helmet-async';
+import '../Blog/ckStyles.css'
 
 const fetcher = async (url) => {
     const response = await fetch(url);
@@ -106,11 +107,11 @@ function Event() {
                 </div>
                 <div className='pt-3'>
                     <h3 className='h3'>Description</h3>
-                    <div className="ql-container ql-snow" style={{ position: "relative", border: "none" }}>
-                        <div className="ql-editor" data-gramm="false">
+                    {/* <div className="ql-container ql-snow" style={{ position: "relative", border: "none" }}>*/}
+                        <div className="ck-content" data-gramm="false"> 
                             <div dangerouslySetInnerHTML={{ __html: eventData?.description }} />
                         </div>
-                    </div>
+                   {/*  </div> */}
                 </div>
                 {eventData?.pdf && (
                     <div className="pt-4">

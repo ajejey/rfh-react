@@ -10,6 +10,7 @@ import Editor from '../Blog/Editor';
 import { useNavigate } from 'react-router-dom';
 import { CircularProgress } from '@mui/material';
 import { uploadToFireBase } from '../../Constants/commonFunctions';
+import CkEditor from '../Blog/CkEditor';
 
 function CreateEvent() {
     const navigate = useNavigate();
@@ -144,7 +145,7 @@ function CreateEvent() {
                         </Grid>
                         <Grid item xs={12}>
                             <label htmlFor="description">Description</label> <br />
-                            <Editor value={description} onChange={setDescription} />
+                            <CkEditor value={description} onChange={setDescription} />
                         </Grid>
                         <Grid item xs={12}>
                             <label htmlFor="location">Location</label> <br />
@@ -202,6 +203,9 @@ function CreateEvent() {
                         <Grid item xs={12}>
                             <Button variant="contained" type="submit">Submit</Button>
                         </Grid>
+                        {/* <Grid item xs={12}>
+                            <CkEditor value={description} onChange={setDescription} />
+                        </Grid> */}
                     </Grid>
                 </form>
             </div>

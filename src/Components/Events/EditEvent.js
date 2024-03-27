@@ -8,6 +8,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import Header from '../Header';
 import { mutate } from 'swr';
 import Editor from '../Blog/Editor';
+import CkEditor from '../Blog/CkEditor';
 
 const EditEvent = () => {
     const navigate = useNavigate();
@@ -139,7 +140,7 @@ const EditEvent = () => {
                         </Grid>
                         <Grid item xs={12}>
                             <label htmlFor="description">Description</label> <br />
-                            <Editor value={description} onChange={setDescription} />
+                            <CkEditor value={description} onChange={setDescription} />
                         </Grid>
                         <Grid item xs={12}>
                             <label htmlFor="location">Location</label> <br />
