@@ -12,7 +12,7 @@ import useAuthStatus from '../../CustomHooks/useAuthStatus';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import '../Blog/ckStyles.css'
-import { Helmet } from 'react-helmet'
+import { Helmet } from 'react-helmet-async';
 
 const fetcher = async (url) => {
     const response = await fetch(url);
@@ -94,7 +94,7 @@ function Event() {
                 <meta property="og:image:width" content="1000" />
 
                 <meta itemprop="name" content={eventData?.eventName} />
-                <meta itemprop="description" content={eventData?.description.slice(0, 160)} />
+                <meta itemprop="description" content={eventData?.description.slice(0, 160)} />                
                 
             </Helmet>
 
