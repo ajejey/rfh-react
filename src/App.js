@@ -42,7 +42,7 @@ function App() {
       <ThemeProvider theme={theme}>
         <Toaster richColors closeButton />
         <ScrollToTop />
-        <HelmetProvider>
+        {/* <HelmetProvider> */}
           <Routes>
             <Route path='/' element={<Home />} />
             <Route path="/login" element={<Login />} />
@@ -72,7 +72,7 @@ function App() {
             {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
 
           </Routes>
-        </HelmetProvider>
+        {/* </HelmetProvider> */}
       </ThemeProvider>
 
     </div>

@@ -11,8 +11,8 @@ import DonateDialog from '../DonateDialog/DonateDialog';
 import useAuthStatus from '../../CustomHooks/useAuthStatus';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { Helmet } from 'react-helmet-async';
 import '../Blog/ckStyles.css'
+import { Helmet } from 'react-helmet'
 
 const fetcher = async (url) => {
     const response = await fetch(url);
@@ -74,15 +74,28 @@ function Event() {
         <div>
             <Helmet>
                 <title>{`RFH | ${eventData?.eventName}`}</title>
-                <meta name="description" content={eventData?.description} />
-                <meta property="og:title" content={eventData?.eventName} />
-                <meta property="og:description" content={eventData?.description} />
-                {eventData?.image && <meta property="og:image" itemProp='image' content={eventData?.image} />}
-                <meta property="og:url" content={window.location.href} />
+                <meta charSet="utf-8" />
+                <meta httpEquiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+                <meta name="theme-color" content="#000" />
+                <meta name="format-detection" content="telephone=no" />
+                <meta name="author" content="Rupee For Humanity" />
+                <meta name="description" content={eventData?.description.slice(0, 160)} />
+                <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+                <meta property="og:site_name" content="Rupee For Humanity" />
+                <meta property="og:url" content="https://www.rupeeforhumanity.org/" />
+                <meta property="og:locale" content="en_US" />
                 <meta property="og:type" content="website" />
+                <meta property="og:title" content={eventData?.eventName} />
+                <meta property="og:description" content={eventData?.description.slice(0, 160)} />
+
+                <meta property="og:image" itemProp="image" content={eventData?.image} />
+                <meta property="og:image:height" content="1000" />
+                <meta property="og:image:width" content="1000" />
+
                 <meta itemprop="name" content={eventData?.eventName} />
-                <meta itemprop="description" content={eventData?.description} />
-                {eventData?.image && <meta itemprop="image" content={eventData?.image} />}
+                <meta itemprop="description" content={eventData?.description.slice(0, 160)} />
+                
             </Helmet>
 
             <Header />
