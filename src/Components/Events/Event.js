@@ -6,13 +6,14 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { GlobalContext } from '../../context/Provider';
-import { Button, Dialog } from '@mui/material';
+import { Button, Dialog, IconButton } from '@mui/material';
 import DonateDialog from '../DonateDialog/DonateDialog';
 import useAuthStatus from '../../CustomHooks/useAuthStatus';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import '../Blog/ckStyles.css'
 import { Helmet } from 'react-helmet-async';
+import ShareIcon from '@mui/icons-material/Share';
 
 const fetcher = async (url) => {
     const response = await fetch(url);
@@ -30,7 +31,7 @@ function Event() {
     const { data: eventData, error } = useSWR(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/events/${path}`, fetcher);
     const [open, setOpen] = React.useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
-
+    const [isSharing, setIsSharing] = useState(false);
     const handleDonateClick = () => {
         setOpen(true)
     }
@@ -70,6 +71,28 @@ function Event() {
         }
     };
 
+
+
+    const handleShare = () => {
+        if (!isSharing) {
+            setIsSharing(true);
+
+            if (navigator.share) {
+                navigator.share({
+                    title: eventData?.eventName,
+                    text: 'Check out this Event from Rupee For Humanity: ',
+                    url: `https://www.rupeeforhumanity.org/events/${path}`,
+                })
+                    .then(() => console.log('Shared successfully'))
+                    .catch((error) => console.error('Error sharing:', error))
+                    .finally(() => setIsSharing(false));
+            } else {
+                console.log('Web Share API not supported');
+                setIsSharing(false);
+            }
+        }
+    };
+
     return (
         <div>
             <Helmet>
@@ -94,8 +117,8 @@ function Event() {
                 <meta property="og:image:width" content="1000" />
 
                 <meta itemprop="name" content={eventData?.eventName} />
-                <meta itemprop="description" content={eventData?.description.slice(0, 160)} />                
-                
+                <meta itemprop="description" content={eventData?.description.slice(0, 160)} />
+
             </Helmet>
 
             <Header />
@@ -112,6 +135,7 @@ function Event() {
                         </div>
                     )}
                 </div>
+                
                 <h1 className="h1">{eventData?.eventName}</h1>
                 <span style={{ fontWeight: 'bold', color: 'gray' }}>
                     <DateRangeIcon color='tertiary' /> &nbsp;
@@ -121,6 +145,11 @@ function Event() {
                     <LocationOnIcon color='tertiary' /> &nbsp;
                     {eventData?.location}
                 </a>
+                <div>
+                    <IconButton color='secondary' aria-label="share" title="Share this Event" onClick={handleShare}>
+                        <ShareIcon  />&nbsp;  Share this Event 
+                    </IconButton>
+                </div>
                 <div className="d-flex justify-content-center pt-4">
                     <img src={eventData?.image} className="img-fluid h-75" alt="Event details" />
                 </div>
