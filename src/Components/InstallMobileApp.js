@@ -14,6 +14,8 @@ const InstallMobileApp = (props) => {
     });
   }, []);
 
+  console.log("showInstallMessageCompopent ", showInstallMessageCompopent)
+
   const promptInstall = () => {
     if (deferredPrompt) {
       deferredPrompt.prompt();

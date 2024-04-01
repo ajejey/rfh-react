@@ -163,12 +163,7 @@ function Home() {
 
     const executeScroll = () => myRef.current.scrollIntoView()
 
-    useEffect(() => {
-        window.addEventListener('beforeinstallprompt', (e) => {
-          e.preventDefault();
-          setShowInstallMessage(true);
-        });
-      }, []);
+
 
     useEffect(() => {
         if ([...searchParams].length) {
@@ -197,11 +192,11 @@ function Home() {
             {/* <div class="banner">
                 <p>New marathon event for Juniors. <a href="https://www.rupeeforhumanity.org/rfh-juniors-run-2024">Register now!</a></p>
             </div> */}
-            {showInstallMessage && 
+            
             <div class="banner">
                 <p>Install the Rupee For Humanity App now! <InstallMobileApp /></p>
             </div>
-            }
+            
             <Dialog maxWidth="sm" fullWidth open={openAppDownloadDialog} onClose={() => setOpenAppDownloadDialog(false)}>
                 <DialogTitle>Install App</DialogTitle>
                 <IconButton
