@@ -15,12 +15,15 @@ import growth from '../assets/images/growth.png'
 import logo from '../assets/images/Logo.jpg'
 import CountUp from 'react-countup';
 import VisibilitySensor from 'react-visibility-sensor';
-import { Dialog, Button, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Fab } from '@mui/material'
+import { Dialog, Button, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Fab, IconButton } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { GlobalContext } from '../context/Provider'
 import CallIcon from '@mui/icons-material/Call';
 import { Helmet } from 'react-helmet-async';
+import InstallMobileApp from './InstallMobileApp'
+
+import CloseIcon from '@mui/icons-material/Close';
 
 function Home() {
     const abortController = new AbortController();
@@ -35,6 +38,7 @@ function Home() {
     const [paymentLink, setPaymentLink] = useState("")
     const [loading, setLoading] = useState(false)
     const [status, setStatus] = useState({});
+    const [openAppDownloadDialog, setOpenAppDownloadDialog] = useState(false);
 
     function generateTransactionId() {
         let id = "RFH";
@@ -165,6 +169,9 @@ function Home() {
             if (Object.fromEntries([...searchParams])?.donate === 'true') {
                 setOpen(true)
             }
+            if (Object.fromEntries([...searchParams])?.source === 'qr') {
+                setOpenAppDownloadDialog(true)
+            }
         } else {
             console.log("No Search Params")
         }
@@ -183,6 +190,33 @@ function Home() {
             {/* <div class="banner">
                 <p>New marathon event for Juniors. <a href="https://www.rupeeforhumanity.org/rfh-juniors-run-2024">Register now!</a></p>
             </div> */}
+            <div class="banner">
+                <p>Install the Rupee For Humanity App now! <InstallMobileApp /></p>
+            </div>
+            <Dialog maxWidth="sm" fullWidth open={openAppDownloadDialog} onClose={() => setOpenAppDownloadDialog(false)}>
+                <DialogTitle>Install App</DialogTitle>
+                <IconButton
+                    aria-label="close"
+                    onClick={() => setOpenAppDownloadDialog(false)}
+                    sx={{
+                        position: 'absolute',
+                        right: 8,
+                        top: 8,
+                        color: (theme) => theme.palette.grey[500],
+                    }}
+                ><CloseIcon /></IconButton>
+                <DialogContent>
+                    <DialogContentText>
+                        Install the Rupee For Humanity App now!
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button variant='text' onClick={() => setOpenAppDownloadDialog(false)} >
+                        Close
+                    </Button>
+                        <InstallMobileApp  type="button" />
+                </DialogActions>
+            </Dialog>
             <Header />
             <section id="title">
                 <div className="hero-text background">
@@ -501,8 +535,8 @@ function Home() {
             <footer id="footer">
                 <p>© Copyright 2023 Rupee for Humanity</p>
                 <div style={{ display: "flex", justifyContent: "center", gap: "16px" }}>
-                <Link to="/refund-policy" >Refund Policy</Link>
-                <Link to="/terms-and-conditions" >Terms and Conditions</Link>
+                    <Link to="/refund-policy" >Refund Policy</Link>
+                    <Link to="/terms-and-conditions" >Terms and Conditions</Link>
                 </div>
             </footer>
 
