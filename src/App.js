@@ -6,7 +6,7 @@ import VolunteerForm from './Components/VolunteerForm';
 import PaymentRedirect from './Components/PaymentRedirect';
 import AdminHome from './Components/Admin/AdminHome';
 import EmailVerification from './Components/EmailVerification';
-import { app } from './config/firebase-config'
+import { app} from './config/firebase-config'
 import { getAuth } from 'firebase/auth';
 import Donate from './Components/Donate/Donate';
 import ReactGA from "react-ga4";
@@ -30,6 +30,10 @@ import PrivacyPolicy from './Components/PrivacyPolicy/PrivacyPolicy';
 import TermsAndConditions from './Components/PrivacyPolicy/TermsAndConditions';
 import Gallery from './Components/Gallery/Gallery';
 import OurTeamMain from './Components/OurTeam/OurTeamMain';
+import EventForm2025 from './Components/Events/EventForm2025';
+
+
+
 
 
 function App() {
@@ -62,6 +66,7 @@ function App() {
             <Route path='/donate' element={<Donate />} />
             <Route path='/nivanshfightsma' element={<NivanshFightSma />} />
             <Route path='/rfh-juniors-run-2024' element={<EventForm />} />
+            <Route path='/rfh-juniors-run-2025' element={<EventForm2025 />} />
             <Route path='/blog' element={<IndexPage />} />
             <Route path='/post/:path' element={<PostPage />} />
             <Route path='/edit/:path' element={<EditPost />} />

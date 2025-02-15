@@ -1,0 +1,160 @@
+{
+    "title": "Marathon Registration Form",
+    "inputs": [
+        {
+            "type": "text",
+            "label": "First Name",
+            "name": "firstName",
+            "required": true
+        },
+        {
+            "type": "text",
+            "label": "Last Name",
+            "name": "lastName",
+            "required": true
+        },
+        {
+            "type": "email",
+            "label": "Email",
+            "name": "email",
+            "required": true
+        },
+        {
+            "type": "date",
+            "label": "Date of Birth",
+            "name": "dob",
+            "required": true
+        },
+        {
+            "type": "text",
+            "label": "Address",
+            "name": "address",
+            "required": true
+        },
+        {
+            "type": "text",
+            "label": "City",
+            "name": "city",
+            "required": true
+        },
+        {
+            "type": "text",
+            "label": "State",
+            "name": "state",
+            "required": true
+        },
+        {
+            "type": "text",
+            "label": "Zip Code",
+            "name": "zipCode",
+            "required": true
+        },
+        {
+            "type": "tel",
+            "label": "Phone Number",
+            "name": "phoneNumber",
+            "required": true
+        },
+        {
+            "type": "text",
+            "label": "Emergency Contact Name",
+            "name": "emergencyContactName",
+            "required": true
+        },
+        {
+            "type": "tel",
+            "label": "Emergency Contact Phone Number",
+            "name": "emergencyContactPhoneNumber",
+            "required": true
+        },
+        {
+            "type": "url",
+            "label": "Website",
+            "name": "website"
+        },
+        {
+            "type": "textarea",
+            "label": "Bio",
+            "name": "bio",
+            "rows": 4
+        },
+        {
+            "type": "radio",
+            "label": "Gender",
+            "name": "gender",
+            "options": [
+                {
+                    "label": "Male",
+                    "value": "male"
+                },
+                {
+                    "label": "Female",
+                    "value": "female"
+                },
+                {
+                    "label": "Other",
+                    "value": "other"
+                }
+            ],
+            "required": true
+        },
+        {
+            "type": "select",
+            "label": "T-Shirt Size",
+            "name": "tShirtSize",
+            "options": [
+                {
+                    "label": "Small",
+                    "value": "small"
+                },
+                {
+                    "label": "Medium",
+                    "value": "medium"
+                },
+                {
+                    "label": "Large",
+                    "value": "large"
+                },
+                {
+                    "label": "Extra Large",
+                    "value": "extraLarge"
+                }
+            ],
+            "required": true
+        },
+        {
+            "type": "checkbox",
+            "label": "Volunteer for Marathon",
+            "name": "volunteer",
+            "required": false
+        },
+        {
+            "type": "multiselect",
+            "label": "Preferred Marathon Distance",
+            "name": "preferredDistance",
+            "options": [
+                {
+                    "label": "5K",
+                    "value": "5k"
+                },
+                {
+                    "label": "10K",
+                    "value": "10k"
+                },
+                {
+                    "label": "Half Marathon",
+                    "value": "halfMarathon"
+                },
+                {
+                    "label": "Full Marathon",
+                    "value": "fullMarathon"
+                }
+            ],
+            "required": true
+        }
+    ],
+    "button": {
+        "text": "Submit",
+        "type": "submit"
+    }
+}
