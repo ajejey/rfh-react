@@ -31,6 +31,7 @@ import TermsAndConditions from './Components/PrivacyPolicy/TermsAndConditions';
 import Gallery from './Components/Gallery/Gallery';
 import OurTeamMain from './Components/OurTeam/OurTeamMain';
 import EventForm2025 from './Components/Events/EventForm2025';
+import RfhSheRun2025 from './Components/Events/RfhSheRun2025';
 
 
 
@@ -67,6 +68,7 @@ function App() {
             <Route path='/nivanshfightsma' element={<NivanshFightSma />} />
             <Route path='/rfh-juniors-run-2024' element={<EventForm />} />
             <Route path='/rfh-juniors-run-2025' element={<EventForm2025 />} />
+            <Route path='/rfh-she-run-2025' element={<RfhSheRun2025 />} />
             <Route path='/blog' element={<IndexPage />} />
             <Route path='/post/:path' element={<PostPage />} />
             <Route path='/edit/:path' element={<EditPost />} />
