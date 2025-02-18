@@ -14,7 +14,7 @@ import tShirtGuide from '../../assets/images/tShirtGuide.jpeg'
 import { toast } from 'sonner';
 
 const EVENT_DETAILS = {
-    name: "RFH SHE Run 2025",
+    name: "RFH She Run 2025",
     date: new Date("2025-05-25T23:59:00+05:30"),
     lastDate: new Date("2025-04-28T23:59:00+05:30"),
     time: "7:00 AM IST",
@@ -172,7 +172,7 @@ function RfhSheRun2025() {
 
         // setValue("totalPrice", totalPrice)
         setValue("totalPrice", 1) // 1 rupee for testing
-        setValue("marathonName", "RFH SHE run 2025")
+        setValue("marathonName", "RFH She run 2025")
         try {
             const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/initiate-payment`, {
                 method: "POST",
@@ -192,7 +192,7 @@ function RfhSheRun2025() {
             console.log("merchantTransactionId from backend ", data?.data?.merchantTransactionId)
             localStorage.setItem('merchantTransactionId', data?.data?.merchantTransactionId
             );
-            localStorage.setItem('cause', "RFH SHE run 2025");
+            localStorage.setItem('cause', "RFH She run 2025");
             // setPaymentStatus(data.message)
             // setPaymentLink(data?.data?.instrumentResponse?.redirectInfo?.url)
             // window.location.href = data?.data?.instrumentResponse?.redirectInfo?.url;
@@ -294,7 +294,7 @@ function RfhSheRun2025() {
     return (
         <div style={{ backgroundColor: "#040002", color: "lightgray", minHeight: "100vh" }}>
             <Helmet>
-                <title>RFH SHE run 2025 | Rupee For Humanity</title>
+                <title>RFH She run 2025 | Rupee For Humanity</title>
             </Helmet>
             <Header />
             <main>
@@ -302,7 +302,7 @@ function RfhSheRun2025() {
                     <section id="registration-form">
                         <div className="container-md">
                             <h1 className="h1" style={{ fontWeight: "800" }}>
-                                RFH SHE run 2025 <br />
+                                RFH She run 2025 <br />
                                 {/* <span className='highlight' style={{ cursor: "pointer" }} onClick={executeScroll}>Virtual Run</span> */}
                             </h1>
                             <div className="row">
@@ -322,9 +322,9 @@ function RfhSheRun2025() {
                             <br />
 
                             <p>
-                                "Rupee For Humanity" is thrilled to present "RFH SHE Run 2025"—a celebration of passion, purpose, and the power of giving! After the resounding success of seven incredible running events in Bengaluru, we are now gearing up for an even more meaningful journey.                            </p>
+                                "Rupee For Humanity" is thrilled to present "RFH She Run 2025"—a celebration of passion, purpose, and the power of giving! After the resounding success of seven incredible running events in Bengaluru, we are now gearing up for an even more meaningful journey.                            </p>
                             <p>
-                                This isn’t just a run; it’s a movement! RFH SHE Run 2025 is a women’s run dedicated to empowerment, equality, and the spirit of sisterhood. Whether you're running for yourself, for the women who inspire you, or for the next generation, every step you take lights the path of education for underprivileged and deserving children.
+                                This isn’t just a run; it’s a movement! RFH She Run 2025 is a women’s run dedicated to empowerment, equality, and the spirit of sisterhood. Whether you're running for yourself, for the women who inspire you, or for the next generation, every step you take lights the path of education for underprivileged and deserving children.
                             </p>
                             <p>What could be more fulfilling than running for a cause that transforms lives?
                             </p>
@@ -373,7 +373,7 @@ function RfhSheRun2025() {
                                     </p>
                                     <ul>
                                         <li>Deepthi @ <a href="tel:+91-9986387435" style={{ color: "#f39c12" }}>+91-99863 87435</a></li>
-                                        <li>Sripada @ <a href="tel:+91-9964046022" style={{ color: "#f39c12" }}>+91-99640 46022</a></li>
+                                        <li>Deekshith @ <a href="tel:+91-8147775122" style={{ color: "#f39c12" }}>+91-81477 75122</a></li>
                                         <li>Raghu @ <a href="tel:+91-9164358027" style={{ color: "#f39c12" }}>+91-91643 58027</a></li>
                                     </ul>
                                 </div>
@@ -646,7 +646,7 @@ function RfhSheRun2025() {
                                     <div className="row">
                                         <div className="col-md-6">
                                             <div className="form-group">
-                                                <label htmlFor="additionalTshirt">Do you need additional T-shirt? <span style={{ color: "red" }}>*</span></label>
+                                                <label htmlFor="additionalTshirt">Twin in Style: Match with Your Bestie, Cousin, or Spouse! (additional T-shirt) <span style={{ color: "red" }}>*</span></label>
                                                 <select {...register("additionalTshirt", { required: false })} id="additionalTshirt" className="form-select" aria-label="Additional T-shirt">
                                                     <option value="">select</option>
                                                     <option value="Yes">Yes</option>
@@ -785,14 +785,14 @@ function RfhSheRun2025() {
                                         <textarea
                                             defaultValue="&#x2022; All registrations are non-refundable, non-transferable, and cannot be modified. 
                                             &#x2022; Please provide a valid mobile number &amp; email address that you check regularly, as these will be our primary means of communication leading up to the event.
-                                            &#x2022; By registering, you acknowledge that participating in this event involves physical exertion and potential health risks. You take full responsibility for participating in the RFH SHE Run 2025 and do not hold the organizing committee, Rupee For Humanity, or any associated persons or entities liable for any injury, accident, or health-related issues.
+                                            &#x2022; By registering, you acknowledge that participating in this event involves physical exertion and potential health risks. You take full responsibility for participating in the RFH She Run 2025 and do not hold the organizing committee, Rupee For Humanity, or any associated persons or entities liable for any injury, accident, or health-related issues.
                                             &#x2022; You also assume all risks associated with participation, including but not limited to falls, contact with other participants, weather conditions (such as high heat or humidity), traffic, road conditions, and unforeseen incidents (such as arson or security threats).
                                             &#x2022; RFH volunteers will be present throughout the course to ensure safety and fairness. Their decisions will be final on event day.
                                             &#x2022; You agree that the organizing committee, Rupee For Humanity, and associated companies/entities shall not be liable for any loss, damage, illness, or injury resulting from your participation in the event.
                                             &#x2022; In case of adverse weather conditions, security concerns, or any unforeseen incidents, the organizers reserve the right to cancel, postpone, or stop the event for safety reasons.
                                             &#x2022; Confirmed registrations and merchandise orders are non-refundable, non-transferable, and cannot be modified. However, if an application is rejected, the collected amount will be refunded in full (excluding bank charges, if applicable).
                                             &#x2022; The organizers will only contact participants via email &amp; text message. Any notice sent to the registered email or mobile number shall be deemed as received by the participant.
-                                            &#x2022; Please remember: RFH SHE Run 2025 is a celebration of women's strength, empowerment, and giving back to society. Enjoy the run, support fellow participants, and embrace the joy of running for a cause!"
+                                            &#x2022; Please remember: RFH She Run 2025 is a celebration of women's strength, empowerment, and giving back to society. Enjoy the run, support fellow participants, and embrace the joy of running for a cause!"
                                             className="form-control"
                                             style={{ fontSize: "0.8rem" }}
                                             id="address"

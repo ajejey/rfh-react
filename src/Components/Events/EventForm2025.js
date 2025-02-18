@@ -13,6 +13,15 @@ import { Helmet } from 'react-helmet-async';
 import tShirtGuide from '../../assets/images/tShirtGuide.jpeg'
 import { toast } from 'sonner';
 
+const EVENT_DETAILS = {
+    name: "RFH Juniors Run 2025",
+    date: new Date("2025-05-25T00:00:00+05:30"), // May 25th, 2025
+    lastDate: new Date("2025-04-28T23:59:00+05:30"),
+    time: "7:00 AM IST",
+    venue: "https://www.google.com/maps/place/Bal+Bhavan+Auditorium/@12.9766439,77.5952091,17z/data=!3m1!4b1!4m6!3m5!1s0x3bae1671b1cd3b1f:0xb72fa25e5df4598d!8m2!3d12.9766439!4d77.597784!16s%2Fg%2F11csqwx6mm?entry=ttu&g_ep=EgoyMDI1MDIxMi4wIKXMDSoASAFQAw%3D%3D",
+    venueName: "Cubbon Park, Bengaluru",
+}
+
 
 function EventForm2025() {
     const { register, control, handleSubmit, getValues, setValue, formState: { errors }, watch } = useForm();
@@ -29,11 +38,11 @@ function EventForm2025() {
     const [paymentLoading, setPaymentLoading] = useState(false)
     const category = watch('category');
 
-    const DISCOUNT_PRICE = 499
-    const PRICE = 299
+    const DISCOUNT_PRICE = 599
+    const PRICE = 599
     // const DISCOUNT_PRICE = 1
     // const PRICE = 1
-    const ADDITIONAL_TSHIRT_PRICE = 249
+    const ADDITIONAL_TSHIRT_PRICE = 225
     const DISCOUNT_DATE = new Date("2025-01-21T23:59:00+05:30");
 
     const executeScroll = () => myRef.current.scrollIntoView()
@@ -71,11 +80,11 @@ function EventForm2025() {
         const age = calculateAge(dob);
 
         // Update the category based on the age
-        if (age >= 0 && age <= 8) {
+        if (age >= 3 && age <= 6) {
             setSelectedCategory('Champs-Run');
-        } else if (age >= 9 && age <= 15) {
+        } else if (age >= 7 && age <= 13) {
             setSelectedCategory('Power-Run');
-        } else if (age >= 16 && age <= 21) {
+        } else if (age >= 14 && age <= 18) {
             setSelectedCategory('Bolts-Run');
         } else {
             setSelectedCategory('');
@@ -298,18 +307,18 @@ function EventForm2025() {
                             </h1>
                             <div className="row">
                                 <div className="col-md-4">
-                                    <span> <strong><EventTwoToneIcon /> Date:</strong>  Feb 11th 2025 (Sunday)   </span>
+                                    <span> <strong><EventTwoToneIcon /> Date:</strong>  {EVENT_DETAILS.date.toLocaleDateString('en-US', dateOptions)}   </span>
                                 </div>
                                 <div className="col-md-4">
-                                    <span><strong> <AccessTimeTwoToneIcon /> Time:</strong>  7:00 AM IST </span>
+                                    <span><strong> <AccessTimeTwoToneIcon /> Time:</strong>  {EVENT_DETAILS.time} </span>
                                 </div>
                                 <div className="col-md-4">
-                                    <span><strong> <PlaceTwoToneIcon /> Venue: </strong><a style={{ color: "lightgray" }} href="https://maps.app.goo.gl/eRJjvw1mJxrQXef5A" target="_blank" rel="noopener noreferrer">DSCE, Bengaluru</a> </span>
+                                    <span><strong> <PlaceTwoToneIcon /> Venue: </strong><a style={{ color: "lightgray" }} href={EVENT_DETAILS.venue} target="_blank" rel="noopener noreferrer">{EVENT_DETAILS.venueName}</a> </span>
                                 </div>
                             </div>
 
 
-                            <span ><small style={{ color: "#ff7675" }}> <strong>Last Date to Register: Feb 10th 2025</strong> </small></span><br />
+                            <span ><small style={{ color: "#ff7675" }}> <strong>Last Date to Register: {EVENT_DETAILS.lastDate.toLocaleDateString('en-US', dateOptions)}</strong> </small></span><br />
                             <br />
 
                             <p>
@@ -342,17 +351,17 @@ function EventForm2025() {
                                     <tbody>
                                         <tr>
                                             <td className="fs-6">Champs Run</td>
-                                            <td>3-8 years</td>
+                                            <td>3-6 years</td>
                                             <td>800 meters</td>
                                         </tr>
                                         <tr>
                                             <td className="fs-6">Power Run</td>
-                                            <td>9-15 years</td>
+                                            <td>7-13 years</td>
                                             <td>1.5 kms</td>
                                         </tr>
                                         <tr>
                                             <td className="fs-6">Bolts Run</td>
-                                            <td>16-21 years</td>
+                                            <td>14-18 years</td>
                                             <td>2.5 kms</td>
                                         </tr>
                                     </tbody>
@@ -384,12 +393,12 @@ function EventForm2025() {
                                     </p>
                                     <ul>
                                         <li>Deepthi @ <a href="tel:+91-9986387435" style={{ color: "#f39c12" }}>+91-99863 87435</a></li>
-                                        <li>Sripada @ <a href="tel:+91-9964046022" style={{ color: "#f39c12" }}>+91-99640 46022</a></li>
+                                        <li>Deekshith @ <a href="tel:+91-8147775122" style={{ color: "#f39c12" }}>+91-81477 75122</a></li>
                                         <li>Raghu @ <a href="tel:+91-9164358027" style={{ color: "#f39c12" }}>+91-91643 58027</a></li>
                                     </ul>
                                 </div>
 
-                                <div className="container d-flex justify-content-center align-items-center ">
+                                {/* <div className="container d-flex justify-content-center align-items-center ">
                                     <div className="bg-dark text-light p-4 rounded border border-warning shadow">
                                         <h4 className="mb-3 font-weight-bold">Special Early Bird Offer!</h4>
 
@@ -404,7 +413,7 @@ function EventForm2025() {
                                         )}
                                         <p className="font-italic">Early Bird offer: Lasts till {new Date(DISCOUNT_DATE).toLocaleDateString(undefined, dateOptions)}</p>
                                     </div>
-                                </div>
+                                </div> */}
 
                             </div>
 
