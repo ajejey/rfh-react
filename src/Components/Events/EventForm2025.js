@@ -631,7 +631,7 @@ function EventForm2025() {
                                             </div>
                                         )}
                                     </div>
-                                    <div className="row d-none">
+                                    <div className="row">
                                         {/* <div className="col-md-6">
                                             <div className="form-group">
                                                 <label htmlFor="need-tee">Do you want to opt for T-Shirt?  <span style={{ color: "red" }}>*</span>
@@ -674,7 +674,7 @@ function EventForm2025() {
                                         </Dialog>
                                     </div>
                                     {/* New row for additional T-shirt question */}
-                                    <div className="row d-none">
+                                    <div className="row">
                                         <div className="col-md-6">
                                             <div className="form-group">
                                                 <label htmlFor="additionalTshirt">Do you need additional T-shirt? <span style={{ color: "red" }}>*</span></label>
