@@ -43,41 +43,99 @@ function PaymentRedirect({path = '/app/payment-status'}) {
     useEffect(() => {
         if (Object.keys(status).length === 0) {
             setLoading(true)
-            const fetchStatus = async () => {
-                let merchantTransactionId = localStorage.getItem('merchantTransactionId')
-                let cause = localStorage.getItem('cause')
-                let body = { merchantTransactionId: merchantTransactionId, cause: cause }
-
+            const merchantTransactionId = localStorage.getItem('merchantTransactionId')
+            const cause = localStorage.getItem('cause')
+            const formData = { merchantTransactionId, cause }
+            
+            const pollPaymentStatus = async () => {
                 try {
-                    const res = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}${path}`, {
+                    const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/payment/check-status`, {
                         method: 'POST',
-                        timeout: 1200000,
                         headers: {
-                            "Content-Type": "application/json",
+                            'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify(body)
+                        body: JSON.stringify({ merchantTransactionId })
                     });
-                    const data = await res.json();
-                    console.log("data ", data)
-
-                    setStatus(data);
-                    setLoading(false)
-
-                    // Check if payment is still pending
-                    // if (data.success === true && data.data.state === 'PENDING') {
-                    //     setTimeout(fetchStatus, 3000);
-                    // }
+                    
+                    const result = await response.json();
+                    
+                    if (result.code === 'PAYMENT_SUCCESS' || result.code === 'PAYMENT_ERROR') {
+                        // Update payment and user details
+                        const updateResponse = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/payment/update-details`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                merchantTransactionId,
+                                paymentResponse: result,
+                                formData
+                            })
+                        });
+                        
+                        if (result.code === 'PAYMENT_SUCCESS') {
+                            // Generate and send receipt
+                            const receiptResponse = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/payment/send-receipt`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    merchantTransactionId,
+                                    formData
+                                })
+                            });
+                            
+                            const receiptResult = await receiptResponse.json();
+                            if (receiptResult.success) {
+                                setStatus({
+                                    message: result.message,
+                                    data: { ...result, pdfBase64: receiptResult.pdfBase64 },
+                                    statusColor: 'green',
+                                    downloadLink: receiptResult.downloadLink
+                                });
+                            }
+                        } else {
+                            setStatus({
+                                message: result.message,
+                                data: result,
+                                statusColor: 'red'
+                            });
+                        }
+                        setLoading(false);
+                        return true; // Stop polling
+                    }
+                    return false; // Continue polling
                 } catch (error) {
-                    console.error(error);
+                    console.error('Error checking payment status:', error);
+                    return false; // Continue polling on error
                 }
             };
 
-            fetchStatus();
+            const startPolling = async () => {
+                const interval = setInterval(async () => {
+                    const shouldStop = await pollPaymentStatus();
+                    if (shouldStop) {
+                        clearInterval(interval);
+                    }
+                }, 3000); // Poll every 3 seconds
 
+                // Stop polling after 5 minutes
+                setTimeout(() => {
+                    clearInterval(interval);
+                    if (loading) {
+                        setLoading(false);
+                        setStatus({
+                            message: 'Payment status check timed out',
+                            statusColor: 'red'
+                        });
+                    }
+                }, 5 * 60 * 1000);
+            };
+
+            startPolling();
         }
-
-
-    }, []);
+    }, [status, loading]);
 
     useEffect(() => {
         // Start timer
@@ -105,46 +163,6 @@ function PaymentRedirect({path = '/app/payment-status'}) {
                             {status?.message}
                         </p>
                     }
-
-                    {/* {status?.message === 'Your payment is successful.' &&
-                        <div>
-                            <h5 style={{ margin: "0" }}> Amount:  </h5>
-                            {loading ?
-                                <span class="placeholder col-12"></span>
-                                :
-                                <small> {status?.data?.data?.amount && `INR ${(Number(status?.data?.data?.amount))}`}</small>
-                            }
-                            {console.log(status?.data?.data.paymentInstrument)}
-                            <br />
-                            <br />
-
-                            {Object.keys(status?.data?.data.paymentInstrument).map((item, index) => (
-                                <div>
-                                    <h5 style={{ margin: "0" }}> {convertCamelCase(item)}: </h5>
-                                    <small> {status?.data?.data.paymentInstrument[item]} </small>
-                                    <br />
-                                    <br />
-                                </div>
-                            ))}
-                            <h6>Thank you for your generous donation towards <br /> Rupee For Humanity</h6>
-                        </div>
-                    } */}
-
-                    {/* <h5 style={{ margin: "0" }}> IFSC:  </h5>
-                    {loading ?
-                        <span class="placeholder col-12"></span>
-                        :
-                        <small>{status?.data?.paymentInstrument?.ifsc}</small>
-                    }
-                    <br />
-                    <br /> */}
-                    {/* <h5 style={{ margin: "0" }}> Account No:  </h5>
-                    {loading ?
-                        <span class="placeholder col-12"></span>
-                        :
-                        <small>{status?.data?.paymentInstrument?.maskedAccountNumber}</small>
-                    }
-                    <br /> */}
 
                     <h5 style={{ margin: "0" }}> Amount:  </h5>
                     {loading ?
