@@ -163,213 +163,357 @@ function PaymentRedirect({path = '/app/payment-status'}) {
         return () => clearInterval(timer);
     }, []);
 
+    const steps = [
+        { status: stepStatus.verifying.status, text: stepStatus.verifying.message },
+        { status: stepStatus.updating.status, text: stepStatus.updating.message },
+        { status: stepStatus.sending.status, text: stepStatus.sending.message },
+    ];
+
     return (
-        <div className='container'>
-            <div className="row">
-                <div className="col-md-8 offset-md-2">
-                    <div className="card mt-5">
-                        <div className="card-body text-center">
-                            <img src={logo} alt="Logo" style={{ width: '150px', marginBottom: '20px' }} />
-                            
-                            {/* Step Status Indicators */}
-                            <div className="steps-container mb-4">
-                                {Object.entries(stepStatus).map(([step, { status, message }]) => (
-                                    <div key={step} className={`step-item mb-3 ${currentStep === step ? 'active' : ''}`}>
-                                        <div className="d-flex align-items-center">
-                                            <div className={`status-indicator ${status}`}>
-                                                {status === 'loading' && <div className="spinner-border spinner-border-sm" role="status" />}
-                                                {status === 'complete' && <i className="fas fa-check" />}
-                                                {status === 'error' && <i className="fas fa-times" />}
-                                            </div>
-                                            <div className="step-message ms-3">
-                                                <p className="mb-0" style={{ color: currentStep === step ? '#000' : '#666' }}>
-                                                    {message}
-                                                </p>
-                                            </div>
+        <>
+        <div className="payment-redirect-container">
+            <div className="payment-card">
+                <div className="logo-container">
+                    <img src="/rfh-logo.png" alt="Rupee for Humanity" className="rfh-logo" />
+                </div>
+
+                <div className="status-content">
+                    {/* Progress Steps */}
+                    <div className="progress-steps">
+                        {steps.map((step, index) => (
+                            <div key={index} className={`step ${step.status}`}>
+                                <div className="step-indicator">
+                                    {step.status === 'complete' ? (
+                                        <i className="fas fa-check"></i>
+                                    ) : step.status === 'error' ? (
+                                        <i className="fas fa-times"></i>
+                                    ) : step.status === 'loading' ? (
+                                        <div className="spinner-border spinner-border-sm" role="status">
+                                            <span className="visually-hidden">Loading...</span>
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* Timer */}
-                            <p className="text-muted mb-4">
-                                Time elapsed: {convertSeconds(timeElapsed)}
-                            </p>
-
-                            {/* Original Status Content */}
-                            {status?.message && (
-                                <div className={`alert alert-${status.statusColor === 'green' ? 'success' : 'danger'}`}>
-                                    {status.message}
+                                    ) : (
+                                        <span className="step-number">{index + 1}</span>
+                                    )}
                                 </div>
-                            )}
+                                <div className="step-content">
+                                    <p className="step-text">{step.text}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
 
-                            {/* Transaction Details */}
-                            <div className="transaction-details mt-4">
-                                <div className="row g-4">
-                                    <div className="col-lg-4 col-md-6">
-                                        <div className="detail-item">
-                                            <h5 className="detail-label">Amount</h5>
-                                            {loading ? (
-                                                <div className="placeholder-glow">
-                                                    <span className="placeholder col-8"></span>
-                                                </div>
-                                            ) : (
-                                                <p className="detail-value">
-                                                    {status?.data?.data?.amount && `INR ${(Number(status?.data?.data?.amount)) / 100}`}
-                                                </p>
-                                            )}
+                    {/* Timer */}
+                    <div className="timer">
+                        Time elapsed: {timeElapsed}s
+                    </div>
+
+                    {/* Success Message */}
+                    {status?.statusColor === 'green' && (
+                        <div className="success-message">
+                            <i className="fas fa-check-circle"></i>
+                            <h3>Payment Successful!</h3>
+                        </div>
+                    )}
+
+                    {/* Transaction Details */}
+                    <div className="transaction-details">
+                        <div className="detail-grid">
+                            <div className="detail-item">
+                                <label>Amount</label>
+                                <div className="detail-value">
+                                    {loading ? (
+                                        <div className="placeholder-glow">
+                                            <span className="placeholder col-8"></span>
                                         </div>
-                                    </div>
-                                    <div className="col-lg-4 col-md-6">
-                                        <div className="detail-item">
-                                            <h5 className="detail-label">Transaction ID</h5>
-                                            {loading ? (
-                                                <div className="placeholder-glow">
-                                                    <span className="placeholder col-8"></span>
-                                                </div>
-                                            ) : (
-                                                <div className="detail-value-wrapper">
-                                                    <p className="detail-value text-break mb-0">
-                                                        {status?.data?.data?.transactionId || 'N/A'}
-                                                    </p>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-4 col-md-12">
-                                        <div className="detail-item">
-                                            <h5 className="detail-label">RFH Reference Number</h5>
-                                            {loading ? (
-                                                <div className="placeholder-glow">
-                                                    <span className="placeholder col-8"></span>
-                                                </div>
-                                            ) : (
-                                                <div className="detail-value-wrapper">
-                                                    <p className="detail-value text-break mb-0">
-                                                        {status?.data?.data?.merchantTransactionId}
-                                                    </p>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
+                                    ) : (
+                                        <strong>
+                                            {status?.data?.data?.amount && `₹${(Number(status?.data?.data?.amount)) / 100}`}
+                                        </strong>
+                                    )}
                                 </div>
                             </div>
 
-                            {/* Download Receipt Button */}
-                            {status?.downloadLink && (
-                                <div className="mt-4 download-link" dangerouslySetInnerHTML={{ __html: status.downloadLink }} />
-                            )}
+                            <div className="detail-item">
+                                <label>Transaction ID</label>
+                                <div className="detail-value">
+                                    {loading ? (
+                                        <div className="placeholder-glow">
+                                            <span className="placeholder col-8"></span>
+                                        </div>
+                                    ) : (
+                                        <code>{status?.data?.data?.transactionId || 'N/A'}</code>
+                                    )}
+                                </div>
+                            </div>
 
-                            {/* Email Note */}
-                            {!loading && status?.statusColor === 'green' && (
-                                <p className="text-muted mt-3">
-                                    <small><i>Please check your email for the receipt</i></small>
-                                </p>
-                            )}
-
-                            {/* Okay Button */}
-                            <button onClick={handleOkayClick} className="btn btn-primary mt-3">
-                                Go Back Home
-                            </button>
+                            <div className="detail-item">
+                                <label>RFH Reference</label>
+                                <div className="detail-value">
+                                    {loading ? (
+                                        <div className="placeholder-glow">
+                                            <span className="placeholder col-8"></span>
+                                        </div>
+                                    ) : (
+                                        <code>{status?.data?.data?.merchantTransactionId}</code>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
+
+                    {/* Actions */}
+                    <div className="action-buttons">
+                        {status?.downloadLink && (
+                            <div className="download-button" dangerouslySetInnerHTML={{ __html: status.downloadLink }} />
+                        )}
+                        <button onClick={handleOkayClick} className="home-button">
+                            <i className="fas fa-home"></i>
+                            Return to Home
+                        </button>
+                    </div>
+
+                    {/* Receipt Note */}
+                    {!loading && status?.statusColor === 'green' && (
+                        <div className="receipt-note">
+                            <i className="fas fa-envelope"></i>
+                            A copy of your receipt has been sent to your email
+                        </div>
+                    )}
                 </div>
             </div>
-
-            <style jsx>{`
-                .steps-container {
-                    text-align: left;
-                    padding: 20px;
-                    border-radius: 8px;
-                    background: #f8f9fa;
-                    margin: 0 auto;
-                    max-width: 600px;
-                }
-                .step-item {
-                    opacity: 0.7;
-                }
-                .step-item.active {
-                    opacity: 1;
-                }
-                .status-indicator {
-                    width: 24px;
-                    height: 24px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    border-radius: 50%;
-                }
-                .status-indicator.loading {
-                    background: #f8f9fa;
-                }
-                .status-indicator.complete {
-                    background: #28a745;
-                    color: white;
-                }
-                .status-indicator.error {
-                    background: #dc3545;
-                    color: white;
-                }
-                .status-indicator.pending {
-                    background: #6c757d;
-                    opacity: 0.5;
-                }
-                .transaction-details {
-                    text-align: left;
-                    padding: 1.5rem;
-                    border-radius: 8px;
-                    background: #fff;
-                    border: 1px solid #dee2e6;
-                    margin: 0 auto;
-                    max-width: 800px;
-                }
-                .detail-item {
-                    height: 100%;
-                    padding: 1rem;
-                    background: #f8f9fa;
-                    border-radius: 6px;
-                }
-                .detail-label {
-                    color: #6c757d;
-                    font-size: 0.85rem;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                    margin-bottom: 0.5rem;
-                }
-                .detail-value {
-                    color: #212529;
-                    font-size: 1rem;
-                    font-weight: 500;
-                    word-break: break-all;
-                }
-                .detail-value-wrapper {
-                    min-height: 48px;
-                    display: flex;
-                    align-items: center;
-                }
-                .download-link a {
-                    display: inline-block;
-                    padding: 8px 16px;
-                    background: #28a745;
-                    color: white;
-                    text-decoration: none;
-                    border-radius: 4px;
-                    transition: background-color 0.2s;
-                }
-                .download-link a:hover {
-                    background: #218838;
-                }
-                @media (max-width: 768px) {
-                    .transaction-details {
-                        padding: 1rem;
-                    }
-                    .detail-item {
-                        text-align: center;
-                        margin-bottom: 1rem;
-                    }
-                }
-            `}</style>
         </div>
+
+        <style jsx>{`
+            .payment-redirect-container {
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 2rem;
+                background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 100%);
+            }
+
+            .payment-card {
+                background: white;
+                border-radius: 16px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                width: 100%;
+                max-width: 800px;
+                overflow: hidden;
+            }
+
+            .logo-container {
+                background: #f8f9fa;
+                padding: 1.5rem;
+                text-align: center;
+                border-bottom: 1px solid #e9ecef;
+            }
+
+            .rfh-logo {
+                height: 60px;
+                width: auto;
+            }
+
+            .status-content {
+                padding: 2rem;
+            }
+
+            .progress-steps {
+                max-width: 600px;
+                margin: 0 auto 2rem;
+            }
+
+            .step {
+                display: flex;
+                align-items: flex-start;
+                margin-bottom: 1rem;
+            }
+
+            .step:last-child {
+                margin-bottom: 0;
+            }
+
+            .step-indicator {
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 1rem;
+                flex-shrink: 0;
+                font-size: 0.875rem;
+                color: white;
+            }
+
+            .step.complete .step-indicator {
+                background: #28a745;
+            }
+
+            .step.error .step-indicator {
+                background: #dc3545;
+            }
+
+            .step.loading .step-indicator {
+                background: #007bff;
+            }
+
+            .step.pending .step-indicator {
+                background: #6c757d;
+            }
+
+            .step-content {
+                flex-grow: 1;
+            }
+
+            .step-text {
+                margin: 0;
+                line-height: 28px;
+                color: #495057;
+            }
+
+            .timer {
+                text-align: center;
+                color: #6c757d;
+                font-size: 0.875rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .success-message {
+                text-align: center;
+                color: #28a745;
+                margin-bottom: 2rem;
+            }
+
+            .success-message i {
+                font-size: 3rem;
+                margin-bottom: 1rem;
+            }
+
+            .success-message h3 {
+                margin: 0;
+                color: #212529;
+            }
+
+            .transaction-details {
+                background: #f8f9fa;
+                border-radius: 12px;
+                padding: 1.5rem;
+                margin-bottom: 2rem;
+            }
+
+            .detail-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1.5rem;
+            }
+
+            .detail-item {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .detail-item label {
+                color: #6c757d;
+                font-size: 0.875rem;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 0.5rem;
+            }
+
+            .detail-value {
+                font-size: 1rem;
+                color: #212529;
+            }
+
+            .detail-value code {
+                background: #e9ecef;
+                padding: 0.25rem 0.5rem;
+                border-radius: 4px;
+                font-size: 0.875rem;
+                word-break: break-all;
+            }
+
+            .action-buttons {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 1rem;
+                justify-content: center;
+                margin-bottom: 1.5rem;
+            }
+
+            .download-button a {
+                display: inline-flex;
+                align-items: center;
+                padding: 0.75rem 1.5rem;
+                background: #28a745;
+                color: white;
+                text-decoration: none;
+                border-radius: 8px;
+                font-weight: 500;
+                transition: all 0.2s;
+            }
+
+            .download-button a:hover {
+                background: #218838;
+                transform: translateY(-1px);
+            }
+
+            .home-button {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.75rem 1.5rem;
+                background: #6c757d;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+            .home-button:hover {
+                background: #5a6268;
+                transform: translateY(-1px);
+            }
+
+            .receipt-note {
+                text-align: center;
+                color: #6c757d;
+                font-size: 0.875rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+            }
+
+            @media (max-width: 768px) {
+                .payment-redirect-container {
+                    padding: 1rem;
+                }
+
+                .status-content {
+                    padding: 1.5rem;
+                }
+
+                .detail-grid {
+                    grid-template-columns: 1fr;
+                    gap: 1rem;
+                }
+
+                .action-buttons {
+                    flex-direction: column;
+                }
+
+                .download-button a,
+                .home-button {
+                    width: 100%;
+                    justify-content: center;
+                }
+            }
+        `}</style>
+        </>
     );
 }
 
