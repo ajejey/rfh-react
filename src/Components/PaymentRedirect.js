@@ -166,10 +166,10 @@ function PaymentRedirect({path = '/app/payment-status'}) {
     return (
         <div className='container'>
             <div className="row">
-                <div className="col-md-6 offset-md-3">
+                <div className="col-md-8 offset-md-2">
                     <div className="card mt-5">
                         <div className="card-body text-center">
-                            <img src={logo} alt="Logo" style={{ width: '100px', marginBottom: '20px' }} />
+                            <img src={logo} alt="Logo" style={{ width: '150px', marginBottom: '20px' }} />
                             
                             {/* Step Status Indicators */}
                             <div className="steps-container mb-4">
@@ -181,7 +181,7 @@ function PaymentRedirect({path = '/app/payment-status'}) {
                                                 {status === 'complete' && <i className="fas fa-check" />}
                                                 {status === 'error' && <i className="fas fa-times" />}
                                             </div>
-                                            <div className="step-message ms-3 text-start">
+                                            <div className="step-message ms-3">
                                                 <p className="mb-0" style={{ color: currentStep === step ? '#000' : '#666' }}>
                                                     {message}
                                                 </p>
@@ -205,49 +205,59 @@ function PaymentRedirect({path = '/app/payment-status'}) {
 
                             {/* Transaction Details */}
                             <div className="transaction-details mt-4">
-                                <div className="detail-item mb-3">
-                                    <h5 className="detail-label mb-1">Amount</h5>
-                                    {loading ? (
-                                        <div className="placeholder-glow">
-                                            <span className="placeholder col-6"></span>
+                                <div className="row g-4">
+                                    <div className="col-lg-4 col-md-6">
+                                        <div className="detail-item">
+                                            <h5 className="detail-label">Amount</h5>
+                                            {loading ? (
+                                                <div className="placeholder-glow">
+                                                    <span className="placeholder col-8"></span>
+                                                </div>
+                                            ) : (
+                                                <p className="detail-value">
+                                                    {status?.data?.data?.amount && `INR ${(Number(status?.data?.data?.amount)) / 100}`}
+                                                </p>
+                                            )}
                                         </div>
-                                    ) : (
-                                        <p className="detail-value mb-0">
-                                            {status?.data?.data?.amount && `INR ${(Number(status?.data?.data?.amount)) / 100}`}
-                                        </p>
-                                    )}
-                                </div>
-
-                                <div className="detail-item mb-3">
-                                    <h5 className="detail-label mb-1">Transaction ID</h5>
-                                    {loading ? (
-                                        <div className="placeholder-glow">
-                                            <span className="placeholder col-6"></span>
+                                    </div>
+                                    <div className="col-lg-4 col-md-6">
+                                        <div className="detail-item">
+                                            <h5 className="detail-label">Transaction ID</h5>
+                                            {loading ? (
+                                                <div className="placeholder-glow">
+                                                    <span className="placeholder col-8"></span>
+                                                </div>
+                                            ) : (
+                                                <div className="detail-value-wrapper">
+                                                    <p className="detail-value text-break mb-0">
+                                                        {status?.data?.data?.transactionId || 'N/A'}
+                                                    </p>
+                                                </div>
+                                            )}
                                         </div>
-                                    ) : (
-                                        <p className="detail-value mb-0">
-                                            {status?.data?.data?.transactionId || 'N/A'}
-                                        </p>
-                                    )}
-                                </div>
-
-                                <div className="detail-item mb-3">
-                                    <h5 className="detail-label mb-1">RFH Reference Number</h5>
-                                    {loading ? (
-                                        <div className="placeholder-glow">
-                                            <span className="placeholder col-6"></span>
+                                    </div>
+                                    <div className="col-lg-4 col-md-12">
+                                        <div className="detail-item">
+                                            <h5 className="detail-label">RFH Reference Number</h5>
+                                            {loading ? (
+                                                <div className="placeholder-glow">
+                                                    <span className="placeholder col-8"></span>
+                                                </div>
+                                            ) : (
+                                                <div className="detail-value-wrapper">
+                                                    <p className="detail-value text-break mb-0">
+                                                        {status?.data?.data?.merchantTransactionId}
+                                                    </p>
+                                                </div>
+                                            )}
                                         </div>
-                                    ) : (
-                                        <p className="detail-value mb-0">
-                                            {status?.data?.data?.merchantTransactionId}
-                                        </p>
-                                    )}
+                                    </div>
                                 </div>
                             </div>
 
                             {/* Download Receipt Button */}
                             {status?.downloadLink && (
-                                <div className="mt-3" dangerouslySetInnerHTML={{ __html: status.downloadLink }} />
+                                <div className="mt-4 download-link" dangerouslySetInnerHTML={{ __html: status.downloadLink }} />
                             )}
 
                             {/* Email Note */}
@@ -259,7 +269,7 @@ function PaymentRedirect({path = '/app/payment-status'}) {
 
                             {/* Okay Button */}
                             <button onClick={handleOkayClick} className="btn btn-primary mt-3">
-                                Okay
+                                Go Back Home
                             </button>
                         </div>
                     </div>
@@ -272,6 +282,8 @@ function PaymentRedirect({path = '/app/payment-status'}) {
                     padding: 20px;
                     border-radius: 8px;
                     background: #f8f9fa;
+                    margin: 0 auto;
+                    max-width: 600px;
                 }
                 .step-item {
                     opacity: 0.7;
@@ -304,19 +316,57 @@ function PaymentRedirect({path = '/app/payment-status'}) {
                 }
                 .transaction-details {
                     text-align: left;
-                    padding: 20px;
+                    padding: 1.5rem;
                     border-radius: 8px;
                     background: #fff;
                     border: 1px solid #dee2e6;
+                    margin: 0 auto;
+                    max-width: 800px;
+                }
+                .detail-item {
+                    height: 100%;
+                    padding: 1rem;
+                    background: #f8f9fa;
+                    border-radius: 6px;
                 }
                 .detail-label {
                     color: #6c757d;
-                    font-size: 0.9rem;
-                    margin: 0;
+                    font-size: 0.85rem;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    margin-bottom: 0.5rem;
                 }
                 .detail-value {
                     color: #212529;
                     font-size: 1rem;
+                    font-weight: 500;
+                    word-break: break-all;
+                }
+                .detail-value-wrapper {
+                    min-height: 48px;
+                    display: flex;
+                    align-items: center;
+                }
+                .download-link a {
+                    display: inline-block;
+                    padding: 8px 16px;
+                    background: #28a745;
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 4px;
+                    transition: background-color 0.2s;
+                }
+                .download-link a:hover {
+                    background: #218838;
+                }
+                @media (max-width: 768px) {
+                    .transaction-details {
+                        padding: 1rem;
+                    }
+                    .detail-item {
+                        text-align: center;
+                        margin-bottom: 1rem;
+                    }
                 }
             `}</style>
         </div>
