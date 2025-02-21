@@ -40,121 +40,153 @@ function PaymentRedirect({path = '/app/payment-status'}) {
     }
 
     useEffect(() => {
-        if (Object.keys(status).length === 0) {
-            setLoading(true)
-            const merchantTransactionId = localStorage.getItem('merchantTransactionId')
-            const cause = localStorage.getItem('cause')
-            const formData = { merchantTransactionId, cause }
-            
-            const pollPaymentStatus = async () => {
-                try {
-                    const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/payment/check-status`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ merchantTransactionId })
-                    });
+        let pollingInterval;
+        let timeoutId;
+
+        const handlePaymentProcess = async (merchantTransactionId, formData) => {
+            try {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/payment/check-status`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ merchantTransactionId })
+                });
+                
+                const result = await response.json();
+                
+                if (result.code === 'PAYMENT_SUCCESS' || result.code === 'PAYMENT_ERROR') {
+                    // Clear polling once we have a definitive result
+                    clearInterval(pollingInterval);
+                    clearTimeout(timeoutId);
+
+                    // Update verification status
+                    updateStepStatus('verifying', 'complete', 
+                        result.code === 'PAYMENT_SUCCESS' ? 'Payment verified successfully!' : 'Payment verification failed');
                     
-                    const result = await response.json();
-                    
-                    if (result.code === 'PAYMENT_SUCCESS' || result.code === 'PAYMENT_ERROR') {
-                        updateStepStatus('verifying', 'complete', 
-                            result.code === 'PAYMENT_SUCCESS' ? 'Payment verified successfully!' : 'Payment verification failed');
-                        
-                        // Move to updating step
-                        setCurrentStep('updating');
-                        updateStepStatus('updating', 'loading');
-                        
-                        // Update payment and user details
-                        const updateResponse = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/payment/update-details`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                merchantTransactionId,
-                                paymentResponse: result,
-                                formData
-                            })
-                        });
-                        
-                        if (result.code === 'PAYMENT_SUCCESS') {
-                            updateStepStatus('updating', 'complete', 'Details updated successfully!');
+                    if (result.code === 'PAYMENT_SUCCESS') {
+                        try {
+                            // Start updating details
+                            setCurrentStep('updating');
+                            updateStepStatus('updating', 'loading');
                             
-                            // Move to sending receipt step
-                            setCurrentStep('sending');
-                            updateStepStatus('sending', 'loading');
-                            
-                            // Generate and send receipt
-                            const receiptResponse = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/payment/send-receipt`, {
+                            const updateResponse = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/payment/update-details`, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
                                 },
                                 body: JSON.stringify({
                                     merchantTransactionId,
+                                    paymentResponse: result,
                                     formData
                                 })
                             });
-                            
-                            const receiptResult = await receiptResponse.json();
-                            if (receiptResult.success) {
-                                updateStepStatus('sending', 'complete', 'Receipt sent successfully!');
-                                setStatus({
-                                    message: result.message,
-                                    data: { ...result, pdfBase64: receiptResult.pdfBase64 },
-                                    statusColor: 'green',
-                                    downloadLink: receiptResult.downloadLink
+
+                            const updateResult = await updateResponse.json();
+                            if (updateResult.success) {
+                                updateStepStatus('updating', 'complete', 'Details updated successfully!');
+                                
+                                // Start sending receipt
+                                setCurrentStep('sending');
+                                updateStepStatus('sending', 'loading');
+                                
+                                const receiptResponse = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/payment/send-receipt`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({
+                                        merchantTransactionId,
+                                        formData
+                                    })
                                 });
+                                
+                                const receiptResult = await receiptResponse.json();
+                                if (receiptResult.success) {
+                                    updateStepStatus('sending', 'complete', 'Receipt sent successfully!');
+                                    setStatus({
+                                        message: result.message,
+                                        data: { ...result, pdfBase64: receiptResult.pdfBase64 },
+                                        statusColor: 'green',
+                                        downloadLink: receiptResult.downloadLink
+                                    });
+                                } else {
+                                    throw new Error('Failed to send receipt');
+                                }
                             } else {
-                                updateStepStatus('sending', 'error', 'Failed to send receipt');
+                                throw new Error('Failed to update details');
                             }
-                        } else {
-                            updateStepStatus('updating', 'error', 'Failed to update details');
+                        } catch (error) {
+                            console.error('Error in payment process:', error);
+                            updateStepStatus(currentStep, 'error', error.message);
                             setStatus({
-                                message: result.message,
-                                data: result,
+                                message: error.message,
                                 statusColor: 'red'
                             });
                         }
-                        setLoading(false);
-                        return true; // Stop polling
-                    }
-                    return false; // Continue polling
-                } catch (error) {
-                    console.error('Error checking payment status:', error);
-                    updateStepStatus(currentStep, 'error', 'An error occurred');
-                    return false; // Continue polling on error
-                }
-            };
-
-            const startPolling = async () => {
-                const interval = setInterval(async () => {
-                    const shouldStop = await pollPaymentStatus();
-                    if (shouldStop) {
-                        clearInterval(interval);
-                    }
-                }, 3000); // Poll every 3 seconds
-
-                // Stop polling after 5 minutes
-                setTimeout(() => {
-                    clearInterval(interval);
-                    if (loading) {
-                        setLoading(false);
-                        updateStepStatus('verifying', 'error', 'Payment status check timed out');
+                    } else {
                         setStatus({
-                            message: 'Payment status check timed out',
+                            message: result.message,
+                            data: result,
                             statusColor: 'red'
                         });
                     }
-                }, 5 * 60 * 1000);
-            };
+                    setLoading(false);
+                    return true;
+                }
+                return false;
+            } catch (error) {
+                console.error('Error checking payment status:', error);
+                updateStepStatus(currentStep, 'error', 'An error occurred');
+                setLoading(false);
+                return false;
+            }
+        };
 
-            startPolling();
-        }
-    }, [status, loading, currentStep]);
+        const startPaymentProcess = () => {
+            const merchantTransactionId = localStorage.getItem('merchantTransactionId');
+            const cause = localStorage.getItem('cause');
+            const formData = { merchantTransactionId, cause };
+            
+            if (!merchantTransactionId) {
+                console.error('No merchantTransactionId found');
+                return;
+            }
 
+            setLoading(true);
+            
+            // Initial check
+            handlePaymentProcess(merchantTransactionId, formData);
+            
+            // Start polling
+            pollingInterval = setInterval(() => {
+                handlePaymentProcess(merchantTransactionId, formData);
+            }, 3000);
+            
+            // Set timeout to stop polling after 5 minutes
+            timeoutId = setTimeout(() => {
+                clearInterval(pollingInterval);
+                if (loading) {
+                    setLoading(false);
+                    updateStepStatus('verifying', 'error', 'Payment status check timed out');
+                    setStatus({
+                        message: 'Payment status check timed out',
+                        statusColor: 'red'
+                    });
+                }
+            }, 5 * 60 * 1000);
+        };
+
+        startPaymentProcess();
+
+        // Cleanup function
+        return () => {
+            clearInterval(pollingInterval);
+            clearTimeout(timeoutId);
+        };
+    }, []); // Empty dependency array since we only want this to run once
+
+    // Timer effect
     useEffect(() => {
         const timer = setInterval(() => {
             setTimeElapsed(prev => prev + 1);
@@ -174,7 +206,7 @@ function PaymentRedirect({path = '/app/payment-status'}) {
         <div className="payment-redirect-container">
             <div className="payment-card">
                 <div className="logo-container">
-                    <img src="/rfh-logo.png" alt="Rupee for Humanity" className="rfh-logo" />
+                    <img src={logo} alt="Rupee for Humanity" className="rfh-logo" />
                 </div>
 
                 <div className="status-content">
