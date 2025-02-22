@@ -253,7 +253,7 @@ function PaymentRedirect({path = '/app/payment-status'}) {
                             <div className="detail-item">
                                 <label>Amount</label>
                                 <div className="detail-value">
-                                    {status?.data?.data?.amount ? (
+                                    {loading ? (
                                         <div className="placeholder-glow">
                                             <span className="placeholder col-8"></span>
                                         </div>
@@ -268,7 +268,7 @@ function PaymentRedirect({path = '/app/payment-status'}) {
                             <div className="detail-item">
                                 <label>Transaction ID</label>
                                 <div className="detail-value">
-                                    {status?.data?.data?.transactionId ? (
+                                    {loading ? (
                                         <div className="placeholder-glow">
                                             <span className="placeholder col-8"></span>
                                         </div>
@@ -281,7 +281,7 @@ function PaymentRedirect({path = '/app/payment-status'}) {
                             <div className="detail-item">
                                 <label>RFH Reference</label>
                                 <div className="detail-value">
-                                    {status?.data?.data?.merchantTransactionId ? (
+                                    {loading ? (
                                         <div className="placeholder-glow">
                                             <span className="placeholder col-8"></span>
                                         </div>
