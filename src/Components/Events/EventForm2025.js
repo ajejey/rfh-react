@@ -17,10 +17,29 @@ const EVENT_DETAILS = {
     name: "RFH Juniors Run 2025",
     date: new Date("2025-05-25T00:00:00+05:30"), // May 25th, 2025
     lastDate: new Date("2025-04-28T23:59:00+05:30"),
-    time: "7:00 AM IST",
+    time: "8:00 AM IST",
     venue: "https://www.google.com/maps/place/Bal+Bhavan+Auditorium/@12.9766439,77.5952091,17z/data=!3m1!4b1!4m6!3m5!1s0x3bae1671b1cd3b1f:0xb72fa25e5df4598d!8m2!3d12.9766439!4d77.597784!16s%2Fg%2F11csqwx6mm?entry=ttu&g_ep=EgoyMDI1MDIxMi4wIKXMDSoASAFQAw%3D%3D",
     venueName: "Cubbon Park, Bengaluru",
 }
+
+const requiredChanges = `
+In *RFH Juniors run* , below are the changes : 
+1. Time should be 8am ( *Must have)* 
+2. In summary, it should be "Additional T-shirt", instead of just "T-shirt ( *Must have* ) 
+3. Summary should be as below : ( *Must have* )
+Rupee For Humanity (RFH) is a  government-registered online NGO founded by a group of passionate engineers dedicated to the nation's progress. As a non-profit organization, its mission is to eliminate illiteracy at its core and contribute to India's advancement as a developed nation.
+
+4. Under breakfast, is it possible to add "Do you need additional breakfast and select 80/-rs per one". ( *Good to have* )
+5. For Breakfast, instead of "Only for participants", can you modify to "Included for participants" ( *Must have* )
+7. For Juniors run, POC should be as below : ( *Must have* )
+Sripada : +91-99640 46022
+Deepthi @ +91-99863 87435
+Raghu @ +91-91643 58027
+8. In the Event description, please add registration cost in the "Information" space.  ( *Must have* )
+9. "Other City Name" is enabled by Default. Is it possible to hide first and later get it when someone selects Others. ( *Good to have)* 
+10. If I select addtional T-shirts are 2, it allows to enter more number of T-shirt sizes. Is their a possibility to have validation? ( *Good to have* )
+
+This is the consolidated list points for RFH Juniors run.`
 
 
 function EventForm2025() {
@@ -36,7 +55,11 @@ function EventForm2025() {
     const [openTshirtGuide, setOpenTshirtGuide] = useState(false)
     const [disablePaymentButton, setDisablePaymentButton] = useState(false)
     const [paymentLoading, setPaymentLoading] = useState(false)
+    const [additionalBreakfast, setAdditionalBreakfast] = useState(0)
+    const [tshirtValidationError, setTshirtValidationError] = useState("")
+    const [tshirtSizes, setTshirtSizes] = useState([]);
     const category = watch('category');
+    const [paymentStatus, setPaymentStatus] = useState("");
 
     const DISCOUNT_PRICE = 599
     const PRICE = 599
@@ -44,6 +67,21 @@ function EventForm2025() {
     // const PRICE = 1
     const ADDITIONAL_TSHIRT_PRICE = 225
     const DISCOUNT_DATE = new Date("2025-01-21T23:59:00+05:30");
+
+    const TSHIRT_SIZE_OPTIONS = [
+        { value: '24', label: 'Size 24' },
+        { value: '26', label: 'Size 26' },
+        { value: '28', label: 'Size 28' },
+        { value: '30', label: 'Size 30' },
+        { value: '32', label: 'Size 32' },
+        { value: '34', label: 'Size 34' },
+        { value: '36', label: 'Size 36' },
+        { value: '38', label: 'Size 38' },
+        { value: '40', label: 'Size 40' },
+        { value: '42', label: 'Size 42' },
+        { value: '44', label: 'Size 44' },
+        { value: '46', label: 'Size 46' }
+    ];
 
     const executeScroll = () => myRef.current.scrollIntoView()
 
@@ -62,6 +100,7 @@ function EventForm2025() {
         })
 
     }, [])
+
     const calculateAge = (dob) => {
         const today = new Date();
         const birthDate = new Date(dob);
@@ -117,8 +156,34 @@ function EventForm2025() {
         console.log("selectedCategory ", selectedCategory)
     }
 
+    const handleTshirtQuantityChange = (e) => {
+        const quantity = parseInt(e.target.value, 10) || 0;
+        setTshirtSizes(Array(quantity).fill(''));
+        setValue('additionalTshirtQuantity', quantity);
+    };
+
+    const handleSizeChange = (index, size) => {
+        const newSizes = [...tshirtSizes];
+        newSizes[index] = size;
+        setTshirtSizes(newSizes);
+        setValue('additionalTshirtSize', newSizes.join(','));
+    };
 
     console.log("submitted ", submitted)
+
+    const validateTshirtSizes = (data) => {
+        if (data.additionalTshirt === 'Yes' && data.additionalTshirtQuantity > 0) {
+            const quantity = Number(data.additionalTshirtQuantity);
+            const sizes = tshirtSizes.filter(size => size !== '');
+            
+            if (sizes.length < quantity) {
+                setTshirtValidationError('Please select sizes for all additional T-shirts');
+                return false;
+            }
+        }
+        setTshirtValidationError('');
+        return true;
+    }
 
     function calculateTotalPrice(formData) {
         // Get the current date
@@ -130,14 +195,17 @@ function EventForm2025() {
         // Calculate the total price
         let totalPrice = registrationFee;
 
-        // Add INR ADDITIONAL_TSHIRT_PRICE for every additional T-shirt
+        // Add cost for additional T-shirts
         if (formData.additionalTshirtQuantity) {
             console.log("formData.additionalTshirtQuantity ", formData.additionalTshirtQuantity)
             const additionalTshirtCost = Number(formData.additionalTshirtQuantity) * ADDITIONAL_TSHIRT_PRICE;
             totalPrice += additionalTshirtCost;
         }
 
-        console.log("totalPrice ", totalPrice)
+        // Add cost for additional breakfast
+        if (formData.additionalBreakfast) {
+            totalPrice += Number(formData.additionalBreakfast) * 80;
+        }
 
         // Add the donation amount
         if (formData.donation) {
@@ -150,6 +218,10 @@ function EventForm2025() {
     }
 
     const onSubmit = (data) => {
+        if (!validateTshirtSizes(data)) {
+            return;
+        }
+
         if (data.donation === 'custom') {
             data.donation = data.customDonation;
             setValue("donation", data.customDonation)
@@ -168,12 +240,24 @@ function EventForm2025() {
         setTotalPrice(totalPrice)
     }
 
-    const handlePaymentClick = async () => {
+    useEffect(() => {
+        // Clear any stale payment data on component mount
+        localStorage.removeItem('merchantTransactionId');
+        localStorage.removeItem('cause');
+        setDisablePaymentButton(false);
+        setPaymentLoading(false);
+        setPaymentStatus("");
+    }, []);
 
-        // setValue("totalPrice", totalPrice)
+    const handlePaymentClick = async () => {
+        // Clear any existing payment data
+        localStorage.removeItem('merchantTransactionId');
+        localStorage.removeItem('cause');
+        
         setValue("totalPrice", 1) // 1 rupee for testing
         setValue("marathonName", "RFH Juniors run 2025")
         try {
+            setPaymentStatus("Initiating payment...");
             const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/initiate-payment`, {
                 method: "POST",
                 timeout: 1200000,
@@ -183,33 +267,30 @@ function EventForm2025() {
                 body: JSON.stringify(getValues()),
             });
             const data = await response.json();
-            console.log("data ", data)
-            console.log("data.message", data, data.message);
             if (data.success === false) {
+                setPaymentStatus("");
+                setDisablePaymentButton(false);
+                setPaymentLoading(false);
                 toast.error('There was an error. Please try later or Contact Raghu @ +91-9164358027 ', { duration: 50000 });
-                return
+                return;
             }
-            console.log("merchantTransactionId from backend ", data?.data?.merchantTransactionId)
-            localStorage.setItem('merchantTransactionId', data?.data?.merchantTransactionId
-            );
+            
+            localStorage.setItem('merchantTransactionId', data?.data?.merchantTransactionId);
             localStorage.setItem('cause', "RFH Juniors run 2025");
-            // setPaymentStatus(data.message)
-            // setPaymentLink(data?.data?.instrumentResponse?.redirectInfo?.url)
-            // window.location.href = data?.data?.instrumentResponse?.redirectInfo?.url;
-            setDisablePaymentButton(true)
-            setPaymentLoading(true)
-            window.open(
-                data?.data?.instrumentResponse?.redirectInfo?.url
-            );
+            
+            // Redirect to payment URL in the same tab
+            window.location.href = data?.data?.instrumentResponse?.redirectInfo?.url;
 
         } catch (error) {
-            console.log("error ", error)
-            setPaymentLoading(false)
-            setDisablePaymentButton(false)
+            console.log("error ", error);
+            setPaymentLoading(false);
+            setDisablePaymentButton(false);
+            setPaymentStatus("");
+            localStorage.removeItem('merchantTransactionId');
+            localStorage.removeItem('cause');
             toast.error('Something went wrong. Please try later or Raghu @ +91-91643 58027');
         }
-
-    }
+    };
 
     const handleSelfPickupChange = (e) => {
         console.log("selfPickUp e.target.value ", e.target.value)
@@ -291,10 +372,158 @@ function EventForm2025() {
         window.scrollTo(0, 0)
     }, [])
 
+    const additionalBreakfastSection = (
+        <div className="row">
+            <div className="col-md-4">
+                <div className="form-group">
+                    <label htmlFor="additionalBreakfast">Additional Breakfast</label>
+                    <select 
+                        {...register("additionalBreakfast")} 
+                        className="form-select" 
+                        onChange={(e) => setAdditionalBreakfast(Number(e.target.value))}
+                    >
+                        <option value="0">No additional breakfast</option>
+                        <option value="1">1 person (₹80)</option>
+                        <option value="2">2 persons (₹160)</option>
+                        <option value="3">3 persons (₹240)</option>
+                        <option value="4">4 persons (₹320)</option>
+                        <option value="5">5 persons (₹400)</option>
+                    </select>
+                    <small className="form-text text-muted">Breakfast is already included for the participant</small>
+                </div>
+            </div>
+        </div>
+    );
+
+    const AdditionalTshirtSection = () => (
+        <>
+            {watch('additionalTshirt') === 'Yes' && (
+                <div className="additional-tshirt-section">
+                    <div className="row mb-4">
+                        <div className="col-md-4">
+                            <div className="form-group">
+                                <label htmlFor="additionalTshirtQuantity">Number of Additional T-shirts</label>
+                                <select 
+                                    {...register("additionalTshirtQuantity")} 
+                                    className="form-select" 
+                                    onChange={handleTshirtQuantityChange}
+                                >
+                                    <option value="0">Select quantity</option>
+                                    <option value="1">1 T-shirt</option>
+                                    <option value="2">2 T-shirts</option>
+                                    <option value="3">3 T-shirts</option>
+                                    <option value="4">4 T-shirts</option>
+                                    <option value="5">5 T-shirts</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    {tshirtSizes.length > 0 && (
+                        <div className="row">
+                            <div className="col-12">
+                                <label className="mb-3">Select sizes for additional T-shirts:</label>
+                                {/* <div className="alert alert-info mb-3">
+                                    <small>
+                                        <i className="fas fa-info-circle me-2"></i>
+                                        T-shirt sizes are in inches. For reference: Size 24-28 (Kids 4-8 yrs), 
+                                        Size 30-34 (Kids 9-14 yrs), Size 36-40 (Adults S-L), 
+                                        Size 42-46 (Adults XL-XXL)
+                                    </small>
+                                </div> */}
+                                <div className="tshirt-sizes-grid">
+                                    {tshirtSizes.map((size, index) => (
+                                        <div key={index} className="tshirt-size-item">
+                                            <div className="size-selector">
+                                                <span className="tshirt-number">T-shirt {index + 1}</span>
+                                                <select 
+                                                    className="form-select"
+                                                    value={size}
+                                                    onChange={(e) => handleSizeChange(index, e.target.value)}
+                                                >
+                                                    <option value="">Select Size</option>
+                                                    {TSHIRT_SIZE_OPTIONS.map(option => (
+                                                        <option key={option.value} value={option.value}>
+                                                            {option.label}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                {tshirtValidationError && (
+                                    <div className="alert alert-danger mt-3">
+                                        {tshirtValidationError}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
+        </>
+    );
+
+    const additionalStyles = `
+        .tshirt-sizes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .tshirt-size-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .tshirt-size-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .size-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .tshirt-number {
+            font-size: 0.9rem;
+            color: #f39c12;
+            font-weight: 500;
+        }
+
+        .form-select {
+            background-color: #1a1a1a;
+            color: #fff;
+            border: 1px solid #333;
+        }
+
+        .form-select:focus {
+            background-color: #1a1a1a;
+            color: #fff;
+            border-color: #f39c12;
+            box-shadow: 0 0 0 0.2rem rgba(243, 156, 18, 0.25);
+        }
+    `;
+
     return (
         <div style={{ backgroundColor: "#040002", color: "lightgray", minHeight: "100vh" }}>
             <Helmet>
-                <title>RFH Juniors run 2025 | Rupee For Humanity</title>
+                <title>RFH Juniors Run 2025</title>
+                <style>
+                    {`
+                        .form-control, .form-select {
+                            background-color: #1a1a1a;
+                            color: #fff;
+                            border: 1px solid #333;
+                        }
+                        ${additionalStyles}
+                    `}
+                </style>
             </Helmet>
             <Header />
             <main>
@@ -322,10 +551,7 @@ function EventForm2025() {
                             <br />
 
                             <p>
-                                Rupee For Humanity (RFH) is an online NGO registered with the Government, started by a bunch of
-                                engineers having passion to work for the country and its development. It is a non-profit
-                                organization aimed at eradicating illiteracy from the roots and making India rise up high in the
-                                ladder of developed nations.
+                                Rupee For Humanity (RFH) is a government-registered online NGO founded by a group of passionate engineers dedicated to the nation's progress. As a non-profit organization, its mission is to eliminate illiteracy at its core and contribute to India's advancement as a developed nation.
                             </p>
                             <p>
                                 We are proud to host the event again this year <b>“RFH Juniors run 2025”!</b>
@@ -367,23 +593,15 @@ function EventForm2025() {
                                     </tbody>
                                 </table>
 
-                                {/* <div style={{ display: "flex", justifyContent: "space-between" }}>
-                                    <div>
-                                        <b>T-shirt</b> : INR 210/- <br />
-                                        <b>Courier charges anywhere in India</b> : INR 150/- <br />
-                                        <b>Self Pickup available only in Bengaluru, Hyderabad, Chennai</b> <br />
-                                        <small>Above items are optional and are not applicable for runners outside India</small><br />
-                                        <small style={{ color: "red" }}>* Upon upload of the screenshot of your running activity in portal</small>
-                                    </div>
-                                </div> */}
                                 <div className="mt-4">
                                     <p>
                                         Each participant receives Medal, Bib, Finisher certificate, Breakfast and witnesses the noble cause of Rupee For Humanity.
                                     </p>
                                     <ul>
                                         <li><strong>Champs run:</strong> Should be accompanied by a parent/guardian.</li>
-                                        {/* <li><strong>Parents:</strong> Can opt for T-shirt for them with an additional price of {ADDITIONAL_TSHIRT_PRICE}/- INR per T-shirt.</li> */}
-                                        <li><strong>Breakfast:</strong> Only for participants. Parents can buy from the food vendor on the venue.</li>
+                                        <li><strong>Registration Cost:</strong> Early Bird (till {new Date(DISCOUNT_DATE).toLocaleDateString(undefined, dateOptions)}) - ₹{DISCOUNT_PRICE}, Regular - ₹{PRICE}</li>
+                                        <li><strong>Additional T-shirt:</strong> ₹{ADDITIONAL_TSHIRT_PRICE} per T-shirt</li>
+                                        <li><strong>Breakfast:</strong> Included for participants. Additional breakfast available at ₹80 per person.</li>
                                     </ul>
                                 </div>
 
@@ -392,28 +610,11 @@ function EventForm2025() {
                                         For any more information about sponsorship / registration / queries, you can reach out to the below organizers:
                                     </p>
                                     <ul>
-                                        <li>Deepthi @ <a href="tel:+91-9986387435" style={{ color: "#f39c12" }}>+91-99863 87435</a></li>
-                                        <li>Deekshith @ <a href="tel:+91-8147775122" style={{ color: "#f39c12" }}>+91-81477 75122</a></li>
-                                        <li>Raghu @ <a href="tel:+91-9164358027" style={{ color: "#f39c12" }}>+91-91643 58027</a></li>
+                                        <li>Sripada : +91-99640 46022</li>
+                                        <li>Deepthi @ +91-99863 87435</li>
+                                        <li>Raghu @ +91-91643 58027</li>
                                     </ul>
                                 </div>
-
-                                {/* <div className="container d-flex justify-content-center align-items-center ">
-                                    <div className="bg-dark text-light p-4 rounded border border-warning shadow">
-                                        <h4 className="mb-3 font-weight-bold">Special Early Bird Offer!</h4>
-
-                                        {new Date() < new Date(DISCOUNT_DATE) ? (
-                                            <p className="lead">
-                                                Registration Fee: INR{' '}
-                                                <span className="text-decoration-line-through" style={{ color: "#999", textDecorationThickness: "2px" }}>{PRICE}/-</span>{' '}
-                                                <span className="text-warning">{DISCOUNT_PRICE}/-</span>
-                                            </p>
-                                        ) : (
-                                            <p className="lead">Registration Fee:  <span className="text-warning">INR {PRICE}/-</span> </p>
-                                        )}
-                                        <p className="font-italic">Early Bird offer: Lasts till {new Date(DISCOUNT_DATE).toLocaleDateString(undefined, dateOptions)}</p>
-                                    </div>
-                                </div> */}
 
                             </div>
 
@@ -514,17 +715,15 @@ function EventForm2025() {
                                                 {errors.city && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
                                         </div>
-                                        {selectedCity === "others" &&
+                                        {watch("city") === "others" && (
                                             <div className="col-md-4">
                                                 <div className="form-group">
                                                     <label htmlFor="otherCity">Other City Name <span style={{ color: "red" }}>*</span></label>
-                                                    <input {...register("otherCity", { required: selectedCity === "others" ? true : false })} className="form-control" type="text" name="Other City" id="otherCity" />
-                                                    {errors.pincode && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                                    <input {...register("otherCity", { required: watch("city") === "others" })} type="text" className="form-control" id="otherCity" />
+                                                    {errors.otherCity && <p style={{ color: "red" }}>This field is mandatory</p>}
                                                 </div>
                                             </div>
-                                        }
-
-
+                                        )}
                                     </div>
                                     <div className="row">
                                         <div className="col-md-4">
@@ -686,40 +885,8 @@ function EventForm2025() {
                                                 {errors.additionalTshirt && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
                                         </div>
-                                        {/* Dropdown for quantity if Yes is selected */}
-                                        {watch('additionalTshirt') === 'Yes' && (
-                                            <div className="col-md-6">
-                                                <div className="form-group">
-                                                    <label htmlFor="additionalTshirtQuantity">Quantity <span style={{ color: "red" }}>*</span></label>
-                                                    <select {...register("additionalTshirtQuantity", { required: false })} id="additionalTshirtQuantity" className="form-select" aria-label="additionalTshirtQuantity">
-                                                        <option value="">select</option>
-                                                        <option value="1">1</option>
-                                                        <option value="2">2</option>
-                                                        <option value="3">3</option>
-                                                        <option value="4">4</option>
-                                                        <option value="5">5</option>
-                                                        <option value="6">6</option>
-                                                    </select>
-                                                    {errors.additionalTshirtQuantity && <p style={{ color: "red" }}>This field is mandatory</p>}
-                                                </div>
-                                            </div>
-                                        )}
                                     </div>
-
-                                    {/* New row for T-shirt sizes if additional T-shirts are selected */}
-                                    {watch('additionalTshirt') === 'Yes' && (
-                                        <div className="row">
-                                            <div className="col-md-12">
-                                                <div className="form-group">
-                                                    <label htmlFor="additionalTshirtSize">Please write T-Shirt Sizes for Additional T-shirts with comma seperation <span style={{ color: "red" }}>*</span></label>
-                                                    <textarea {...register("additionalTshirtSize", { required: false })} id="additionalTshirtSize" className="form-control" aria-label="Additional T-shirt Size"></textarea>
-
-                                                    {errors.additionalTshirtSize && <p style={{ color: "red" }}>This field is mandatory</p>}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-
+                                    <AdditionalTshirtSection />
                                     {/* New row for donation question */}
                                     <div className="row">
                                         <div className="form-group">
@@ -744,6 +911,8 @@ function EventForm2025() {
                                             </div>
                                         )}
                                     </div>
+
+                                    {additionalBreakfastSection}
 
                                     <br />
                                     <hr />
@@ -900,6 +1069,31 @@ function EventForm2025() {
                                 <button className="btn btn-primary" onClick={handlePaymentClick} disabled={disablePaymentButton} >Make Payment</button>
                             </div>
 
+                            <div className="row justify-content-center mt-3">
+                                <div className="col-md-8">
+                                    {paymentStatus && (
+                                        <div className="alert alert-info text-center">
+                                            <i className="fas fa-info-circle me-2"></i>
+                                            {paymentStatus}
+                                            {disablePaymentButton && (
+                                                <div className="mt-2">
+                                                    <small>
+                                                        <i className="fas fa-exclamation-circle me-1"></i>
+                                                        If you accidentally closed the payment tab, 
+                                                        <button 
+                                                            className="btn btn-link btn-sm p-0 ms-1" 
+                                                            onClick={() => window.location.reload()}
+                                                        >
+                                                            click here to try again
+                                                        </button>
+                                                    </small>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
                         </div>
 
                         <div>
@@ -917,12 +1111,16 @@ function EventForm2025() {
                                                     <td className="fs-6"> INR {new Date() < new Date(DISCOUNT_DATE) ? DISCOUNT_PRICE : PRICE}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td className="fs-6">T-shirt</td>
+                                                    <td className="fs-6">Additional T-shirt</td>
                                                     <td> INR {getValues("additionalTshirt") === "Yes" ? getValues("additionalTshirtQuantity") * ADDITIONAL_TSHIRT_PRICE : 0} </td>
                                                 </tr>
                                                 <tr>
                                                     <td className="fs-6">Donation</td>
                                                     <td> INR {getValues("donation") === "" ? 0 : getValues("donation")}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td className="fs-6">Additional Breakfast</td>
+                                                    <td> INR {getValues("additionalBreakfast") * 80} </td>
                                                 </tr>
                                                 <tr>
                                                     <td className="fs-6">Total </td>
