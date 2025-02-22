@@ -389,7 +389,7 @@ function EventForm2025() {
                         <option value="4">4 persons (₹320)</option>
                         <option value="5">5 persons (₹400)</option>
                     </select>
-                    <small className="form-text text-muted">Breakfast is already included for the participant</small>
+                    <small className="form-text text-light-50">Breakfast is already included for the participant</small>
                 </div>
             </div>
         </div>
@@ -1123,8 +1123,8 @@ function EventForm2025() {
                                                     <td> INR {getValues("additionalBreakfast") * 80} </td>
                                                 </tr>
                                                 <tr>
-                                                    <td className="fs-6">Total </td>
-                                                    <td> {`INR ${totalPrice}`}  </td>
+                                                    <td className="fs-6"><strong>Total</strong></td>
+                                                    <td><strong>{`INR ${totalPrice}`}</strong></td>
                                                 </tr>
                                             </tbody>
                                         </table>
