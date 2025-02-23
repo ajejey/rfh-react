@@ -22,6 +22,14 @@ const EVENT_DETAILS = {
     venueName: "Cubbon Park, Bengaluru",
 }
 
+const TSHIRT_SIZE_OPTIONS = [
+    { value: 'XS', label: 'Extra Small (XS)' },
+    { value: 'S', label: 'Small (S)' },
+    { value: 'M', label: 'Medium (M)' },
+    { value: 'L', label: 'Large (L)' },
+    { value: 'XL', label: 'Extra Large (XL)' },
+    { value: 'XXL', label: 'Double XL (XXL)' }
+];
 
 function RfhSheRun2025() {
     const { register, control, handleSubmit, getValues, setValue, formState: { errors }, watch } = useForm();
@@ -36,6 +44,10 @@ function RfhSheRun2025() {
     const [openTshirtGuide, setOpenTshirtGuide] = useState(false)
     const [disablePaymentButton, setDisablePaymentButton] = useState(false)
     const [paymentLoading, setPaymentLoading] = useState(false)
+    const [tshirtSizes, setTshirtSizes] = useState([]);
+    const [tshirtValidationError, setTshirtValidationError] = useState("");
+    const [additionalBreakfast, setAdditionalBreakfast] = useState(0);
+    const [paymentStatus, setPaymentStatus] = useState("");
     const category = watch('category');
 
     const DISCOUNT_PRICE = 800
@@ -62,6 +74,7 @@ function RfhSheRun2025() {
         })
 
     }, [])
+
     const calculateAge = (dob) => {
         const today = new Date();
         const birthDate = new Date(dob);
@@ -117,37 +130,144 @@ function RfhSheRun2025() {
         console.log("selectedCategory ", selectedCategory)
     }
 
+    const handleTshirtQuantityChange = (e) => {
+        const quantity = parseInt(e.target.value, 10) || 0;
+        setTshirtSizes(Array(quantity).fill(''));
+        setValue('additionalTshirtQuantity', quantity);
+    };
 
-    console.log("submitted ", submitted)
+    const handleSizeChange = (index, size) => {
+        const newSizes = [...tshirtSizes];
+        newSizes[index] = size;
+        setTshirtSizes(newSizes);
+        setValue('additionalTshirtSize', newSizes.join(','));
+    };
 
-    function calculateTotalPrice(formData) {
-        // Get the current date
-        const currentDate = new Date();
-
-        // Set the registration fee based on the current date
-        const registrationFee = currentDate < new Date(DISCOUNT_DATE) ? DISCOUNT_PRICE : PRICE;
-        console.log("registrationFee ", registrationFee)
-        // Calculate the total price
-        let totalPrice = registrationFee;
-
-        // Add INR ADDITIONAL_TSHIRT_PRICE for every additional T-shirt
-        if (formData.additionalTshirtQuantity) {
-            console.log("formData.additionalTshirtQuantity ", formData.additionalTshirtQuantity)
-            const additionalTshirtCost = Number(formData.additionalTshirtQuantity) * ADDITIONAL_TSHIRT_PRICE;
-            totalPrice += additionalTshirtCost;
+    const validateTshirtSizes = (data) => {
+        if (data.additionalTshirt === 'Yes' && data.additionalTshirtQuantity > 0) {
+            const quantity = Number(data.additionalTshirtQuantity);
+            const sizes = tshirtSizes.filter(size => size !== '');
+            
+            if (sizes.length < quantity) {
+                setTshirtValidationError('Please select sizes for all additional T-shirts');
+                return false;
+            }
         }
+        setTshirtValidationError('');
+        return true;
+    };
 
-        console.log("totalPrice ", totalPrice)
+    const AdditionalTshirtSection = () => (
+        <>
+            {watch('additionalTshirt') === 'Yes' && (
+                <div className="additional-tshirt-section">
+                    <div className="row mb-4">
+                        <div className="col-md-4">
+                            <div className="form-group">
+                                <label htmlFor="additionalTshirtQuantity">Number of Additional T-shirts</label>
+                                <select 
+                                    {...register("additionalTshirtQuantity")} 
+                                    className="form-select" 
+                                    onChange={handleTshirtQuantityChange}
+                                >
+                                    <option value="0">Select quantity</option>
+                                    <option value="1">1 T-shirt</option>
+                                    <option value="2">2 T-shirts</option>
+                                    <option value="3">3 T-shirts</option>
+                                    <option value="4">4 T-shirts</option>
+                                    <option value="5">5 T-shirts</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
 
-        // Add the donation amount
-        if (formData.donation) {
-            totalPrice += parseInt(formData.donation, 10);
-        }
+                    {tshirtSizes.length > 0 && (
+                        <div className="row">
+                            <div className="col-12">
+                                <label className="mb-3">Select sizes for additional T-shirts:</label>
+                                {/* <div className="alert alert-info mb-3">
+                                    <small>
+                                        <i className="fas fa-info-circle me-2"></i>
+                                        Available sizes: XS (Extra Small), S (Small), M (Medium), 
+                                        L (Large), XL (Extra Large), XXL (Double XL)
+                                    </small>
+                                </div> */}
+                                <div className="tshirt-sizes-grid">
+                                    {tshirtSizes.map((size, index) => (
+                                        <div key={index} className="tshirt-size-item">
+                                            <div className="size-selector">
+                                                <span className="tshirt-number">T-shirt {index + 1}</span>
+                                                <select 
+                                                    className="form-select"
+                                                    value={size}
+                                                    onChange={(e) => handleSizeChange(index, e.target.value)}
+                                                >
+                                                    <option value="">Select Size</option>
+                                                    {TSHIRT_SIZE_OPTIONS.map(option => (
+                                                        <option key={option.value} value={option.value}>
+                                                            {option.label}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                {tshirtValidationError && (
+                                    <div className="alert alert-danger mt-3">
+                                        {tshirtValidationError}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
+        </>
+    );
 
-        console.log("totalPrice ", totalPrice)
+    const AdditionalBreakfastSection = () => (
+        <div className="row mb-4">
+            <div className="col-md-4">
+                <div className="form-group">
+                    <label htmlFor="additionalBreakfast">Additional Breakfast</label>
+                    <select 
+                        {...register("additionalBreakfast")} 
+                        className="form-select" 
+                        onChange={(e) => {
+                            const value = Number(e.target.value);
+                            setAdditionalBreakfast(value);
+                            setValue('additionalBreakfast', value);
+                        }}
+                        value={additionalBreakfast}
+                    >
+                        <option value="0">No additional breakfast</option>
+                        <option value="1">1 person (₹80)</option>
+                        <option value="2">2 persons (₹160)</option>
+                        <option value="3">3 persons (₹240)</option>
+                        <option value="4">4 persons (₹320)</option>
+                        <option value="5">5 persons (₹400)</option>
+                    </select>
+                    <small className="form-text" style={{ color: 'whitesmoke' }}>Breakfast is already included for the participant</small>
+                </div>
+            </div>
+        </div>
+    );
 
-        return totalPrice;
-    }
+    const InformationSection = () => (
+        <div className="col-md-12">
+            <div className="card bg-dark text-light mb-4">
+                <div className="card-body">
+                    <h5 className="card-title">Information</h5>
+                    <ul>
+                        <li><strong>Registration Cost:</strong> Early Bird (till {new Date(DISCOUNT_DATE).toLocaleDateString(undefined, dateOptions)}) - ₹{DISCOUNT_PRICE}, Regular - ₹{PRICE}</li>
+                        <li><strong>Additional T-shirt:</strong> ₹{ADDITIONAL_TSHIRT_PRICE} per T-shirt</li>
+                        <li><strong>Breakfast:</strong> Included for participants. Additional breakfast available at ₹80 per person.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    );
 
     const onSubmit = (data) => {
         if (data.donation === 'custom') {
@@ -161,19 +281,67 @@ function RfhSheRun2025() {
             setValue("additionalTshirtSize", "")
             data.additionalTshirtSize = ""
         }
-
+        if (!validateTshirtSizes(data)) {
+            return;
+        }
         console.log(data);
         setSubmitted(!submitted)
         const totalPrice = calculateTotalPrice(data);
         setTotalPrice(totalPrice)
     }
 
-    const handlePaymentClick = async () => {
+    const calculateTotalPrice = (formData) => {
+        // Get the current date
+        const currentDate = new Date();
 
+        // Set the registration fee based on the current date
+        const registrationFee = currentDate < new Date(DISCOUNT_DATE) ? DISCOUNT_PRICE : PRICE;
+        
+        // Calculate the total price
+        let totalPrice = registrationFee;
+
+        // Add cost for additional T-shirts
+        if (formData.additionalTshirt === 'Yes' && formData.additionalTshirtQuantity) {
+            const additionalTshirtCost = Number(formData.additionalTshirtQuantity) * ADDITIONAL_TSHIRT_PRICE;
+            totalPrice += additionalTshirtCost;
+        }
+
+        // Add cost for additional breakfast
+        if (formData.additionalBreakfast) {
+            const breakfastCost = Number(formData.additionalBreakfast) * 80;
+            totalPrice += breakfastCost;
+        }
+
+        // Add the donation amount
+        if (formData.donation) {
+            totalPrice += parseInt(formData.donation, 10);
+        }
+
+        return totalPrice;
+    }
+
+    useEffect(() => {
+        // Clear any stale payment data on component mount
+        localStorage.removeItem('merchantTransactionId');
+        localStorage.removeItem('cause');
+        setDisablePaymentButton(false);
+        setPaymentLoading(false);
+        setPaymentStatus("");
+    }, []);
+
+    const handlePaymentClick = async () => {
+        // Clear any existing payment data
+        localStorage.removeItem('merchantTransactionId');
+        localStorage.removeItem('cause');
+        
         // setValue("totalPrice", totalPrice)
         setValue("totalPrice", 1) // 1 rupee for testing
         setValue("marathonName", "RFH She run 2025")
         try {
+            setPaymentLoading(true);
+            setDisablePaymentButton(true);
+            setPaymentStatus("Initiating payment...");
+            
             const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/initiate-payment`, {
                 method: "POST",
                 timeout: 1200000,
@@ -182,34 +350,32 @@ function RfhSheRun2025() {
                 },
                 body: JSON.stringify(getValues()),
             });
+            
             const data = await response.json();
-            console.log("data ", data)
-            console.log("data.message", data, data.message);
             if (data.success === false) {
+                setPaymentStatus("");
+                setDisablePaymentButton(false);
+                setPaymentLoading(false);
                 toast.error('There was an error. Please try later or Contact Raghu @ +91-9164358027 ', { duration: 50000 });
-                return
+                return;
             }
-            console.log("merchantTransactionId from backend ", data?.data?.merchantTransactionId)
-            localStorage.setItem('merchantTransactionId', data?.data?.merchantTransactionId
-            );
-            localStorage.setItem('cause', "RFH She run 2025");
-            // setPaymentStatus(data.message)
-            // setPaymentLink(data?.data?.instrumentResponse?.redirectInfo?.url)
-            // window.location.href = data?.data?.instrumentResponse?.redirectInfo?.url;
-            setDisablePaymentButton(true)
-            setPaymentLoading(true)
-            window.open(
-                data?.data?.instrumentResponse?.redirectInfo?.url
-            );
+            
+            localStorage.setItem('merchantTransactionId', data?.data?.merchantTransactionId);
+            localStorage.setItem('cause', "RFH She Run 2025");
+            
+            // Redirect to payment URL in the same tab
+            window.location.href = data?.data?.instrumentResponse?.redirectInfo?.url;
 
         } catch (error) {
-            console.log("error ", error)
-            setPaymentLoading(false)
-            setDisablePaymentButton(false)
-            toast.error('Something went wrong. Please try later or Raghu @ +91-91643 58027');
+            console.error("Payment error:", error);
+            setPaymentLoading(false);
+            setDisablePaymentButton(false);
+            setPaymentStatus("");
+            localStorage.removeItem('merchantTransactionId');
+            localStorage.removeItem('cause');
+            toast.error('Something went wrong. Please try later or contact Raghu @ +91-91643 58027');
         }
-
-    }
+    };
 
     const handleSelfPickupChange = (e) => {
         console.log("selfPickUp e.target.value ", e.target.value)
@@ -294,7 +460,53 @@ function RfhSheRun2025() {
     return (
         <div style={{ backgroundColor: "#040002", color: "lightgray", minHeight: "100vh" }}>
             <Helmet>
-                <title>RFH She run 2025 | Rupee For Humanity</title>
+                <title>RFH She Run 2025 | Rupee For Humanity</title>
+                <style>
+                    {`
+                        .form-control, .form-select {
+                            background-color: #1a1a1a;
+                            color: #fff;
+                            border: 1px solid #333;
+                        }
+
+                        .tshirt-sizes-grid {
+                            display: grid;
+                            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                            gap: 1rem;
+                            margin-bottom: 1rem;
+                        }
+
+                        .tshirt-size-item {
+                            background: rgba(255, 255, 255, 0.05);
+                            padding: 1rem;
+                            border-radius: 8px;
+                            transition: all 0.3s ease;
+                        }
+
+                        .tshirt-size-item:hover {
+                            background: rgba(255, 255, 255, 0.1);
+                        }
+
+                        .size-selector {
+                            display: flex;
+                            flex-direction: column;
+                            gap: 0.5rem;
+                        }
+
+                        .tshirt-number {
+                            font-size: 0.9rem;
+                            color: #f39c12;
+                            font-weight: 500;
+                        }
+
+                        .form-select:focus {
+                            background-color: #1a1a1a;
+                            color: #fff;
+                            border-color: #f39c12;
+                            box-shadow: 0 0 0 0.2rem rgba(243, 156, 18, 0.25);
+                        }
+                    `}
+                </style>
             </Helmet>
             <Header />
             <main>
@@ -365,6 +577,11 @@ function RfhSheRun2025() {
                                     <p>
                                         Each participant receives T-shirt, Medal, Certificate, Breakfast and witnesses the noble cause of Rupee For Humanity.
                                     </p>
+                                    <ul>
+                                        <li><strong>Registration Cost:</strong> Early Bird (till {new Date(DISCOUNT_DATE).toLocaleDateString(undefined, dateOptions)}) - ₹{DISCOUNT_PRICE}, Regular - ₹{PRICE}</li>
+                                        <li><strong>Additional T-shirt:</strong> ₹{ADDITIONAL_TSHIRT_PRICE} per T-shirt</li>
+                                        <li><strong>Breakfast:</strong> Included for participants. Additional breakfast available at ₹80 per person.</li>
+                                    </ul>
                                 </div>
 
                                 <div className="mt-4">
@@ -657,37 +874,12 @@ function RfhSheRun2025() {
                                         </div>
                                         {/* Dropdown for quantity if Yes is selected */}
                                         {watch('additionalTshirt') === 'Yes' && (
-                                            <div className="col-md-6">
-                                                <div className="form-group">
-                                                    <label htmlFor="additionalTshirtQuantity">Quantity <span style={{ color: "red" }}>*</span></label>
-                                                    <select {...register("additionalTshirtQuantity", { required: false })} id="additionalTshirtQuantity" className="form-select" aria-label="additionalTshirtQuantity">
-                                                        <option value="">select</option>
-                                                        <option value="1">1</option>
-                                                        <option value="2">2</option>
-                                                        <option value="3">3</option>
-                                                        <option value="4">4</option>
-                                                        <option value="5">5</option>
-                                                        <option value="6">6</option>
-                                                    </select>
-                                                    {errors.additionalTshirtQuantity && <p style={{ color: "red" }}>This field is mandatory</p>}
-                                                </div>
-                                            </div>
+                                            <AdditionalTshirtSection />
                                         )}
                                     </div>
 
-                                    {/* New row for T-shirt sizes if additional T-shirts are selected */}
-                                    {watch('additionalTshirt') === 'Yes' && (
-                                        <div className="row">
-                                            <div className="col-md-12">
-                                                <div className="form-group">
-                                                    <label htmlFor="additionalTshirtSize">Please write T-Shirt Sizes for Additional T-shirts with comma seperation <span style={{ color: "red" }}>*</span></label>
-                                                    <textarea {...register("additionalTshirtSize", { required: false })} id="additionalTshirtSize" className="form-control" aria-label="Additional T-shirt Size"></textarea>
-
-                                                    {errors.additionalTshirtSize && <p style={{ color: "red" }}>This field is mandatory</p>}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
+                                    {/* New row for additional breakfast */}
+                                    <AdditionalBreakfastSection />
 
                                     {/* New row for donation question */}
                                     <div className="row">
@@ -860,6 +1052,10 @@ function RfhSheRun2025() {
                                         <td> {getValues("additionalTshirtQuantity")}  </td>
                                     </tr>
                                     <tr>
+                                        <td className="fs-6">Additional Breakfast </td>
+                                        <td> {getValues("additionalBreakfast")}  </td>
+                                    </tr>
+                                    <tr>
                                         <td className="fs-6">Total Price </td>
                                         <td> <b>INR {totalPrice}/-</b>   </td>
                                     </tr>
@@ -867,9 +1063,47 @@ function RfhSheRun2025() {
                             </table>
                             <div style={{ display: "flex", justifyContent: "flex-end", gap: "16px" }}>
                                 <button className="btn btn-secondary" onClick={handleEditClick}>Edit</button>
-                                <button className="btn btn-primary" onClick={handlePaymentClick} disabled={disablePaymentButton} >Make Payment</button>
+                                <button 
+                                    className="btn btn-primary" 
+                                    onClick={handleSubmit(handlePaymentClick)} 
+                                    disabled={disablePaymentButton}
+                                >
+                                    {paymentLoading ? (
+                                        <span>
+                                            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                            Processing...
+                                        </span>
+                                    ) : (
+                                        "Make Payment"
+                                    )}
+                                </button>
                             </div>
 
+                            <div className="row justify-content-center mt-3">
+                                <div className="col-md-8">
+                                    {paymentStatus && (
+                                        <div className="alert alert-info text-center">
+                                            <i className="fas fa-info-circle me-2"></i>
+                                            {paymentStatus}
+                                            {/* {disablePaymentButton && (
+                                                <div className="mt-2">
+                                                    <small>
+                                                        <i className="fas fa-exclamation-circle me-1"></i>
+                                                        If you accidentally closed the payment tab, 
+                                                        <button 
+                                                            className="btn btn-link btn-sm p-0 ms-1" 
+                                                            onClick={() => window.location.reload()}
+                                                        >
+                                                            click here
+                                                        </button>
+                                                        to try again.
+                                                    </small>
+                                                </div>
+                                            )} */}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
 
                         <div>
@@ -887,20 +1121,24 @@ function RfhSheRun2025() {
                                                     <td className="fs-6"> INR {new Date() < new Date(DISCOUNT_DATE) ? DISCOUNT_PRICE : PRICE}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td className="fs-6">T-shirt</td>
+                                                    <td className="fs-6">Additional T-shirt</td>
                                                     <td> INR {getValues("additionalTshirt") === "Yes" ? getValues("additionalTshirtQuantity") * ADDITIONAL_TSHIRT_PRICE : 0} </td>
+                                                </tr>
+                                                <tr>
+                                                    <td className="fs-6">Additional Breakfast</td>
+                                                    <td> INR {getValues("additionalBreakfast") * 80} </td>
                                                 </tr>
                                                 <tr>
                                                     <td className="fs-6">Donation</td>
                                                     <td> INR {getValues("donation") === "" ? 0 : getValues("donation")}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td className="fs-6">Total </td>
-                                                    <td> {`INR ${totalPrice}`}  </td>
+                                                    <td className="fs-6"><strong>Total</strong></td>
+                                                    <td><strong>{`INR ${totalPrice}`}</strong></td>
                                                 </tr>
                                             </tbody>
                                         </table>
-                                        <button onClick={handlePaymentClick} disabled={disablePaymentButton} type="button" className="w-100 btn btn-lg btn-primary">Make Payment</button>
+                                        <button onClick={handleSubmit(handlePaymentClick)} disabled={disablePaymentButton} type="button" className="w-100 btn btn-lg btn-primary">Make Payment</button>
                                     </div>
                                 </div>
                             </div>
