@@ -61,12 +61,12 @@ function EventForm2025() {
     const category = watch('category');
     const [paymentStatus, setPaymentStatus] = useState("");
 
-    const DISCOUNT_PRICE = 599
+    const DISCOUNT_PRICE = 599 * (1 - 0.15)
     const PRICE = 599
     // const DISCOUNT_PRICE = 1
     // const PRICE = 1
     const ADDITIONAL_TSHIRT_PRICE = 225
-    const DISCOUNT_DATE = new Date("2025-01-21T23:59:00+05:30");
+    const DISCOUNT_DATE = new Date("2025-03-28T23:59:00+05:30");
 
     const TSHIRT_SIZE_OPTIONS = [
         { value: '24', label: 'Size 24' },

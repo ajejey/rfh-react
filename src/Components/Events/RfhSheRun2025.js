@@ -50,12 +50,12 @@ function RfhSheRun2025() {
     const [paymentStatus, setPaymentStatus] = useState("");
     const category = watch('category');
 
-    const DISCOUNT_PRICE = 800
+    const DISCOUNT_PRICE = 800 * (1 - 0.15) 
     const PRICE = 800
     // const DISCOUNT_PRICE = 1
     // const PRICE = 1
     const ADDITIONAL_TSHIRT_PRICE = 225
-    const DISCOUNT_DATE = new Date("2025-01-21T23:59:00+05:30");
+    const DISCOUNT_DATE = new Date("2025-03-28T23:59:00+05:30");
 
     const executeScroll = () => myRef.current.scrollIntoView()
 
@@ -721,7 +721,7 @@ function RfhSheRun2025() {
                                                 {errors.city && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
                                         </div>
-                                        {selectedCity === "others" &&
+                                        {watch("city") === "others" &&
                                             <div className="col-md-4">
                                                 <div className="form-group">
                                                     <label htmlFor="otherCity">Other City Name <span style={{ color: "red" }}>*</span></label>
