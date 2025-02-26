@@ -23,23 +23,10 @@ const EVENT_DETAILS = {
 }
 
 const requiredChanges = `
-In *RFH Juniors run* , below are the changes : 
-1. Time should be 8am ( *Must have)* 
-2. In summary, it should be "Additional T-shirt", instead of just "T-shirt ( *Must have* ) 
-3. Summary should be as below : ( *Must have* )
-Rupee For Humanity (RFH) is a  government-registered online NGO founded by a group of passionate engineers dedicated to the nation's progress. As a non-profit organization, its mission is to eliminate illiteracy at its core and contribute to India's advancement as a developed nation.
-
-4. Under breakfast, is it possible to add "Do you need additional breakfast and select 80/-rs per one". ( *Good to have* )
-5. For Breakfast, instead of "Only for participants", can you modify to "Included for participants" ( *Must have* )
-7. For Juniors run, POC should be as below : ( *Must have* )
-Sripada : +91-99640 46022
-Deepthi @ +91-99863 87435
-Raghu @ +91-91643 58027
-8. In the Event description, please add registration cost in the "Information" space.  ( *Must have* )
-9. "Other City Name" is enabled by Default. Is it possible to hide first and later get it when someone selects Others. ( *Good to have)* 
-10. If I select addtional T-shirts are 2, it allows to enter more number of T-shirt sizes. Is their a possibility to have validation? ( *Good to have* )
-
-This is the consolidated list points for RFH Juniors run.`
+Juniors run : 
+1. Update early bird offer as 499/-
+2. Update date (till offer lasts)
+3. Remove 1re payment and update the actual payment cost.`
 
 
 function EventForm2025() {
@@ -61,12 +48,12 @@ function EventForm2025() {
     const category = watch('category');
     const [paymentStatus, setPaymentStatus] = useState("");
 
-    const DISCOUNT_PRICE = 599 * (1 - 0.15)
+    const DISCOUNT_PRICE = 499
     const PRICE = 599
     // const DISCOUNT_PRICE = 1
     // const PRICE = 1
     const ADDITIONAL_TSHIRT_PRICE = 225
-    const DISCOUNT_DATE = new Date("2025-03-28T23:59:00+05:30");
+    const DISCOUNT_DATE = new Date("2025-05-25T00:00:00+05:30");
 
     const TSHIRT_SIZE_OPTIONS = [
         { value: '24', label: 'Size 24' },
@@ -253,8 +240,7 @@ function EventForm2025() {
         // Clear any existing payment data
         localStorage.removeItem('merchantTransactionId');
         localStorage.removeItem('cause');
-        
-        setValue("totalPrice", 1) // 1 rupee for testing
+        setValue("totalPrice", totalPrice)
         setValue("marathonName", "RFH Juniors run 2025")
         try {
             setPaymentStatus("Initiating payment...");
@@ -599,7 +585,7 @@ function EventForm2025() {
                                     </p>
                                     <ul>
                                         <li><strong>Champs run:</strong> Should be accompanied by a parent/guardian.</li>
-                                        <li><strong>Registration Cost:</strong> Early Bird (till {new Date(DISCOUNT_DATE).toLocaleDateString(undefined, dateOptions)}) - ₹{DISCOUNT_PRICE}, Regular - ₹{PRICE}</li>
+                                        <li><strong>Registration Cost:</strong> Early Bird (till offer lasts) - ₹{DISCOUNT_PRICE}, Regular - ₹{PRICE}</li>
                                         <li><strong>Additional T-shirt:</strong> ₹{ADDITIONAL_TSHIRT_PRICE} per T-shirt</li>
                                         <li><strong>Breakfast:</strong> Included for participants. Additional breakfast available at ₹80 per person.</li>
                                     </ul>

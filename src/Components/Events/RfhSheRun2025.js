@@ -31,6 +31,11 @@ const TSHIRT_SIZE_OPTIONS = [
     { value: 'XXL', label: 'Double XL (XXL)' }
 ];
 
+const requiredChanges = `
+She Run : 
+1. Remove early bird offer
+2. Remove 1re payment and update the actual payment cost.`
+
 function RfhSheRun2025() {
     const { register, control, handleSubmit, getValues, setValue, formState: { errors }, watch } = useForm();
     const myRef = useRef(null)
@@ -50,7 +55,7 @@ function RfhSheRun2025() {
     const [paymentStatus, setPaymentStatus] = useState("");
     const category = watch('category');
 
-    const DISCOUNT_PRICE = 800 * (1 - 0.15) 
+    const DISCOUNT_PRICE = 800 
     const PRICE = 800
     // const DISCOUNT_PRICE = 1
     // const PRICE = 1
@@ -260,7 +265,7 @@ function RfhSheRun2025() {
                 <div className="card-body">
                     <h5 className="card-title">Information</h5>
                     <ul>
-                        <li><strong>Registration Cost:</strong> Early Bird (till {new Date(DISCOUNT_DATE).toLocaleDateString(undefined, dateOptions)}) - ₹{DISCOUNT_PRICE}, Regular - ₹{PRICE}</li>
+                        <li><strong>Registration Cost:</strong> Regular - ₹{PRICE}</li>
                         <li><strong>Additional T-shirt:</strong> ₹{ADDITIONAL_TSHIRT_PRICE} per T-shirt</li>
                         <li><strong>Breakfast:</strong> Included for participants. Additional breakfast available at ₹80 per person.</li>
                     </ul>
@@ -334,8 +339,8 @@ function RfhSheRun2025() {
         localStorage.removeItem('merchantTransactionId');
         localStorage.removeItem('cause');
         
-        // setValue("totalPrice", totalPrice)
-        setValue("totalPrice", 1) // 1 rupee for testing
+        setValue("totalPrice", totalPrice)
+        // setValue("totalPrice", 1) // 1 rupee for testing
         setValue("marathonName", "RFH She run 2025")
         try {
             setPaymentLoading(true);
@@ -578,7 +583,7 @@ function RfhSheRun2025() {
                                         Each participant receives T-shirt, Medal, Certificate, Breakfast and witnesses the noble cause of Rupee For Humanity.
                                     </p>
                                     <ul>
-                                        <li><strong>Registration Cost:</strong> Early Bird (till {new Date(DISCOUNT_DATE).toLocaleDateString(undefined, dateOptions)}) - ₹{DISCOUNT_PRICE}, Regular - ₹{PRICE}</li>
+                                        <li><strong>Registration Cost:</strong> Regular - ₹{PRICE}</li>
                                         <li><strong>Additional T-shirt:</strong> ₹{ADDITIONAL_TSHIRT_PRICE} per T-shirt</li>
                                         <li><strong>Breakfast:</strong> Included for participants. Additional breakfast available at ₹80 per person.</li>
                                     </ul>
