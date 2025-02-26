@@ -547,10 +547,10 @@ function RfhSheRun2025() {
                             </p>
                             <p>Join us, celebrate the strength of women, and be a part of something truly extraordinary! </p>
 
-                            {/* {seeMore === true && expandedText()} */}
-                            {/* <div style={{ paddingBottom: "16px" }}>
+                            {seeMore === true && expandedText()}
+                            <div style={{ paddingBottom: "16px" }}>
                                 <span style={{ textDecoration: "underline", cursor: "pointer", color: "lightblue" }} onClick={handleSeeMore}>See {seeMore ? "less" : "more"} </span>
-                            </div> */}
+                            </div>
 
                             <h2 className="h2">
                                 Information
