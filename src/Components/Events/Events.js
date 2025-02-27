@@ -10,6 +10,7 @@ import { Grid, Card, CardMedia, CardContent, Typography, Skeleton } from '@mui/m
 import useSWR from 'swr';
 import useAuthStatus from '../../CustomHooks/useAuthStatus'
 import rfhjuniorsRun2025Poster from '../../assets/images/rfh-juniors-run-2025-poster.jpeg'
+import rfhSheRun2025Poster from '../../assets/images/rfh-she-run-2025-poster.jpeg'
 
 const fetcher = async (url) => {
     const response = await fetch(url);
@@ -106,6 +107,10 @@ function Events() {
                     height="350"
                     image={rfhjuniorsRun2025Poster}
                     alt="RFH Juniors Run 2025"
+                    sx={{
+                        objectFit: "contain",
+                        objectPosition: "center",
+                    }}
                 />
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="div">
@@ -123,9 +128,13 @@ function Events() {
             <Card  style={{ cursor: 'pointer' }}>
                 <CardMedia
                     component="img"
-                    height="140"
-                    image="/path-to-she-run-image.jpg"
+                    height="350"
+                    image={rfhSheRun2025Poster}
                     alt="RFH She Run 2025"
+                    sx={{
+                        objectFit: "contain",
+                        objectPosition: "center",
+                    }}
                 />
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="div">
