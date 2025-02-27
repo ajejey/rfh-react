@@ -233,8 +233,13 @@ function Home() {
                         <button onClick={handleVolunteerClick} type="button" className="btn btn-dark btn-outline btn-lg download-button">
                             Volunteer Today
                         </button>
+                        <Link to="/rfh-juniors-run-2025" className="btn btn-dark btn-lg download-button">
+                            RFH Juniors Run 2025
+                        </Link>
+                        <Link to="/rfh-she-run-2025" className="btn btn-dark btn-lg download-button">
+                            RFH She Run 2025
+                        </Link>
                     </div>
-
                 </div>
                 <Fab onClick={executeScroll} aria-label="contact-us" style={{ position: "fixed", bottom: "2%", right: "2%", backgroundColor: "#efb442" }}>
                     <CallIcon />

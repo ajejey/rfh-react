@@ -66,7 +66,7 @@ function App() {
             {/* </Route> */}
             <Route path='/donate' element={<Donate />} />
             <Route path='/nivanshfightsma' element={<NivanshFightSma />} />
-            <Route path='/rfh-juniors-run-2024' element={<EventForm />} />
+            {/* <Route path='/rfh-juniors-run-2024' element={<EventForm />} /> */}
             <Route path='/rfh-juniors-run-2025' element={<EventForm2025 />} />
             <Route path='/rfh-she-run-2025' element={<RfhSheRun2025 />} />
             <Route path='/blog' element={<IndexPage />} />

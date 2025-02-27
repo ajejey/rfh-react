@@ -3,12 +3,13 @@ import Header from '../Header'
 import runner from '../../assets/images/runner-min.png'
 import marathon from '../../assets/images/marathon.jpg'
 import runnersVector from '../../assets/images/RunnersVectors.svg'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { Badge, Box, Button, CardActions, CardHeader } from '@mui/material'
 import { Grid, Card, CardMedia, CardContent, Typography, Skeleton } from '@mui/material';
 import useSWR from 'swr';
 import useAuthStatus from '../../CustomHooks/useAuthStatus'
+import rfhjuniorsRun2025Poster from '../../assets/images/rfh-juniors-run-2025-poster.jpeg'
 
 const fetcher = async (url) => {
     const response = await fetch(url);
@@ -95,6 +96,50 @@ function Events() {
                         {loggedIn && <Button variant='contained' color='secondary' onClick={handleCreateEvent}>Create Event</Button>}
                     </div>
 
+
+    <Grid container spacing={2}>
+        <Grid item xs={12} sm={6} md={4}>
+        <Link to={'/rfh-she-run-2025'}>
+            <Card style={{ cursor: 'pointer' }}>
+                <CardMedia
+                    component="img"
+                    height="350"
+                    image={rfhjuniorsRun2025Poster}
+                    alt="RFH Juniors Run 2025"
+                />
+                <CardContent>
+                    <Typography gutterBottom variant="h5" component="div">
+                        RFH Juniors Run 2025
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        Join us for the exciting RFH Juniors Run 2025!
+                    </Typography>
+                </CardContent>
+            </Card>
+            </Link>
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+            <Link to={'/rfh-she-run-2025'}>
+            <Card  style={{ cursor: 'pointer' }}>
+                <CardMedia
+                    component="img"
+                    height="140"
+                    image="/path-to-she-run-image.jpg"
+                    alt="RFH She Run 2025"
+                />
+                <CardContent>
+                    <Typography gutterBottom variant="h5" component="div">
+                        RFH She Run 2025
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        Empower women through the RFH She Run 2025!
+                    </Typography>
+                </CardContent>
+            </Card>
+            </Link>
+        </Grid>       
+    </Grid>
+             
                     {!eventData && (
                         <Grid container spacing={2}>
                             {[...Array(6)].map((_, index) => (
