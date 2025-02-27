@@ -100,7 +100,7 @@ function Events() {
 
     <Grid container spacing={2}>
         <Grid item xs={12} sm={6} md={4}>
-        <Link to={'/rfh-she-run-2025'}>
+        <Link to={'/rfh-juniors-run-2025'}>
             <Card style={{ cursor: 'pointer' }}>
                 <CardMedia
                     component="img"
