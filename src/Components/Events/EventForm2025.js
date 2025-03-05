@@ -522,7 +522,10 @@ function EventForm2025() {
                             </h1>
                             <div className="row">
                                 <div className="col-md-4">
-                                    <span> <strong><EventTwoToneIcon /> Date:</strong>  {EVENT_DETAILS.date.toLocaleDateString('en-US', dateOptions)}   </span>
+                                    <span> <strong><EventTwoToneIcon /> Date:</strong> 
+                                     {/* {EVENT_DETAILS.date.toLocaleDateString('en-US', dateOptions)}  */}
+                                     May 25th, 2025
+                                       </span>
                                 </div>
                                 <div className="col-md-4">
                                     <span><strong> <AccessTimeTwoToneIcon /> Time:</strong>  {EVENT_DETAILS.time} </span>
