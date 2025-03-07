@@ -55,7 +55,7 @@ function RfhSheRun2025() {
     const [paymentStatus, setPaymentStatus] = useState("");
     const category = watch('category');
 
-    const DISCOUNT_PRICE = 800 
+    const DISCOUNT_PRICE = 700
     const PRICE = 800
     // const DISCOUNT_PRICE = 1
     // const PRICE = 1
@@ -152,7 +152,7 @@ function RfhSheRun2025() {
         if (data.additionalTshirt === 'Yes' && data.additionalTshirtQuantity > 0) {
             const quantity = Number(data.additionalTshirtQuantity);
             const sizes = tshirtSizes.filter(size => size !== '');
-            
+
             if (sizes.length < quantity) {
                 setTshirtValidationError('Please select sizes for all additional T-shirts');
                 return false;
@@ -170,9 +170,9 @@ function RfhSheRun2025() {
                         <div className="col-md-4">
                             <div className="form-group">
                                 <label htmlFor="additionalTshirtQuantity">Number of Additional T-shirts</label>
-                                <select 
-                                    {...register("additionalTshirtQuantity")} 
-                                    className="form-select" 
+                                <select
+                                    {...register("additionalTshirtQuantity")}
+                                    className="form-select"
                                     onChange={handleTshirtQuantityChange}
                                 >
                                     <option value="0">Select quantity</option>
@@ -202,7 +202,7 @@ function RfhSheRun2025() {
                                         <div key={index} className="tshirt-size-item">
                                             <div className="size-selector">
                                                 <span className="tshirt-number">T-shirt {index + 1}</span>
-                                                <select 
+                                                <select
                                                     className="form-select"
                                                     value={size}
                                                     onChange={(e) => handleSizeChange(index, e.target.value)}
@@ -236,9 +236,9 @@ function RfhSheRun2025() {
             <div className="col-md-4">
                 <div className="form-group">
                     <label htmlFor="additionalBreakfast">Additional Breakfast</label>
-                    <select 
-                        {...register("additionalBreakfast")} 
-                        className="form-select" 
+                    <select
+                        {...register("additionalBreakfast")}
+                        className="form-select"
                         onChange={(e) => {
                             const value = Number(e.target.value);
                             setAdditionalBreakfast(value);
@@ -301,7 +301,7 @@ function RfhSheRun2025() {
 
         // Set the registration fee based on the current date
         const registrationFee = currentDate < new Date(DISCOUNT_DATE) ? DISCOUNT_PRICE : PRICE;
-        
+
         // Calculate the total price
         let totalPrice = registrationFee;
 
@@ -338,7 +338,7 @@ function RfhSheRun2025() {
         // Clear any existing payment data
         localStorage.removeItem('merchantTransactionId');
         localStorage.removeItem('cause');
-        
+
         setValue("totalPrice", totalPrice)
         // setValue("totalPrice", 1) // 1 rupee for testing
         setValue("marathonName", "RFH She run 2025")
@@ -346,7 +346,7 @@ function RfhSheRun2025() {
             setPaymentLoading(true);
             setDisablePaymentButton(true);
             setPaymentStatus("Initiating payment...");
-            
+
             const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/initiate-payment`, {
                 method: "POST",
                 timeout: 1200000,
@@ -355,7 +355,7 @@ function RfhSheRun2025() {
                 },
                 body: JSON.stringify(getValues()),
             });
-            
+
             const data = await response.json();
             if (data.success === false) {
                 setPaymentStatus("");
@@ -364,10 +364,10 @@ function RfhSheRun2025() {
                 toast.error('There was an error. Please try later or Contact Raghu @ +91-9164358027 ', { duration: 50000 });
                 return;
             }
-            
+
             localStorage.setItem('merchantTransactionId', data?.data?.merchantTransactionId);
             localStorage.setItem('cause', "RFH She Run 2025");
-            
+
             // Redirect to payment URL in the same tab
             window.location.href = data?.data?.instrumentResponse?.redirectInfo?.url;
 
@@ -538,6 +538,19 @@ function RfhSheRun2025() {
                             <span ><small style={{ color: "#ff7675" }}> <strong>Last Date to Register: {EVENT_DETAILS.lastDate.toLocaleDateString('en-US', dateOptions)}</strong> </small></span><br />
                             <br />
 
+                            <div className="container d-flex justify-content-center align-items-center my-4">
+                                    <div className="p-4 rounded shadow" style={{ background: "linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)", border: "2px solid #f39c12" }}>
+                                        <h3 className="mb-3 font-weight-bold text-center" style={{ color: "#5d4037" }}>Women's Day Special Offer! 🎉</h3>
+                                        <p className="lead text-center mb-2" style={{ color: "#5d4037" }}>
+                                            Celebrate International Women's Day with us and enjoy a special price of{' '}
+                                            <span className="font-weight-bold" style={{ fontSize: "1.2em", color: "#d81b60" }}>INR 700/-</span>
+                                        </p>
+                                        <p className="text-center mb-0" style={{ color: "#5d4037", fontStyle: "italic" }}>
+                                            Limited time offer to honor the strength and spirit of women everywhere!
+                                        </p>
+                                    </div>
+                                </div>
+
                             <p>
                                 "Rupee For Humanity" is thrilled to present "RFH She Run 2025"—a celebration of passion, purpose, and the power of giving! After the resounding success of seven incredible running events in Bengaluru, we are now gearing up for an even more meaningful journey.                            </p>
                             <p>
@@ -626,6 +639,9 @@ function RfhSheRun2025() {
                                         <p className="font-italic">Early Bird offer: Lasts till {new Date(DISCOUNT_DATE).toLocaleDateString(undefined, dateOptions)}</p>
                                     </div>
                                 </div> */}
+
+                          
+
 
                             </div>
 
@@ -1068,9 +1084,9 @@ function RfhSheRun2025() {
                             </table>
                             <div style={{ display: "flex", justifyContent: "flex-end", gap: "16px" }}>
                                 <button className="btn btn-secondary" onClick={handleEditClick}>Edit</button>
-                                <button 
-                                    className="btn btn-primary" 
-                                    onClick={handleSubmit(handlePaymentClick)} 
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={handleSubmit(handlePaymentClick)}
                                     disabled={disablePaymentButton}
                                 >
                                     {paymentLoading ? (
