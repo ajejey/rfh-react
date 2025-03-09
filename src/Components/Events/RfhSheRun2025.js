@@ -55,7 +55,7 @@ function RfhSheRun2025() {
     const [paymentStatus, setPaymentStatus] = useState("");
     const category = watch('category');
 
-    const DISCOUNT_PRICE = 700
+    const DISCOUNT_PRICE = 800
     const PRICE = 800
     // const DISCOUNT_PRICE = 1
     // const PRICE = 1
@@ -538,7 +538,7 @@ function RfhSheRun2025() {
                             <span ><small style={{ color: "#ff7675" }}> <strong>Last Date to Register: {EVENT_DETAILS.lastDate.toLocaleDateString('en-US', dateOptions)}</strong> </small></span><br />
                             <br />
 
-                            <div className="container d-flex justify-content-center align-items-center my-4">
+                            {/* <div className="container d-flex justify-content-center align-items-center my-4">
                                     <div className="p-4 rounded shadow" style={{ background: "linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)", border: "2px solid #f39c12" }}>
                                         <h3 className="mb-3 font-weight-bold text-center" style={{ color: "#5d4037" }}>Women's Day Special Offer! 🎉</h3>
                                         <p className="lead text-center mb-2" style={{ color: "#5d4037" }}>
@@ -549,7 +549,7 @@ function RfhSheRun2025() {
                                             Limited time offer to honor the strength and spirit of women everywhere!
                                         </p>
                                     </div>
-                                </div>
+                                </div> */}
 
                             <p>
                                 "Rupee For Humanity" is thrilled to present "RFH She Run 2025"—a celebration of passion, purpose, and the power of giving! After the resounding success of seven incredible running events in Bengaluru, we are now gearing up for an even more meaningful journey.                            </p>
