@@ -339,8 +339,8 @@ function RfhSheRun2025() {
         localStorage.removeItem('merchantTransactionId');
         localStorage.removeItem('cause');
 
-        // setValue("totalPrice", totalPrice)
-        setValue("totalPrice", 1) // 1 rupee for testing
+        setValue("totalPrice", totalPrice)
+        // setValue("totalPrice", 1) // 1 rupee for testing
         setValue("marathonName", "RFH She run 2025")
         try {
             setPaymentLoading(true);
