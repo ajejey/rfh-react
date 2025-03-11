@@ -25,7 +25,9 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  TablePagination
+  TablePagination,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import useSWR from 'swr';
@@ -43,6 +45,7 @@ import RestaurantIcon from '@mui/icons-material/Restaurant';
 import SearchIcon from '@mui/icons-material/Search';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import FilterListIcon from '@mui/icons-material/FilterList';
+import EmailIcon from '@mui/icons-material/Email';
 
 const StyledFormControl = styled(FormControl)(({ theme }) => ({
     minWidth: 200,
@@ -109,6 +112,11 @@ function EventParticipants() {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
     const [tabValue, setTabValue] = useState(0);
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: '',
+        severity: 'info'
+    });
 
     // Filtered data based on search, filtering and test transaction exclusion
     const filteredData = useMemo(() => {
@@ -178,6 +186,59 @@ function EventParticipants() {
         setPage(0);
     };
 
+    const handleSnackbarClose = () => {
+        setSnackbar(prev => ({ ...prev, open: false }));
+    };
+
+    const sendEmailReceipt = async (item) => {
+        try {
+            // Show loading notification
+            setSnackbar({
+                open: true,
+                message: 'Sending email...',
+                severity: 'info'
+            });
+
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/payment/send-receipt`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    merchantTransactionId: item.merchantTransactionId,
+                    formData: { 
+                        merchantTransactionId: item.merchantTransactionId,
+                        cause: item.marathonName || marathonName
+                    }
+                })
+            });
+
+            const result = await response.json();
+            console.log("result ", result);
+            
+            if (result.success) {
+                // Show success notification
+                setSnackbar({
+                    open: true,
+                    message: 'Email sent successfully!',
+                    severity: 'success'
+                });
+                
+                // Refresh data
+                mutate();
+            } else {
+                throw new Error(result.message || 'Failed to send email');
+            }
+        } catch (error) {
+            console.error('Error sending email:', error);
+            setSnackbar({
+                open: true,
+                message: error.message || 'Error sending email',
+                severity: 'error'
+            });
+        }
+    };
+
     // Utility functions for calculating statistics
     const calculateStats = (data) => {
         if (!data || data.length === 0) return {
@@ -206,7 +267,6 @@ function EventParticipants() {
             }
         };
 
-        // Filter out test transactions (amount = 100 paise = 1 rupee)
         const filteredData = data.filter(item => {
             if (item.paymentDetails && 
                 item.paymentDetails.success && 
@@ -218,11 +278,13 @@ function EventParticipants() {
             return true; // Keep items without payment details or failed payments
         });
 
+        const successfulParticipants = filteredData.filter(item => item.paymentDetails && item.paymentDetails.success);
+
         let stats = {
-            totalParticipants: filteredData.length,
-            successfulPayments: 0,
-            failedPayments: 0,
-            totalAmount: 0,
+            totalParticipants: successfulParticipants.length,
+            successfulPayments: successfulParticipants.length,
+            failedPayments: data.length - successfulParticipants.length,
+            totalAmount: successfulParticipants.reduce((sum, item) => sum + (item.paymentDetails.data.amount ? item.paymentDetails.data.amount / 100 : 0), 0),
             tshirtCount: {
                 total: 0,
                 sizes: {}
@@ -244,75 +306,58 @@ function EventParticipants() {
             }
         };
 
-        filteredData.forEach(item => {
-            // Payment status
-            if (item.paymentDetails && item.paymentDetails.success) {
-                stats.successfulPayments++;
-                
-                // Calculate total amount
-                if (item.paymentDetails.data && item.paymentDetails.data.amount) {
-                    // PhonePe returns amount in paise, convert to rupees
-                    const amountInRupees = Number(item.paymentDetails.data.amount) / 100;
-                    stats.totalAmount += amountInRupees;
-                }
-            } else {
-                stats.failedPayments++;
+        successfulParticipants.forEach(item => {
+            // T-shirt counts
+            if (item.userDetails && item.userDetails.TshirtSize) {
+                stats.tshirtCount.total++;
+                const size = item.userDetails.TshirtSize.trim();
+                stats.tshirtCount.sizes[size] = (stats.tshirtCount.sizes[size] || 0) + 1;
             }
 
-            // Process userDetails if payment was successful
-            if (item.userDetails && item.paymentDetails && item.paymentDetails.success) {
-                // T-shirt counts
-                if (item.userDetails.TshirtSize) {
-                    stats.tshirtCount.total++;
-                    const size = item.userDetails.TshirtSize.trim();
-                    stats.tshirtCount.sizes[size] = (stats.tshirtCount.sizes[size] || 0) + 1;
-                }
-
-                // Additional T-shirts
-                if (item.userDetails.additionalTshirt === "Yes" && item.userDetails.additionalTshirtQuantity) {
-                    const additionalQuantity = Number(item.userDetails.additionalTshirtQuantity) || 0;
-                    stats.additionalTshirtCount.total += additionalQuantity;
+            // Additional T-shirts
+            if (item.userDetails && item.userDetails.additionalTshirt === "Yes" && item.userDetails.additionalTshirtQuantity) {
+                const additionalQuantity = Number(item.userDetails.additionalTshirtQuantity) || 0;
+                stats.additionalTshirtCount.total += additionalQuantity;
+                
+                if (item.userDetails.additionalTshirtSize) {
+                    // Handle comma-separated sizes
+                    const additionalSizes = item.userDetails.additionalTshirtSize.split(',');
                     
-                    if (item.userDetails.additionalTshirtSize) {
-                        // Handle comma-separated sizes
-                        const additionalSizes = item.userDetails.additionalTshirtSize.split(',');
+                    // If we have just one size but multiple quantities, apply all quantities to that size
+                    if (additionalSizes.length === 1) {
+                        const size = additionalSizes[0].trim();
+                        stats.additionalTshirtCount.sizes[size] = (stats.additionalTshirtCount.sizes[size] || 0) + additionalQuantity;
+                    } 
+                    // If we have multiple sizes, distribute quantities evenly or based on additional logic if needed
+                    else {
+                        // For now, we'll assume equal distribution among sizes
+                        const quantityPerSize = additionalQuantity / additionalSizes.length;
                         
-                        // If we have just one size but multiple quantities, apply all quantities to that size
-                        if (additionalSizes.length === 1) {
-                            const size = additionalSizes[0].trim();
-                            stats.additionalTshirtCount.sizes[size] = (stats.additionalTshirtCount.sizes[size] || 0) + additionalQuantity;
-                        } 
-                        // If we have multiple sizes, distribute quantities evenly or based on additional logic if needed
-                        else {
-                            // For now, we'll assume equal distribution among sizes
-                            const quantityPerSize = additionalQuantity / additionalSizes.length;
-                            
-                            additionalSizes.forEach(sizeItem => {
-                                const size = sizeItem.trim();
-                                stats.additionalTshirtCount.sizes[size] = (stats.additionalTshirtCount.sizes[size] || 0) + quantityPerSize;
-                            });
-                        }
+                        additionalSizes.forEach(sizeItem => {
+                            const size = sizeItem.trim();
+                            stats.additionalTshirtCount.sizes[size] = (stats.additionalTshirtCount.sizes[size] || 0) + quantityPerSize;
+                        });
                     }
                 }
+            }
 
-                // Breakfast counts
-                stats.breakfastCount.included += 1; // Each participant gets included breakfast
-                
-                if (item.userDetails.additionalBreakfast) {
-                    const additionalBreakfastCount = Number(item.userDetails.additionalBreakfast) || 0;
-                    stats.breakfastCount.additional += additionalBreakfastCount;
-                }
+            // Breakfast counts
+            stats.breakfastCount.included += 1; // Each participant gets included breakfast
+            
+            if (item.userDetails && item.userDetails.additionalBreakfast) {
+                const additionalBreakfastCount = Number(item.userDetails.additionalBreakfast) || 0;
+                stats.breakfastCount.additional += additionalBreakfastCount;
+            }
 
-                // Revenue breakdown (if we have pricing info)
-                if (item.userDetails.totalPrice) {
-                    const totalPrice = Number(item.userDetails.totalPrice) || 0;
-                    stats.revenue.total += totalPrice;
-                }
+            // Revenue breakdown (if we have pricing info)
+            if (item.userDetails && item.userDetails.totalPrice) {
+                const totalPrice = Number(item.userDetails.totalPrice) || 0;
+                stats.revenue.total += totalPrice;
+            }
 
-                if (item.userDetails.donation) {
-                    const donation = Number(item.userDetails.donation) || 0;
-                    stats.revenue.donation += donation;
-                }
+            if (item.userDetails && item.userDetails.donation) {
+                const donation = Number(item.userDetails.donation) || 0;
+                stats.revenue.donation += donation;
             }
         });
 
@@ -679,6 +724,17 @@ function EventParticipants() {
                                                             <SearchIcon fontSize="small" />
                                                         </IconButton>
                                                     </Tooltip>
+                                                    {item?.paymentDetails?.success && (
+                                                        <Tooltip title="Send/Resend Email Receipt">
+                                                            <IconButton 
+                                                                size="small" 
+                                                                onClick={() => sendEmailReceipt(item)}
+                                                                color="primary"
+                                                            >
+                                                                <EmailIcon fontSize="small" />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                    )}
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -876,6 +932,16 @@ function EventParticipants() {
                     </Paper>
                 )}
             </Box>
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={handleSnackbarClose}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert severity={snackbar.severity} sx={{ width: '100%' }}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 }

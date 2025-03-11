@@ -264,8 +264,34 @@ function EventForm2025() {
             localStorage.setItem('merchantTransactionId', data?.data?.merchantTransactionId);
             localStorage.setItem('cause', "RFH Juniors run 2025");
             
-            // Redirect to payment URL in the same tab
-            window.location.href = data?.data?.instrumentResponse?.redirectInfo?.url;
+            // Detect if user is on iOS/Safari
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+            
+            const paymentUrl = data?.data?.instrumentResponse?.redirectInfo?.url;
+            console.log("Payment URL:", paymentUrl);
+            
+            if (paymentUrl) {
+                if (isIOS || isSafari) {
+                    // For iOS devices, use a form submission approach which works better
+                    const form = document.createElement('form');
+                    form.method = 'GET';
+                    form.action = paymentUrl;
+                    form.target = '_self';
+                    document.body.appendChild(form);
+                    form.submit();
+                } else {
+                    // For non-iOS devices, use the standard approach
+                    window.location.href = paymentUrl;
+                }
+            } else {
+                console.error("Payment URL was not provided in the response");
+                setPaymentLoading(false);
+                setDisablePaymentButton(false);
+                setPaymentStatus("");
+                toast.error('Payment gateway error. Please try again or contact support.');
+            }
 
         } catch (error) {
             console.log("error ", error);
@@ -584,7 +610,7 @@ function EventForm2025() {
 
                                 <div className="mt-4">
                                     <p>
-                                        Each participant receives Medal, Bib, Finisher certificate, Breakfast and witnesses the noble cause of Rupee For Humanity.
+                                        Each participant receives a Tshirt, Medal, Bib, Finisher certificate, Breakfast and witnesses the noble cause of Rupee For Humanity.
                                     </p>
                                     <ul>
                                         <li><strong>Champs run:</strong> Should be accompanied by a parent/guardian.</li>
