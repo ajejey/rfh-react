@@ -48,7 +48,7 @@ function EventForm2025() {
     const category = watch('category');
     const [paymentStatus, setPaymentStatus] = useState("");
 
-    const DISCOUNT_PRICE = 499
+    const DISCOUNT_PRICE = 599
     const PRICE = 599
     // const DISCOUNT_PRICE = 1
     // const PRICE = 1
