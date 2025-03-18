@@ -304,6 +304,89 @@ function EventForm2025() {
         }
     };
 
+    const handleRazorpayClick = async () => {
+        try {
+            setPaymentLoading(true);
+            setDisablePaymentButton(true);
+            setPaymentStatus("Initiating Razorpay payment...");
+            setValue("totalPrice", totalPrice)
+        setValue("marathonName", "RFH Juniors run 2025")
+
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/initiate-razorpay-payment`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(getValues()),
+            });
+
+            const data = await response.json();
+            if (!data.orderId) {
+                throw new Error('Failed to create order');
+            }
+
+            const options = {
+                key: data.keyId,
+                amount: data.amount,
+                currency: data.currency,
+                name: "Rupee For Humanity",
+                description: "RFH Juniors Run 2025 Registration",
+                order_id: data.orderId,
+                handler: async function (response) {
+                    try {
+                        const verifyResponse = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/razorpay-webhook`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_signature: response.razorpay_signature,
+                            }),
+                        });
+
+                        const verifyData = await verifyResponse.json();
+                        if (verifyData.status === 'success') {
+                            localStorage.setItem('merchantTransactionId', data.merchantTransactionId);
+                            localStorage.setItem('cause', "RFH Juniors Run 2025");
+                            window.location.href = `${process.env.REACT_APP_BASE_URL}/events/payment-redirect`;
+                        } else {
+                            toast.error('Payment verification failed. Please contact support.');
+                        }
+                    } catch (error) {
+                        console.error('Verification error:', error);
+                        toast.error('Payment verification failed. Please contact support.');
+                    }
+                },
+                prefill: {
+                    name: getValues().fullName,
+                    email: getValues().email,
+                    contact: getValues().mobNo,
+                },
+                theme: {
+                    color: "#040002",
+                },
+            };
+
+            const rzp = new window.Razorpay(options);
+            rzp.on('payment.failed', function (response) {
+                toast.error('Payment failed. Please try again.');
+                setPaymentLoading(false);
+                setDisablePaymentButton(false);
+                setPaymentStatus("");
+            });
+
+            rzp.open();
+        } catch (error) {
+            console.error("Razorpay error:", error);
+            setPaymentLoading(false);
+            setDisablePaymentButton(false);
+            setPaymentStatus("");
+            toast.error('Failed to initialize Razorpay. Please try again or contact support.');
+        }
+    };
+
     const handleSelfPickupChange = (e) => {
         console.log("selfPickUp e.target.value ", e.target.value)
         setWillPickUp(e.target.value)
@@ -526,6 +609,7 @@ function EventForm2025() {
         <div style={{ backgroundColor: "#040002", color: "lightgray", minHeight: "100vh" }}>
             <Helmet>
                 <title>RFH Juniors Run 2025</title>
+                <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
                 <style>
                     {`
                         .form-control, .form-select {
@@ -1081,7 +1165,22 @@ function EventForm2025() {
                             </table>
                             <div style={{ display: "flex", justifyContent: "flex-end", gap: "16px" }}>
                                 <button className="btn btn-secondary" onClick={handleEditClick}>Edit</button>
-                                <button className="btn btn-primary" onClick={handlePaymentClick} disabled={disablePaymentButton} >Make Payment</button>
+                                <div className="d-flex justify-content-center gap-3">
+                                    <button
+                                        className="btn btn-primary"
+                                        onClick={handlePaymentClick}
+                                        disabled={disablePaymentButton || paymentLoading}
+                                    >
+                                        {paymentLoading ? "Processing..." : "Pay with PhonePe"}
+                                    </button>
+                                    <button
+                                        className="btn btn-primary"
+                                        onClick={handleRazorpayClick}
+                                        disabled={disablePaymentButton || paymentLoading}
+                                    >
+                                        {paymentLoading ? "Processing..." : "Pay with Razorpay"}
+                                    </button>
+                                </div>
                             </div>
 
                             <div className="row justify-content-center mt-3">

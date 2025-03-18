@@ -407,6 +407,87 @@ function RfhSheRun2025() {
         }
     };
 
+    const handleRazorpayClick = async () => {
+        try {
+            setPaymentLoading(true);
+            setDisablePaymentButton(true);
+            setPaymentStatus("Initiating Razorpay payment...");
+
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/initiate-razorpay-payment`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(getValues()),
+            });
+
+            const data = await response.json();
+            if (!data.orderId) {
+                throw new Error('Failed to create order');
+            }
+
+            const options = {
+                key: data.keyId,
+                amount: data.amount,
+                currency: data.currency,
+                name: "Rupee For Humanity",
+                description: "RFH She Run 2025 Registration",
+                order_id: data.orderId,
+                handler: async function (response) {
+                    try {
+                        const verifyResponse = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/razorpay-webhook`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_signature: response.razorpay_signature,
+                            }),
+                        });
+
+                        const verifyData = await verifyResponse.json();
+                        if (verifyData.status === 'success') {
+                            localStorage.setItem('merchantTransactionId', data.merchantTransactionId);
+                            localStorage.setItem('cause', "RFH She Run 2025");
+                            window.location.href = `${process.env.REACT_APP_BASE_URL}/events/payment-redirect`;
+                        } else {
+                            toast.error('Payment verification failed. Please contact support.');
+                        }
+                    } catch (error) {
+                        console.error('Verification error:', error);
+                        toast.error('Payment verification failed. Please contact support.');
+                    }
+                },
+                prefill: {
+                    name: getValues().fullName,
+                    email: getValues().email,
+                    contact: getValues().mobNo,
+                },
+                theme: {
+                    color: "#040002",
+                },
+            };
+
+            const rzp = new window.Razorpay(options);
+            rzp.on('payment.failed', function (response) {
+                toast.error('Payment failed. Please try again.');
+                setPaymentLoading(false);
+                setDisablePaymentButton(false);
+                setPaymentStatus("");
+            });
+
+            rzp.open();
+        } catch (error) {
+            console.error("Razorpay error:", error);
+            setPaymentLoading(false);
+            setDisablePaymentButton(false);
+            setPaymentStatus("");
+            toast.error('Failed to initialize Razorpay. Please try again or contact support.');
+        }
+    };
+
     const handleSelfPickupChange = (e) => {
         console.log("selfPickUp e.target.value ", e.target.value)
         setWillPickUp(e.target.value)
@@ -491,6 +572,7 @@ function RfhSheRun2025() {
         <div style={{ backgroundColor: "#040002", color: "lightgray", minHeight: "100vh" }}>
             <Helmet>
                 <title>RFH She Run 2025 | Rupee For Humanity</title>
+                <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
                 <style>
                     {`
                         .form-control, .form-select {
@@ -1123,6 +1205,20 @@ function RfhSheRun2025() {
                                         "Make Payment"
                                     )}
                                 </button>
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={handleSubmit(handleRazorpayClick)}
+                                    disabled={disablePaymentButton}
+                                >
+                                    {paymentLoading ? (
+                                        <span>
+                                            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                            Processing...
+                                        </span>
+                                    ) : (
+                                        "Pay with Razorpay"
+                                    )}
+                                </button>
                             </div>
 
                             <div className="row justify-content-center mt-3">
@@ -1131,21 +1227,6 @@ function RfhSheRun2025() {
                                         <div className="alert alert-info text-center">
                                             <i className="fas fa-info-circle me-2"></i>
                                             {paymentStatus}
-                                            {/* {disablePaymentButton && (
-                                                <div className="mt-2">
-                                                    <small>
-                                                        <i className="fas fa-exclamation-circle me-1"></i>
-                                                        If you accidentally closed the payment tab, 
-                                                        <button 
-                                                            className="btn btn-link btn-sm p-0 ms-1" 
-                                                            onClick={() => window.location.reload()}
-                                                        >
-                                                            click here
-                                                        </button>
-                                                        to try again.
-                                                    </small>
-                                                </div>
-                                            )} */}
                                         </div>
                                     )}
                                 </div>
@@ -1185,6 +1266,7 @@ function RfhSheRun2025() {
                                             </tbody>
                                         </table>
                                         <button onClick={handleSubmit(handlePaymentClick)} disabled={disablePaymentButton} type="button" className="w-100 btn btn-lg btn-primary">Make Payment</button>
+                                        <button onClick={handleSubmit(handleRazorpayClick)} disabled={disablePaymentButton} type="button" className="w-100 btn btn-lg btn-primary">Pay with Razorpay</button>
                                     </div>
                                 </div>
                             </div>
