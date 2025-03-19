@@ -24,6 +24,7 @@ import { Helmet } from 'react-helmet-async';
 import InstallMobileApp from './InstallMobileApp'
 
 import CloseIcon from '@mui/icons-material/Close';
+import { toast } from 'sonner'
 
 function Home() {
     const abortController = new AbortController();
@@ -113,6 +114,11 @@ function Home() {
             //     data?.data?.instrumentResponse?.redirectInfo?.url,
             //     '_blank' // <- This is what makes it open in a new window.
             // );
+
+            // Detect if user is on iOS/Safari
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
             const paymentUrl = data?.data?.instrumentResponse?.redirectInfo?.url
 
