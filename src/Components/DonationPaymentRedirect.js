@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import logo from '../assets/images/Logo.jpg'
 import { GlobalContext } from '../context/Provider'
@@ -6,9 +6,12 @@ import { GlobalContext } from '../context/Provider'
 function DonationPaymentRedirect({path = '/app/payment-status'}) {
     const navigate = useNavigate()
     const { transaction, setTransaction } = useContext(GlobalContext)
+    const [paymentStatus, setPaymentStatus] = useState("")
+    const [paymentDetails, setPaymentDetails] = useState({})
     const [loading, setLoading] = useState(true)
     const [status, setStatus] = useState({});
     const [displayFields, setDisplayFields] = useState({})
+    const fetchStatusCalled = useRef(false);
 
     const convertSeconds = (seconds) => {
         const minutes = Math.floor(seconds / 60);
@@ -25,29 +28,26 @@ function DonationPaymentRedirect({path = '/app/payment-status'}) {
         navigate('/')
     }
 
+    console.log("transactionID Fav ", transaction)
+
     const handleDownloadInvoice = () => {
         const link = document.createElement('a');
         link.href = `data:application/pdf;base64,${status?.data?.result?.pdfBase64}`;
         link.download = 'invoice.pdf';
-        link.target = '_blank';
+        link.target = '_blank'; 
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     }
 
     useEffect(() => {
-        const merchantTransactionId = localStorage.getItem('merchantTransactionId')
-        const cause = localStorage.getItem('cause')
-        
-        // Only fetch if we have required data
-        if (merchantTransactionId && cause) {
+        if (!fetchStatusCalled.current) {
+            fetchStatusCalled.current = true;
+            setLoading(true);
             const fetchStatus = async () => {
-                // Prevent duplicate API calls by checking localStorage flag
-                const hasCheckedPayment = localStorage.getItem('paymentChecked')
-                if (hasCheckedPayment) return
-
-                setLoading(true)
-                const body = { merchantTransactionId, cause }
+                let merchantTransactionId = localStorage.getItem('merchantTransactionId')
+                let cause = localStorage.getItem('cause')
+                let body = { merchantTransactionId: merchantTransactionId, cause: cause }
 
                 try {
                     const res = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}${path}`, {
@@ -59,19 +59,26 @@ function DonationPaymentRedirect({path = '/app/payment-status'}) {
                         body: JSON.stringify(body)
                     });
                     const data = await res.json();
+                    console.log("data ", data)
+
                     setStatus(data);
-                    // Set flag to prevent duplicate API calls
-                    localStorage.setItem('paymentChecked', 'true')
+                    setLoading(false)
+
+                    // Check if payment is still pending
+                    // if (data.success === true && data.data.state === 'PENDING') {
+                    //     setTimeout(fetchStatus, 3000);
+                    // }
                 } catch (error) {
                     console.error(error);
-                } finally {
-                    setLoading(false)
                 }
             };
 
             fetchStatus();
+
         }
-    }, []);
+
+
+    }, [path]);
 
     return (
         <div>
