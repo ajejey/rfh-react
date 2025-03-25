@@ -350,7 +350,7 @@ function EventForm2025() {
                         if (verifyData.status === 'success') {
                             localStorage.setItem('merchantTransactionId', data.merchantTransactionId);
                             localStorage.setItem('cause', "RFH Juniors Run 2025");
-                            window.location.href = `${process.env.REACT_APP_BASE_URL}/events/payment-redirect`;
+                            window.location.href = `/events/payment-redirect`;
                         } else {
                             toast.error('Payment verification failed. Please contact support.');
                         }
