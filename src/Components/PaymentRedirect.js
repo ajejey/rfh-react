@@ -10,7 +10,7 @@ function PaymentRedirect({path = '/app/payment-status'}) {
     const [paymentDetails, setPaymentDetails] = useState({})
     const [loading, setLoading] = useState(true)
     const [status, setStatus] = useState({});
-    const [timeElapsed, setTimeElapsed] = useState(0);
+    // const [timeElapsed, setTimeElapsed] = useState(0);
     const [displayFields, setDisplayFields] = useState({})
     const [currentStep, setCurrentStep] = useState('verifying')
     const [stepStatus, setStepStatus] = useState({
@@ -18,6 +18,7 @@ function PaymentRedirect({path = '/app/payment-status'}) {
         updating: { status: 'pending', message: 'Updating your details' },
         sending: { status: 'pending', message: 'Generating receipt and sending email' }
     })
+    const [redirectCountdown, setRedirectCountdown] = useState(120);
     const fetchStatusCalled = useRef(false);
 
     const convertSeconds = (seconds) => {
@@ -191,14 +192,20 @@ function PaymentRedirect({path = '/app/payment-status'}) {
         };
     }, []);
 
-    // Timer effect
+    // Auto-redirect timer effect
     useEffect(() => {
         const timer = setInterval(() => {
-            setTimeElapsed(prev => prev + 1);
+            setRedirectCountdown(prev => {
+                if (prev <= 1) {
+                    clearInterval(timer);
+                    navigate('/');
+                }
+                return prev - 1;
+            });
         }, 1000);
 
         return () => clearInterval(timer);
-    }, []);
+    }, [navigate]);
 
     const steps = [
         { status: stepStatus.verifying.status, text: stepStatus.verifying.message },
@@ -239,9 +246,9 @@ function PaymentRedirect({path = '/app/payment-status'}) {
                         ))}
                     </div>
 
-                    {/* Timer */}
+                    {/* Redirect Timer */}
                     <div className="timer">
-                        Time elapsed: {timeElapsed}s
+                        Redirecting to home page in {redirectCountdown} seconds
                     </div>
 
                     {/* Success Message */}
