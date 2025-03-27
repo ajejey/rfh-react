@@ -106,7 +106,7 @@ function EventForm2025() {
         const age = calculateAge(dob);
 
         // Update the category based on the age
-        if (age >= 3 && age <= 6) {
+        if (age >= 1 && age <= 6) {
             setSelectedCategory('Champs-Run');
         } else if (age >= 7 && age <= 13) {
             setSelectedCategory('Power-Run');
