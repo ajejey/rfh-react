@@ -12,6 +12,7 @@ import { Button, Dialog } from '@mui/material';
 import { Helmet } from 'react-helmet-async';
 import tShirtGuide from '../../assets/images/tShirtGuide.jpeg'
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 const EVENT_DETAILS = {
     name: "RFH Juniors Run 2025",
@@ -42,11 +43,14 @@ function EventForm2025() {
     const [openTshirtGuide, setOpenTshirtGuide] = useState(false)
     const [disablePaymentButton, setDisablePaymentButton] = useState(false)
     const [paymentLoading, setPaymentLoading] = useState(false)
+    const [paymentStatus, setPaymentStatus] = useState("")
+    const [showPaymentSuccessDialog, setShowPaymentSuccessDialog] = useState(false)
+    const [paymentDetails, setPaymentDetails] = useState(null)
     const [additionalBreakfast, setAdditionalBreakfast] = useState(0)
     const [tshirtValidationError, setTshirtValidationError] = useState("")
     const [tshirtSizes, setTshirtSizes] = useState([]);
     const category = watch('category');
-    const [paymentStatus, setPaymentStatus] = useState("");
+    const navigate = useNavigate()
 
     const DISCOUNT_PRICE = 599
     const PRICE = 599
@@ -162,7 +166,7 @@ function EventForm2025() {
         if (data.additionalTshirt === 'Yes' && data.additionalTshirtQuantity > 0) {
             const quantity = Number(data.additionalTshirtQuantity);
             const sizes = tshirtSizes.filter(size => size !== '');
-            
+
             if (sizes.length < quantity) {
                 setTshirtValidationError('Please select sizes for all additional T-shirts');
                 return false;
@@ -260,18 +264,18 @@ function EventForm2025() {
                 toast.error('There was an error. Please try later or Contact Raghu @ +91-9164358027 ', { duration: 50000 });
                 return;
             }
-            
+
             localStorage.setItem('merchantTransactionId', data?.data?.merchantTransactionId);
             localStorage.setItem('cause', "RFH Juniors run 2025");
-            
+
             // Detect if user is on iOS/Safari
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-                          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
             const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-            
+
             const paymentUrl = data?.data?.instrumentResponse?.redirectInfo?.url;
             console.log("Payment URL:", paymentUrl);
-            
+
             if (paymentUrl) {
                 if (isIOS || isSafari) {
                     // For iOS devices, use a form submission approach which works better
@@ -310,7 +314,7 @@ function EventForm2025() {
             setDisablePaymentButton(true);
             setPaymentStatus("Initiating Razorpay payment...");
             setValue("totalPrice", totalPrice)
-        setValue("marathonName", "RFH Juniors run 2025")
+            setValue("marathonName", "RFH Juniors run 2025")
 
             const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/initiate-razorpay-payment`, {
                 method: "POST",
@@ -347,10 +351,18 @@ function EventForm2025() {
                         });
 
                         const verifyData = await verifyResponse.json();
+                        console.log('Razorpay verification response:', verifyData);
+
                         if (verifyData.status === 'success') {
                             localStorage.setItem('merchantTransactionId', data.merchantTransactionId);
                             localStorage.setItem('cause', "RFH Juniors Run 2025");
-                            window.location.href = `/events/payment-redirect`;
+
+                            // Show success dialog with payment details
+                            console.log('Payment details for dialog:', verifyData.payment);
+                            setPaymentDetails(verifyData.payment);
+                            setShowPaymentSuccessDialog(true);
+                            setPaymentLoading(false);
+                            setDisablePaymentButton(false);
                         } else {
                             toast.error('Payment verification failed. Please contact support.');
                         }
@@ -472,9 +484,9 @@ function EventForm2025() {
             <div className="col-md-4">
                 <div className="form-group">
                     <label htmlFor="additionalBreakfast">Additional Breakfast</label>
-                    <select 
-                        {...register("additionalBreakfast")} 
-                        className="form-select" 
+                    <select
+                        {...register("additionalBreakfast")}
+                        className="form-select"
                         onChange={(e) => setAdditionalBreakfast(Number(e.target.value))}
                     >
                         <option value="0">No additional breakfast</option>
@@ -498,9 +510,9 @@ function EventForm2025() {
                         <div className="col-md-4">
                             <div className="form-group">
                                 <label htmlFor="additionalTshirtQuantity">Number of Additional T-shirts</label>
-                                <select 
-                                    {...register("additionalTshirtQuantity")} 
-                                    className="form-select" 
+                                <select
+                                    {...register("additionalTshirtQuantity")}
+                                    className="form-select"
                                     onChange={handleTshirtQuantityChange}
                                 >
                                     <option value="0">Select quantity</option>
@@ -531,7 +543,7 @@ function EventForm2025() {
                                         <div key={index} className="tshirt-size-item">
                                             <div className="size-selector">
                                                 <span className="tshirt-number">T-shirt {index + 1}</span>
-                                                <select 
+                                                <select
                                                     className="form-select"
                                                     value={size}
                                                     onChange={(e) => handleSizeChange(index, e.target.value)}
@@ -632,10 +644,10 @@ function EventForm2025() {
                             </h1>
                             <div className="row">
                                 <div className="col-md-4">
-                                    <span> <strong><EventTwoToneIcon /> Date:</strong> 
-                                     {/* {EVENT_DETAILS.date.toLocaleDateString('en-US', dateOptions)}  */}
-                                     May 25th, 2025
-                                       </span>
+                                    <span> <strong><EventTwoToneIcon /> Date:</strong>
+                                        {/* {EVENT_DETAILS.date.toLocaleDateString('en-US', dateOptions)}  */}
+                                        May 25th, 2025
+                                    </span>
                                 </div>
                                 <div className="col-md-4">
                                     <span><strong> <AccessTimeTwoToneIcon /> Time:</strong>  {EVENT_DETAILS.time} </span>
@@ -1118,7 +1130,7 @@ function EventForm2025() {
                                         <button
                                             className="btn btn-primary"
                                             type="submit"
-                                            // disabled={new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }) > new Date("2025-02-10T23:59:00+05:30").toLocaleString("en-US", { timeZone: "Asia/Kolkata" })}
+                                        // disabled={new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }) > new Date("2025-02-10T23:59:00+05:30").toLocaleString("en-US", { timeZone: "Asia/Kolkata" })}
                                         >
                                             Submit
                                         </button>
@@ -1163,27 +1175,27 @@ function EventForm2025() {
                                     </tr>
                                 </tbody>
                             </table>
-                            <div style={{ display: "flex", justifyContent: "flex-end", gap: "16px" }}>
+                            <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mt-3">
                                 <button className="btn btn-secondary" onClick={handleEditClick}>Edit</button>
-                                <div className="d-flex justify-content-center gap-3">
+                                {/* <div className="d-flex flex-column flex-sm-row justify-content-center gap-2 gap-sm-3 w-100 w-md-auto">
                                     <button
-                                        className="btn btn-primary"
+                                        className="btn btn-primary w-100"
                                         onClick={handlePaymentClick}
                                         disabled={disablePaymentButton || paymentLoading}
                                     >
                                         {paymentLoading ? "Processing..." : "Pay with PhonePe"}
                                     </button>
                                     <button
-                                        className="btn btn-primary"
+                                        className="btn btn-primary w-100"
                                         onClick={handleRazorpayClick}
                                         disabled={disablePaymentButton || paymentLoading}
                                     >
                                         {paymentLoading ? "Processing..." : "Pay with Razorpay"}
                                     </button>
-                                </div>
+                                </div> */}
                             </div>
 
-                            <div className="row justify-content-center mt-3">
+                            {/* <div className="row justify-content-center mt-3">
                                 <div className="col-md-8">
                                     {paymentStatus && (
                                         <div className="alert alert-info text-center">
@@ -1196,6 +1208,84 @@ function EventForm2025() {
                                                         If you accidentally closed the payment tab, 
                                                         <button 
                                                             className="btn btn-link btn-sm p-0 ms-1" 
+                                                            onClick={() => window.location.reload()}
+                                                        >
+                                                            click here to try again
+                                                        </button>
+                                                    </small>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            </div> */}
+
+                            {/* Razorpay Payment Success Dialog */}
+                            {showPaymentSuccessDialog && (
+                                <div style={{ color: "#000" }} className="payment-success-dialog">
+                                    <div className="payment-success-content">
+                                        <div className="success-header">
+                                            <i className="fas fa-check-circle text-success"></i>
+                                            <h3 style={{ color: "#000" }}>Payment Successful!</h3>
+                                        </div>
+
+                                        <div className="payment-details">
+                                            <div className="detail-row">
+                                                <span style={{ color: "#000" }}>Amount:</span>
+                                                <strong style={{ color: "#000" }}>₹{paymentDetails?.amount / 100}</strong>
+                                            </div>
+                                            <div className="detail-row">
+                                                <span style={{ color: "#000" }}>Transaction ID:</span>
+                                                <code style={{ color: "#000" }}>{paymentDetails?.transactionId}</code>
+                                            </div>
+                                            <div className="detail-row">
+                                                <span style={{ color: "#000" }}>Reference ID:</span>
+                                                <code>{paymentDetails?.merchantTransactionId}</code>
+                                            </div>
+                                        </div>
+
+                                        <div className="receipt-note">
+                                            <i className="fas fa-envelope"></i>
+                                            <span style={{ color: "#000" }}>A receipt has been sent to {paymentDetails?.email}</span>
+                                        </div>
+
+                                        <div className="action-buttons">
+                                            {paymentDetails?.downloadLink && (
+                                                <a
+                                                    href={paymentDetails.downloadLink}
+                                                    download="RFH_Receipt.pdf"
+                                                    className="btn btn-success"
+                                                >
+                                                    <i className="fas fa-download"></i> Download Receipt
+                                                </a>
+                                            )}
+                                            <button
+                                                className="btn btn-primary"
+                                                onClick={() => {
+                                                    setShowPaymentSuccessDialog(false);
+                                                    navigate('/');
+                                                }}
+                                            >
+                                                <i className="fas fa-home"></i> Return to Home
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="row justify-content-center mt-3">
+                                <div className="col-md-8">
+                                    {paymentStatus && (
+                                        <div className="alert alert-info text-center">
+                                            <i className="fas fa-info-circle me-2"></i>
+                                            {paymentStatus}
+                                            {disablePaymentButton && (
+                                                <div className="mt-2">
+                                                    <small>
+                                                        <i className="fas fa-exclamation-circle me-1"></i>
+                                                        If you accidentally closed the payment tab,
+                                                        <button
+                                                            className="btn btn-link btn-sm p-0 ms-1"
                                                             onClick={() => window.location.reload()}
                                                         >
                                                             click here to try again
@@ -1242,7 +1332,8 @@ function EventForm2025() {
                                                 </tr>
                                             </tbody>
                                         </table>
-                                        <button onClick={handlePaymentClick} disabled={disablePaymentButton} type="button" className="w-100 btn btn-lg btn-primary">Make Payment</button>
+                                        <button onClick={handlePaymentClick} disabled={disablePaymentButton} type="button" className="w-100 btn btn-lg btn-primary">Pay with PhonePe</button>
+                                        <button onClick={handleRazorpayClick} disabled={disablePaymentButton || paymentLoading} type="button" className="w-100 btn btn-lg btn-primary mt-4">Pay with Razorpay</button>
                                     </div>
                                 </div>
                             </div>
@@ -1252,6 +1343,79 @@ function EventForm2025() {
                 }
 
             </main>
+            <style>
+                {`
+                    .payment-success-dialog {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background-color: rgba(0, 0, 0, 0.7);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        z-index: 1050;
+                    }
+                    
+                    .payment-success-content {
+                        background-color: white;
+                        border-radius: 8px;
+                        padding: 2rem;
+                        width: 90%;
+                        max-width: 500px;
+                        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+                    }
+                    
+                    .success-header {
+                        text-align: center;
+                        margin-bottom: 1.5rem;
+                    }
+                    
+                    .success-header i {
+                        font-size: 3rem;
+                        margin-bottom: 1rem;
+                    }
+                    
+                    .payment-details {
+                        background-color: #f8f9fa;
+                        border-radius: 8px;
+                        padding: 1rem;
+                        margin-bottom: 1.5rem;
+                    }
+                    
+                    .detail-row {
+                        display: flex;
+                        justify-content: space-between;
+                        margin-bottom: 0.5rem;
+                    }
+                    
+                    .detail-row:last-child {
+                        margin-bottom: 0;
+                    }
+                    
+                    .receipt-note {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        margin-bottom: 1.5rem;
+                        color: #6c757d;
+                        font-size: 0.9rem;
+                    }
+                    
+                    .action-buttons {
+                        display: flex;
+                        justify-content: center;
+                        gap: 1rem;
+                    }
+                    
+                    @media (max-width: 576px) {
+                        .action-buttons {
+                            flex-direction: column;
+                        }
+                    }
+                `}
+            </style>
         </div>
     )
 }
