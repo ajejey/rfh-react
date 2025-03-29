@@ -1,33 +1,33 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { 
-  CircularProgress, 
-  FormControl, 
-  InputLabel, 
-  MenuItem, 
-  Select,
-  Box,
-  Grid,
-  Paper,
-  Typography,
-  Divider,
-  Card,
-  CardContent,
-  IconButton,
-  Chip,
-  Tooltip,
-  Tab,
-  Tabs,
-  Button,
-  TextField,
-  TableContainer,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  TablePagination,
-  Snackbar,
-  Alert
+import {
+    CircularProgress,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
+    Box,
+    Grid,
+    Paper,
+    Typography,
+    Divider,
+    Card,
+    CardContent,
+    IconButton,
+    Chip,
+    Tooltip,
+    Tab,
+    Tabs,
+    Button,
+    TextField,
+    TableContainer,
+    Table,
+    TableHead,
+    TableBody,
+    TableRow,
+    TableCell,
+    TablePagination,
+    Snackbar,
+    Alert
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import useSWR from 'swr';
@@ -100,6 +100,65 @@ const fetcher = async (url) => {
     return data;
 };
 
+const sampleRazorpayData = { 
+    "_id": { "$oid": "67e793dd40fc168bca3fcca4" },
+     "user": { "$oid": "640dbcf04dd2c258706920be" }, 
+     "marathonName": "RFH She Run 2025", 
+     "userDetails": { 
+        "fullName": "Ajey", 
+        "gender": "female", 
+        "bloodGroup": "B+", 
+        "address": "rr nagar", 
+        "city": "Bengaluru", 
+        "state": "Karnataka", 
+        "country": "India", 
+        "nationality": "Indian", 
+        "mobNo": "9884299308", 
+        "email": "ajejey@gmail.com",
+        "dob": "1988-06-06", 
+        "category": "Chennamma-Run", 
+        "TshirtSize": "XS", 
+        "additionalTshirt": "No", 
+        "donation": "", 
+        "emergencyName": "DD", 
+        "emergencyNo": "9887455896", 
+        "reference": "friend", 
+        "AgreeTnC": "Sure!", 
+        "additionalBreakfast": "0", 
+        "additionalTshirtQuantity": "0", 
+        "additionalTshirtSize": "", 
+        "totalPrice": { "$numberInt": "1" }, 
+        "marathonName": "RFH She Run 2025" }, 
+        "date": { "$date": { "$numberLong": "1743229917038" } }, 
+        "merchantTransactionId": "RFH-SHE-RUN-2025-00044", 
+        "__v": { "$numberInt": "0" }, 
+        "paymentDetails": { 
+            "orderId": "order_QCVZWIdS9MEKsa", 
+            "amount": { "$numberInt": "100" }, 
+            "status": "paid", 
+            "data": { 
+                "amount": { "$numberInt": "100" }, 
+                "amount_due": { "$numberInt": "100" }, 
+                "amount_paid": { "$numberInt": "0" }, 
+                "attempts": { "$numberInt": "0" }, 
+                "created_at": { "$numberInt": "1743229919" }, 
+                "currency": "INR", 
+                "entity": "order", 
+                "id": "order_QCVZWIdS9MEKsa", 
+                "notes": { "marathonName": "RFH She Run 2025", "userEmail": "ajejey@gmail.com" }, 
+                "offer_id": null, 
+                "receipt": "RFH-SHE-RUN-2025-00044", 
+                "status": "created" 
+            }, 
+            "code": "PAYMENT_SUCCESS", 
+            "paymentGateway": "Razorpay", 
+            "paymentId": "pay_QCVaRLjA1v593X", 
+            "success": true, 
+            "verifiedAt": { "$date": { "$numberLong": "1743229987599" } }, 
+            "emailSent": true 
+        } 
+    }
+
 function EventParticipants() {
     const { data: marathonNames, error, isLoading } = useSWR('api/payments/all-marathon-names', fetcher);
     const [marathonName, setMarathonName] = useState('');
@@ -121,40 +180,40 @@ function EventParticipants() {
     // Filtered data based on search, filtering and test transaction exclusion
     const filteredData = useMemo(() => {
         if (!participantsData || participantsData.length === 0) return [];
-        
+
         // First filter out test transactions (amount = 100 paise = 1 rupee)
         const nonTestTransactions = participantsData.filter(item => {
-            if (item.paymentDetails && 
-                item.paymentDetails.success && 
-                item.paymentDetails.data && 
+            if (item.paymentDetails &&
+                item.paymentDetails.success &&
+                item.paymentDetails.data &&
                 item.paymentDetails.data.amount) {
                 // Filter out transactions with amount = 100 (1 rupee)
                 return Number(item.paymentDetails.data.amount) !== 100;
             }
             return true; // Keep items without payment details or failed payments
         });
-        
+
         // Then apply search and status filters
         return nonTestTransactions.filter(item => {
             // Filter based on payment status
             if (filterStatus === 'success' && (!item.paymentDetails || !item.paymentDetails.success)) return false;
             if (filterStatus === 'failed' && item.paymentDetails && item.paymentDetails.success) return false;
-            
+
             // Filter based on search term
             if (searchTerm) {
                 const searchTermLower = searchTerm.toLowerCase();
                 const userDetails = item.userDetails || {};
                 const paymentDetails = item.paymentDetails || {};
-                
+
                 return (
                     (userDetails.fullName && userDetails.fullName.toLowerCase().includes(searchTermLower)) ||
                     (userDetails.email && userDetails.email.toLowerCase().includes(searchTermLower)) ||
                     (userDetails.phone && userDetails.phone.includes(searchTerm)) ||
-                    (paymentDetails.data && paymentDetails.data.transactionId && 
-                     paymentDetails.data.transactionId.toLowerCase().includes(searchTermLower))
+                    (paymentDetails.data && paymentDetails.data.transactionId &&
+                        paymentDetails.data.transactionId.toLowerCase().includes(searchTermLower))
                 );
             }
-            
+
             return true;
         });
     }, [participantsData, searchTerm, filterStatus]);
@@ -206,7 +265,7 @@ function EventParticipants() {
                 },
                 body: JSON.stringify({
                     merchantTransactionId: item.merchantTransactionId,
-                    formData: { 
+                    formData: {
                         merchantTransactionId: item.merchantTransactionId,
                         cause: item.marathonName || marathonName
                     }
@@ -215,7 +274,7 @@ function EventParticipants() {
 
             const result = await response.json();
             console.log("result ", result);
-            
+
             if (result.success) {
                 // Show success notification
                 setSnackbar({
@@ -223,7 +282,7 @@ function EventParticipants() {
                     message: 'Email sent successfully!',
                     severity: 'success'
                 });
-                
+
                 // Refresh data
                 mutate();
             } else {
@@ -268,9 +327,9 @@ function EventParticipants() {
         };
 
         const filteredData = data.filter(item => {
-            if (item.paymentDetails && 
-                item.paymentDetails.success && 
-                item.paymentDetails.data && 
+            if (item.paymentDetails &&
+                item.paymentDetails.success &&
+                item.paymentDetails.data &&
                 item.paymentDetails.data.amount) {
                 // Check if amount is 100 (1 rupee)
                 return Number(item.paymentDetails.data.amount) !== 100;
@@ -318,21 +377,21 @@ function EventParticipants() {
             if (item.userDetails && item.userDetails.additionalTshirt === "Yes" && item.userDetails.additionalTshirtQuantity) {
                 const additionalQuantity = Number(item.userDetails.additionalTshirtQuantity) || 0;
                 stats.additionalTshirtCount.total += additionalQuantity;
-                
+
                 if (item.userDetails.additionalTshirtSize) {
                     // Handle comma-separated sizes
                     const additionalSizes = item.userDetails.additionalTshirtSize.split(',');
-                    
+
                     // If we have just one size but multiple quantities, apply all quantities to that size
                     if (additionalSizes.length === 1) {
                         const size = additionalSizes[0].trim();
                         stats.additionalTshirtCount.sizes[size] = (stats.additionalTshirtCount.sizes[size] || 0) + additionalQuantity;
-                    } 
+                    }
                     // If we have multiple sizes, distribute quantities evenly or based on additional logic if needed
                     else {
                         // For now, we'll assume equal distribution among sizes
                         const quantityPerSize = additionalQuantity / additionalSizes.length;
-                        
+
                         additionalSizes.forEach(sizeItem => {
                             const size = sizeItem.trim();
                             stats.additionalTshirtCount.sizes[size] = (stats.additionalTshirtCount.sizes[size] || 0) + quantityPerSize;
@@ -343,7 +402,7 @@ function EventParticipants() {
 
             // Breakfast counts
             stats.breakfastCount.included += 1; // Each participant gets included breakfast
-            
+
             if (item.userDetails && item.userDetails.additionalBreakfast) {
                 const additionalBreakfastCount = Number(item.userDetails.additionalBreakfast) || 0;
                 stats.breakfastCount.additional += additionalBreakfastCount;
@@ -377,13 +436,13 @@ function EventParticipants() {
     return (
         <Box sx={{ maxWidth: '100%', overflow: 'hidden' }}>
             <Header />
-            
+
             <Box sx={{ p: 3 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                     <Typography variant="h4" component="h1" gutterBottom>
                         Marathon Dashboard
                     </Typography>
-                    
+
                     <StyledFormControl>
                         <InputLabel id="marathon-names-label">Select Marathon</InputLabel>
                         <Select
@@ -426,7 +485,7 @@ function EventParticipants() {
                                     </CardContent>
                                 </StyledCard>
                             </Grid>
-                            
+
                             <Grid item xs={12} sm={6} md={3}>
                                 <StyledCard>
                                     <CardContent sx={{ display: 'flex', alignItems: 'center' }}>
@@ -444,7 +503,7 @@ function EventParticipants() {
                                     </CardContent>
                                 </StyledCard>
                             </Grid>
-                            
+
                             <Grid item xs={12} sm={6} md={3}>
                                 <StyledCard>
                                     <CardContent sx={{ display: 'flex', alignItems: 'center' }}>
@@ -462,7 +521,7 @@ function EventParticipants() {
                                     </CardContent>
                                 </StyledCard>
                             </Grid>
-                            
+
                             <Grid item xs={12} sm={6} md={3}>
                                 <StyledCard>
                                     <CardContent sx={{ display: 'flex', alignItems: 'center' }}>
@@ -501,13 +560,13 @@ function EventParticipants() {
                                                 </Typography>
                                             </Box>
                                         </Box>
-                                        
+
                                         <Divider sx={{ mb: 2 }} />
-                                        
+
                                         <Typography variant="subtitle1" gutterBottom>
                                             Size Breakdown:
                                         </Typography>
-                                        
+
                                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                                             {/* Combine regular and additional sizes */}
                                             {Object.entries({
@@ -533,7 +592,7 @@ function EventParticipants() {
                                     </CardContent>
                                 </StyledCard>
                             </Grid>
-                            
+
                             {/* Breakfast Card */}
                             <Grid item xs={12} md={6}>
                                 <StyledCard>
@@ -551,9 +610,9 @@ function EventParticipants() {
                                                 </Typography>
                                             </Box>
                                         </Box>
-                                        
+
                                         <Divider sx={{ mb: 2 }} />
-                                        
+
                                         <Grid container spacing={2}>
                                             <Grid item xs={12} md={6}>
                                                 <Paper sx={{ p: 2, textAlign: 'center', bgcolor: 'rgba(255, 87, 34, 0.1)' }}>
@@ -565,7 +624,7 @@ function EventParticipants() {
                                                     </Typography>
                                                 </Paper>
                                             </Grid>
-                                            
+
                                             <Grid item xs={12} md={6}>
                                                 <Paper sx={{ p: 2, textAlign: 'center', bgcolor: 'rgba(255, 87, 34, 0.1)' }}>
                                                     <Typography variant="h6" color="#FF5722">
@@ -603,18 +662,18 @@ function EventParticipants() {
                                         )}
                                     </SearchBar>
                                 </Grid>
-                                
+
                                 <Grid item xs={12} md={7}>
                                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                                        <Button 
-                                            variant={filterStatus === 'all' ? 'contained' : 'outlined'} 
+                                        <Button
+                                            variant={filterStatus === 'all' ? 'contained' : 'outlined'}
                                             size="small"
                                             onClick={() => handleFilterChange('all')}
                                         >
                                             All
                                         </Button>
-                                        <Button 
-                                            variant={filterStatus === 'success' ? 'contained' : 'outlined'} 
+                                        <Button
+                                            variant={filterStatus === 'success' ? 'contained' : 'outlined'}
                                             color="success"
                                             size="small"
                                             onClick={() => handleFilterChange('success')}
@@ -622,8 +681,8 @@ function EventParticipants() {
                                         >
                                             Success
                                         </Button>
-                                        <Button 
-                                            variant={filterStatus === 'failed' ? 'contained' : 'outlined'} 
+                                        <Button
+                                            variant={filterStatus === 'failed' ? 'contained' : 'outlined'}
                                             color="error"
                                             size="small"
                                             onClick={() => handleFilterChange('failed')}
@@ -631,8 +690,8 @@ function EventParticipants() {
                                         >
                                             Failed
                                         </Button>
-                                        <Button 
-                                            variant="outlined" 
+                                        <Button
+                                            variant="outlined"
                                             size="small"
                                             startIcon={<DownloadIcon />}
                                             onClick={() => {
@@ -662,17 +721,18 @@ function EventParticipants() {
 
                         {/* Hide the CSV Downloader but keep it functional */}
                         <Box sx={{ display: 'none' }}>
-                            <CSVDownloader 
-                                data={participantsData.map((item) => { 
-                                    return { 
-                                        date: new Date(item.date).toLocaleString(), 
-                                        merchantTransactionId: item?.merchantTransactionId, 
-                                        ...item?.userDetails, 
-                                        paymentStatus: item?.paymentDetails?.code, 
-                                        phonePeTransactionId: item?.paymentDetails?.data?.transactionId 
-                                    } 
-                                })} 
-                                filename={`${marathonName}_participants`} 
+                            <CSVDownloader
+                                data={participantsData.map((item) => {
+                                    return {
+                                        date: new Date(item.date).toLocaleString(),
+                                        merchantTransactionId: item?.merchantTransactionId,
+                                        ...item?.userDetails,
+                                        paymentStatus: item?.paymentDetails?.code,
+                                        phonePeTransactionId: item?.paymentDetails?.data?.transactionId,
+                                        paymentGateway: item?.paymentDetails?.paymentGateway || (item?.paymentDetails?.success ? "PhonePe" : "Offline")
+                                    }
+                                })}
+                                filename={`${marathonName}_participants`}
                             />
                         </Box>
 
@@ -695,9 +755,9 @@ function EventParticipants() {
                                     </TableHead>
                                     <TableBody>
                                         {paginatedData.map((item) => (
-                                            <TableRow 
+                                            <TableRow
                                                 key={item._id}
-                                                sx={{ 
+                                                sx={{
                                                     backgroundColor: item?.paymentDetails?.success ? 'rgba(76, 175, 80, 0.08)' : 'rgba(244, 67, 54, 0.08)'
                                                 }}
                                             >
@@ -709,8 +769,8 @@ function EventParticipants() {
                                                 <TableCell>{item?.userDetails?.gender}</TableCell>
                                                 <TableCell>{item?.userDetails?.TshirtSize}</TableCell>
                                                 <TableCell>
-                                                    <Chip 
-                                                        label={item?.paymentDetails?.success ? "Success" : "Failed"} 
+                                                    <Chip
+                                                        label={item?.paymentDetails?.success ? "Success" : "Failed"}
                                                         color={item?.paymentDetails?.success ? "success" : "error"}
                                                         size="small"
                                                     />
@@ -726,8 +786,8 @@ function EventParticipants() {
                                                     </Tooltip>
                                                     {item?.paymentDetails?.success && (
                                                         <Tooltip title="Send/Resend Email Receipt">
-                                                            <IconButton 
-                                                                size="small" 
+                                                            <IconButton
+                                                                size="small"
                                                                 onClick={() => sendEmailReceipt(item)}
                                                                 color="primary"
                                                             >
@@ -763,14 +823,15 @@ function EventParticipants() {
                                             <TableCell>Payment Status</TableCell>
                                             <TableCell>Amount (₹)</TableCell>
                                             <TableCell>Payment Method</TableCell>
+                                            <TableCell>Payment Gateway</TableCell>
                                             <TableCell>PhonePe Transaction ID</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
                                         {paginatedData.map((item) => (
-                                            <TableRow 
+                                            <TableRow
                                                 key={item._id}
-                                                sx={{ 
+                                                sx={{
                                                     backgroundColor: item?.paymentDetails?.success ? 'rgba(76, 175, 80, 0.08)' : 'rgba(244, 67, 54, 0.08)'
                                                 }}
                                             >
@@ -778,19 +839,22 @@ function EventParticipants() {
                                                 <TableCell>{item?.userDetails?.fullName}</TableCell>
                                                 <TableCell>{new Date(item?.date).toLocaleString()}</TableCell>
                                                 <TableCell>
-                                                    <Chip 
-                                                        label={item?.paymentDetails?.code || "N/A"} 
+                                                    <Chip
+                                                        label={item?.paymentDetails?.code || "N/A"}
                                                         color={item?.paymentDetails?.success ? "success" : "error"}
                                                         size="small"
                                                     />
                                                 </TableCell>
                                                 <TableCell>
-                                                    {item?.paymentDetails?.data?.amount 
-                                                        ? (Number(item.paymentDetails.data.amount) / 100).toLocaleString() 
+                                                    {item?.paymentDetails?.data?.amount
+                                                        ? (Number(item.paymentDetails.data.amount) / 100).toLocaleString()
                                                         : item?.userDetails?.totalPrice || "N/A"}
                                                 </TableCell>
                                                 <TableCell>
                                                     {item?.paymentDetails?.data?.paymentInstrument?.type || "N/A"}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {item?.paymentDetails?.paymentGateway || (item?.paymentDetails?.success ? "PhonePe" : "N/A")}
                                                 </TableCell>
                                                 <TableCell>{item?.paymentDetails?.data?.transactionId || "N/A"}</TableCell>
                                             </TableRow>
@@ -829,7 +893,7 @@ function EventParticipants() {
                                                 // Process additional t-shirt sizes for display
                                                 const additionalSizes = item?.userDetails?.additionalTshirtSize || "N/A";
                                                 const hasMultipleSizes = additionalSizes !== "N/A" && additionalSizes.includes(',');
-                                                
+
                                                 return (
                                                     <TableRow key={item._id}>
                                                         <TableCell>{item?.userDetails?.fullName}</TableCell>
@@ -839,10 +903,10 @@ function EventParticipants() {
                                                             {hasMultipleSizes ? (
                                                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                                                     {additionalSizes.split(',').map((size, index) => (
-                                                                        <Chip 
-                                                                            key={index} 
-                                                                            label={size.trim()} 
-                                                                            size="small" 
+                                                                        <Chip
+                                                                            key={index}
+                                                                            label={size.trim()}
+                                                                            size="small"
                                                                             color="secondary"
                                                                         />
                                                                     ))}
@@ -851,8 +915,8 @@ function EventParticipants() {
                                                         </TableCell>
                                                         <TableCell>{item?.userDetails?.additionalTshirtQuantity || "0"}</TableCell>
                                                         <TableCell>
-                                                            <Chip 
-                                                                label="Success" 
+                                                            <Chip
+                                                                label="Success"
                                                                 color="success"
                                                                 size="small"
                                                             />
@@ -894,8 +958,8 @@ function EventParticipants() {
                                                     <TableCell>{item?.userDetails?.additionalBreakfast || "0"}</TableCell>
                                                     <TableCell>{(Number(item?.userDetails?.additionalBreakfast || 0) + 1).toString()}</TableCell>
                                                     <TableCell>
-                                                        <Chip 
-                                                            label="Success" 
+                                                        <Chip
+                                                            label="Success"
                                                             color="success"
                                                             size="small"
                                                         />

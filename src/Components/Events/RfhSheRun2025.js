@@ -12,6 +12,7 @@ import { Button, Dialog } from '@mui/material';
 import { Helmet } from 'react-helmet-async';
 import tShirtGuide from '../../assets/images/tShirtGuide.jpeg'
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 const EVENT_DETAILS = {
     name: "RFH She Run 2025",
@@ -49,11 +50,14 @@ function RfhSheRun2025() {
     const [openTshirtGuide, setOpenTshirtGuide] = useState(false)
     const [disablePaymentButton, setDisablePaymentButton] = useState(false)
     const [paymentLoading, setPaymentLoading] = useState(false)
+    const [paymentStatus, setPaymentStatus] = useState("")
+    const [showPaymentSuccessDialog, setShowPaymentSuccessDialog] = useState(false)
+    const [paymentDetails, setPaymentDetails] = useState(null)
     const [tshirtSizes, setTshirtSizes] = useState([]);
     const [tshirtValidationError, setTshirtValidationError] = useState("");
     const [additionalBreakfast, setAdditionalBreakfast] = useState(0);
-    const [paymentStatus, setPaymentStatus] = useState("");
     const category = watch('category');
+    const navigate = useNavigate()
 
     const DISCOUNT_PRICE = 800
     const PRICE = 800
@@ -369,13 +373,13 @@ function RfhSheRun2025() {
             localStorage.setItem('cause', "RFH She Run 2025");
 
             // Detect if user is on iOS/Safari
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-                          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
             const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-            
+
             const paymentUrl = data?.data?.instrumentResponse?.redirectInfo?.url;
             console.log("Payment URL:", paymentUrl);
-            
+
             if (paymentUrl) {
                 if (isIOS || isSafari) {
                     // For iOS devices, use a form submission approach which works better
@@ -404,6 +408,98 @@ function RfhSheRun2025() {
             localStorage.removeItem('merchantTransactionId');
             localStorage.removeItem('cause');
             toast.error('Something went wrong. Please try later or contact Raghu @ +91-91643 58027');
+        }
+    };
+
+    const handleRazorpayClick = async () => {
+        try {
+            setPaymentLoading(true);
+            setDisablePaymentButton(true);
+            setPaymentStatus("Initiating Razorpay payment...");
+            setValue("totalPrice", totalPrice)
+            // setValue("totalPrice", 1) // make 1 rupee for testing
+            setValue("marathonName", "RFH She Run 2025")
+
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/initiate-razorpay-payment`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(getValues()),
+            });
+
+            const data = await response.json();
+            if (!data.orderId) {
+                throw new Error('Failed to create order');
+            }
+
+            const options = {
+                key: data.keyId,
+                amount: data.amount,
+                currency: data.currency,
+                name: "Rupee For Humanity",
+                description: "RFH She Run 2025 Registration",
+                order_id: data.orderId,
+                handler: async function (response) {
+                    try {
+                        const verifyResponse = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/razorpay-webhook`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_signature: response.razorpay_signature,
+                            }),
+                        });
+
+                        const verifyData = await verifyResponse.json();
+                        console.log('Razorpay verification response:', verifyData);
+
+                        if (verifyData.status === 'success') {
+                            localStorage.setItem('merchantTransactionId', data.merchantTransactionId);
+                            localStorage.setItem('cause', "RFH She Run 2025");
+
+                            // Show success dialog with payment details
+                            console.log('Payment details for dialog:', verifyData.payment);
+                            setPaymentDetails(verifyData.payment);
+                            setShowPaymentSuccessDialog(true);
+                            setPaymentLoading(false);
+                            setDisablePaymentButton(false);
+                        } else {
+                            toast.error('Payment verification failed. Please contact support.');
+                        }
+                    } catch (error) {
+                        console.error('Verification error:', error);
+                        toast.error('Payment verification failed. Please contact support.');
+                    }
+                },
+                prefill: {
+                    name: getValues().fullName,
+                    email: getValues().email,
+                    contact: getValues().mobNo,
+                },
+                theme: {
+                    color: "#e84393",
+                },
+            };
+
+            const rzp = new window.Razorpay(options);
+            rzp.on('payment.failed', function (response) {
+                toast.error('Payment failed. Please try again.');
+                setPaymentLoading(false);
+                setDisablePaymentButton(false);
+                setPaymentStatus("");
+            });
+
+            rzp.open();
+        } catch (error) {
+            console.error("Razorpay error:", error);
+            setPaymentLoading(false);
+            setDisablePaymentButton(false);
+            setPaymentStatus("");
+            toast.error('Failed to initialize Razorpay. Please try again or contact support.');
         }
     };
 
@@ -491,6 +587,7 @@ function RfhSheRun2025() {
         <div style={{ backgroundColor: "#040002", color: "lightgray", minHeight: "100vh" }}>
             <Helmet>
                 <title>RFH She Run 2025 | Rupee For Humanity</title>
+                <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
                 <style>
                     {`
                         .form-control, .form-select {
@@ -665,7 +762,7 @@ function RfhSheRun2025() {
                                     </div>
                                 </div> */}
 
-                          
+
 
 
                             </div>
@@ -797,7 +894,6 @@ function RfhSheRun2025() {
                                             <div className="form-group">
                                                 <label htmlFor="country">Country <span style={{ color: "red" }}>*</span></label>
                                                 {/* <input {...register("country", { required: true })} className="form-control" type="text" name="country" id="country" /> */}
-
                                                 <select {...register("country", { required: true })} id="country" className="form-select" aria-label="Countries select">
                                                     <option value="">select</option>
                                                     {countries.map((item, index) => (
@@ -1107,22 +1203,32 @@ function RfhSheRun2025() {
                                     </tr>
                                 </tbody>
                             </table>
-                            <div style={{ display: "flex", justifyContent: "flex-end", gap: "16px" }}>
-                                <button className="btn btn-secondary" onClick={handleEditClick}>Edit</button>
-                                <button
-                                    className="btn btn-primary"
-                                    onClick={handleSubmit(handlePaymentClick)}
-                                    disabled={disablePaymentButton}
-                                >
-                                    {paymentLoading ? (
-                                        <span>
-                                            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                            Processing...
-                                        </span>
-                                    ) : (
-                                        "Make Payment"
-                                    )}
-                                </button>
+                            <div style={{ display: "flex", flexDirection: "column", gap: "16px", width: "100%" }} className="mb-4">
+                                <div className="d-flex justify-content-between">
+                                    <button
+                                        className="btn btn-secondary"
+                                        onClick={handleEditClick}
+                                        style={{ width: "100px" }}
+                                    >
+                                        Edit
+                                    </button>
+                                </div>
+                                <div className="d-flex flex-column flex-md-row gap-3 w-100">
+                                    <button
+                                        className="btn btn-primary w-100"
+                                        onClick={handleSubmit(handlePaymentClick)}
+                                        disabled={disablePaymentButton || paymentLoading}
+                                    >
+                                        {paymentLoading ? "Processing..." : "Pay with PhonePe"}
+                                    </button>
+                                    <button
+                                        className="btn btn-primary w-100"
+                                        onClick={handleSubmit(handleRazorpayClick)}
+                                        disabled={disablePaymentButton || paymentLoading}
+                                    >
+                                        {paymentLoading ? "Processing..." : "Pay with Razorpay"}
+                                    </button>
+                                </div>
                             </div>
 
                             <div className="row justify-content-center mt-3">
@@ -1131,21 +1237,6 @@ function RfhSheRun2025() {
                                         <div className="alert alert-info text-center">
                                             <i className="fas fa-info-circle me-2"></i>
                                             {paymentStatus}
-                                            {/* {disablePaymentButton && (
-                                                <div className="mt-2">
-                                                    <small>
-                                                        <i className="fas fa-exclamation-circle me-1"></i>
-                                                        If you accidentally closed the payment tab, 
-                                                        <button 
-                                                            className="btn btn-link btn-sm p-0 ms-1" 
-                                                            onClick={() => window.location.reload()}
-                                                        >
-                                                            click here
-                                                        </button>
-                                                        to try again.
-                                                    </small>
-                                                </div>
-                                            )} */}
                                         </div>
                                     )}
                                 </div>
@@ -1184,7 +1275,8 @@ function RfhSheRun2025() {
                                                 </tr>
                                             </tbody>
                                         </table>
-                                        <button onClick={handleSubmit(handlePaymentClick)} disabled={disablePaymentButton} type="button" className="w-100 btn btn-lg btn-primary">Make Payment</button>
+                                        {/* <button onClick={handleSubmit(handlePaymentClick)} disabled={disablePaymentButton || paymentLoading} type="button" className="w-100 btn btn-lg btn-primary">Pay with PhonePe</button>
+                                        <button onClick={handleSubmit(handleRazorpayClick)} disabled={disablePaymentButton || paymentLoading} type="button" className="w-100 btn btn-lg btn-primary mt-2">Pay with Razorpay</button> */}
                                     </div>
                                 </div>
                             </div>
@@ -1194,6 +1286,130 @@ function RfhSheRun2025() {
                 }
 
             </main>
+            <style>
+                {`
+                    .payment-success-dialog {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background-color: rgba(0, 0, 0, 0.7);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        z-index: 1050;
+                    }
+                    
+                    .payment-success-content {
+                        background-color: white;
+                        border-radius: 8px;
+                        padding: 2rem;
+                        width: 90%;
+                        max-width: 500px;
+                        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+                    }
+                    
+                    .success-header {
+                        text-align: center;
+                        margin-bottom: 1.5rem;
+                    }
+                    
+                    .success-header i {
+                        font-size: 3rem;
+                        margin-bottom: 1rem;
+                    }
+                    
+                    .payment-details {
+                        background-color: #f8f9fa;
+                        border-radius: 8px;
+                        padding: 1rem;
+                        margin-bottom: 1.5rem;
+                    }
+                    
+                    .detail-row {
+                        display: flex;
+                        justify-content: space-between;
+                        margin-bottom: 0.5rem;
+                    }
+                    
+                    .detail-row:last-child {
+                        margin-bottom: 0;
+                    }
+                    
+                    .receipt-note {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        margin-bottom: 1.5rem;
+                        color: #6c757d;
+                        font-size: 0.9rem;
+                    }
+                    
+                    .action-buttons {
+                        display: flex;
+                        justify-content: center;
+                        gap: 1rem;
+                    }
+                    
+                    @media (max-width: 576px) {
+                        .action-buttons {
+                            flex-direction: column;
+                        }
+                    }
+                `}
+            </style>
+            {showPaymentSuccessDialog && (
+                <div style={{ color: "#000" }} className="payment-success-dialog">
+                    <div className="payment-success-content">
+                        <div className="success-header">
+                            <i className="fas fa-check-circle text-success"></i>
+                            <h3>Payment Successful!</h3>
+                        </div>
+
+                        <div className="payment-details">
+                            <div className="detail-row">
+                                <span style={{ color: "#000" }}>Amount:</span>
+                                <strong style={{ color: "#000" }}>₹{paymentDetails?.amount / 100}</strong>
+                            </div>
+                            <div className="detail-row">
+                                <span style={{ color: "#000" }}>Transaction ID:</span>
+                                <code style={{ color: "#000" }}>{paymentDetails?.transactionId}</code>
+                            </div>
+                            <div className="detail-row">
+                                <span style={{ color: "#000" }}>Reference ID:</span>
+                                <code>{paymentDetails?.merchantTransactionId}</code>
+                            </div>
+                        </div>
+
+                        <div className="receipt-note">
+                            <i className="fas fa-envelope"></i>
+                            <span style={{ color: "#000" }}>A receipt has been sent to {paymentDetails?.email}</span>
+                        </div>
+
+                        <div className="action-buttons">
+                            {paymentDetails?.downloadLink && (
+                                <a
+                                    href={paymentDetails.downloadLink}
+                                    download="RFH_Receipt.pdf"
+                                    className="btn btn-success"
+                                >
+                                    <i className="fas fa-download"></i> Download Receipt
+                                </a>
+                            )}
+                            <button
+                                className="btn btn-primary"
+                                onClick={() => {
+                                    setShowPaymentSuccessDialog(false);
+                                    navigate('/');
+                                }}
+                            >
+                                <i className="fas fa-home"></i> Return to Home
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
