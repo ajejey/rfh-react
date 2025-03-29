@@ -417,6 +417,7 @@ function RfhSheRun2025() {
             setDisablePaymentButton(true);
             setPaymentStatus("Initiating Razorpay payment...");
             setValue("totalPrice", totalPrice)
+            // setValue("totalPrice", 1) // make 1 rupee for testing
             setValue("marathonName", "RFH She Run 2025")
 
             const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/initiate-razorpay-payment`, {
@@ -1274,8 +1275,8 @@ function RfhSheRun2025() {
                                                 </tr>
                                             </tbody>
                                         </table>
-                                        <button onClick={handleSubmit(handlePaymentClick)} disabled={disablePaymentButton || paymentLoading} type="button" className="w-100 btn btn-lg btn-primary">Pay with PhonePe</button>
-                                        <button onClick={handleSubmit(handleRazorpayClick)} disabled={disablePaymentButton || paymentLoading} type="button" className="w-100 btn btn-lg btn-primary mt-2">Pay with Razorpay</button>
+                                        {/* <button onClick={handleSubmit(handlePaymentClick)} disabled={disablePaymentButton || paymentLoading} type="button" className="w-100 btn btn-lg btn-primary">Pay with PhonePe</button>
+                                        <button onClick={handleSubmit(handleRazorpayClick)} disabled={disablePaymentButton || paymentLoading} type="button" className="w-100 btn btn-lg btn-primary mt-2">Pay with Razorpay</button> */}
                                     </div>
                                 </div>
                             </div>
