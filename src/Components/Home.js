@@ -24,6 +24,7 @@ import { Helmet } from 'react-helmet-async';
 import InstallMobileApp from './InstallMobileApp'
 
 import CloseIcon from '@mui/icons-material/Close';
+import { toast } from 'sonner'
 
 function Home() {
     const abortController = new AbortController();
@@ -109,11 +110,36 @@ function Home() {
             setPaymentLink(data?.data?.instrumentResponse?.redirectInfo?.url)
             // window.location.href = data?.data?.instrumentResponse?.redirectInfo?.url;
 
-            window.open(
-                data?.data?.instrumentResponse?.redirectInfo?.url,
-                '_blank' // <- This is what makes it open in a new window.
-            );
+            // window.open(
+            //     data?.data?.instrumentResponse?.redirectInfo?.url,
+            //     '_blank' // <- This is what makes it open in a new window.
+            // );
 
+            // Detect if user is on iOS/Safari
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+            const paymentUrl = data?.data?.instrumentResponse?.redirectInfo?.url
+
+            if (paymentUrl) {
+                if (isIOS || isSafari) {
+                    // For iOS devices, use a form submission approach which works better
+                    const form = document.createElement('form');
+                    form.method = 'GET';
+                    form.action = paymentUrl;
+                    form.target = '_self';
+                    document.body.appendChild(form);
+                    form.submit();
+                } else {
+                    // For non-iOS devices, use the standard approach
+                    window.location.href = paymentUrl;
+                }
+            } else {
+                console.error("Payment URL was not provided in the response");
+                setPaymentStatus("");
+                toast.error('Payment gateway error. Please try again or contact support.');
+            }
 
             const callCheckAPI = async () => {
                 let merchantTransactionId = localStorage.getItem('merchantTransactionId')
@@ -135,7 +161,7 @@ function Home() {
                     setStatus(data);
                     setLoading(false)
 
-                    navigate('/payment-redirect')
+                    // navigate('/payment-redirect')
 
                     // Check if payment is still pending
                     // if (data.success === true && data.data.state === 'PENDING') {
@@ -148,7 +174,7 @@ function Home() {
                 }
             }
 
-            setTimeout(callCheckAPI, 20000)
+            // setTimeout(callCheckAPI, 20000)
 
 
         } catch (error) {

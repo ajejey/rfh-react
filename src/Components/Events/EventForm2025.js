@@ -688,7 +688,7 @@ function EventForm2025() {
                                     <tbody>
                                         <tr>
                                             <td className="fs-6">Champs Run</td>
-                                            <td>1-6 years</td>
+                                            <td>3-6 years</td>
                                             <td>800 meters</td>
                                         </tr>
                                         <tr>

@@ -32,6 +32,7 @@ import Gallery from './Components/Gallery/Gallery';
 import OurTeamMain from './Components/OurTeam/OurTeamMain';
 import EventForm2025 from './Components/Events/EventForm2025';
 import RfhSheRun2025 from './Components/Events/RfhSheRun2025';
+import DonationPaymentRedirect from './Components/DonationPaymentRedirect';
 
 
 
@@ -60,7 +61,8 @@ function App() {
             <Route path='/refund-policy' element={<PrivacyPolicy />} />
             <Route path='/terms-and-conditions' element={<TermsAndConditions />} />
             <Route path='/verifyEmail/:id/:token' element={<EmailVerification />} />
-            <Route path='/payment-redirect' element={<PaymentRedirect />} />
+            {/* <Route path='/payment-redirect' element={<PaymentRedirect />} /> */}
+            <Route path='/payment-redirect' element={<DonationPaymentRedirect />} />
             {/* <Route path='/admin/*' element={<PrivateRoute />} > */}
             <Route path='admin/*' element={<AdminMain />} />
             {/* </Route> */}
