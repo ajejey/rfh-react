@@ -111,6 +111,12 @@ function AdminHome() {
                     <hr />
                 </section>
                 <section className="mb-4">
+                    <h3>Add Offline Registration</h3>
+                    <p>Add offline registrations for participants who paid through other methods</p>
+                    <Link to="/admin/offline-registration" className="btn btn-primary">Add Offline Registration</Link>
+                    <hr />
+                </section>
+                <section className="mb-4">
                     <h3>Generate Donations CSV</h3>
                     <div className="d-flex justify-content-center align-items-center mt-3 gap-3">
                         <button className="btn btn-primary mr-2" onClick={downloadCsv}>

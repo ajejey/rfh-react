@@ -4,6 +4,7 @@ import AdminHome from './AdminHome'
 import GetAllDonations from './GetAllDonations'
 import useAuthStatus from '../../CustomHooks/useAuthStatus'
 import EventParticipants from './EventParticipents'
+import OfflineRegistration from './OfflineRegistration'
 
 const AdminMain = () => {
     console.log("admin main")
@@ -47,6 +48,7 @@ const AdminMain = () => {
                 <Route path='/' element={<AdminHome />} />
                 <Route path='/get-all-donations' element={<GetAllDonations />} />
                 <Route path='/marathon-participants' element={<EventParticipants />} />
+                <Route path='/offline-registration' element={<OfflineRegistration />} />
 
             </Routes>
         </div>
