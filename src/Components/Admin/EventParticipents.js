@@ -729,7 +729,7 @@ function EventParticipants() {
                                         ...item?.userDetails,
                                         paymentStatus: item?.paymentDetails?.code,
                                         phonePeTransactionId: item?.paymentDetails?.data?.transactionId,
-                                        paymentGateway: item?.paymentDetails?.paymentGateway || (item?.paymentDetails?.success ? "PhonePe" : "Offline")
+                                        paymentGateway: item?.paymentDetails?.paymentGateway || (item?.paymentDetails?.success ? "PhonePe" : "N/A")
                                     }
                                 })}
                                 filename={`${marathonName}_participants`}
@@ -854,7 +854,12 @@ function EventParticipants() {
                                                     {item?.paymentDetails?.data?.paymentInstrument?.type || "N/A"}
                                                 </TableCell>
                                                 <TableCell>
-                                                    {item?.paymentDetails?.paymentGateway || (item?.paymentDetails?.success ? "PhonePe" : "N/A")}
+                                                    <Chip
+                                                        label={item?.paymentDetails?.paymentGateway || (item?.paymentDetails?.success ? "PhonePe" : "N/A")}
+                                                        color={item?.paymentDetails?.paymentGateway === "OFFLINE" ? "secondary" : "primary"}
+                                                        size="small"
+                                                        variant="outlined"
+                                                    />
                                                 </TableCell>
                                                 <TableCell>{item?.paymentDetails?.data?.transactionId || "N/A"}</TableCell>
                                             </TableRow>
