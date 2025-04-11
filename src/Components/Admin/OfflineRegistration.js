@@ -44,15 +44,15 @@ function OfflineRegistration() {
 
     // Constants for pricing
     const PRICE_MAP = {
-        'RFH She Run 2025': 800,
-        'RFH Juniors Run 2025': 599
+        'RFH She run 2025': 800,
+        'RFH Juniors run 2025': 599
     };
     const ADDITIONAL_TSHIRT_PRICE = 225;
     const BREAKFAST_PRICE = 80;
 
     // T-shirt size options based on marathon
     const TSHIRT_SIZE_OPTIONS = {
-        'RFH She Run 2025': [
+        'RFH She run 2025': [
             { value: 'XS', label: 'Extra Small (XS)' },
             { value: 'S', label: 'Small (S)' },
             { value: 'M', label: 'Medium (M)' },
@@ -60,7 +60,7 @@ function OfflineRegistration() {
             { value: 'XL', label: 'Extra Large (XL)' },
             { value: 'XXL', label: 'Double XL (XXL)' }
         ],
-        'RFH Juniors Run 2025': [
+        'RFH Juniors run 2025': [
             { value: '24', label: 'Size 24' },
             { value: '26', label: 'Size 26' },
             { value: '28', label: 'Size 28' },
@@ -78,12 +78,11 @@ function OfflineRegistration() {
 
     // Categories based on marathon
     const CATEGORIES = {
-        'RFH She Run 2025': [
-            { value: 'Kittur-Rani-Chennamma', label: 'Kittur Rani Chennamma (5K)' },
-            { value: 'Onake-Obavva', label: 'Onake Obavva (10K)' },
-            { value: 'Chennamma-Run', label: 'Chennamma Run (3K)' }
+        'RFH She run 2025': [
+            { value: 'Chennamma-Run', label: 'Chennamma Run' },
+            { value: 'Jhansi-Run', label: 'Jhansi Run' }
         ],
-        'RFH Juniors Run 2025': [
+        'RFH Juniors run 2025': [
             { value: 'Champs-Run', label: 'Champs Run (Ages 3-6, 800m)' },
             { value: 'Power-Run', label: 'Power Run (Ages 7-13, 1.5K)' },
             { value: 'Bolts-Run', label: 'Bolts Run (Ages 14-18, 2.5K)' }
@@ -103,9 +102,12 @@ function OfflineRegistration() {
     }, [marathonName, category, watchAdditionalTshirt, watchAdditionalTshirtQuantity, watchAdditionalBreakfast, watchDonation]);
 
     const handleMarathonChange = (event) => {
+        console.log("event",event)
         const selectedMarathon = event.target.value;
+        console.log("Selected marathon:", selectedMarathon);
         setMarathonName(selectedMarathon);
         setCategory('');
+        setValue('marathonName', selectedMarathon);
         setValue('category', '');
         setValue('TshirtSize', '');
         
@@ -117,10 +119,12 @@ function OfflineRegistration() {
 
     const handleCategoryChange = (event) => {
         setCategory(event.target.value);
+        setValue('category', event.target.value);
     };
 
     const handleTshirtQuantityChange = (e) => {
-        const quantity = parseInt(e.target.value) || 0;
+        const value = e.target.value;
+        const quantity = parseInt(value) || 0;
         setAdditionalTshirtQuantity(quantity);
         
         // Update tshirt sizes array
@@ -135,6 +139,7 @@ function OfflineRegistration() {
             newSizes.splice(quantity);
         }
         setTshirtSizes(newSizes);
+        register('additionalTshirtQuantity').onChange(e);
     };
 
     const handleSizeChange = (index, size) => {
@@ -186,6 +191,7 @@ function OfflineRegistration() {
                 success: true,
                 code: 'PAYMENT_SUCCESS',
                 amount: totalPrice * 100, // In paise/cents
+                // amount: 100, // for testing
                 paymentGateway: 'OFFLINE', // This is the key field to identify offline payments
                 paymentMethod: data.paymentMethodType || 'cash',
                 receiptNumber: data.receiptNumber || '',
@@ -201,7 +207,7 @@ function OfflineRegistration() {
             };
 
             // Send to server
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/marathons/add-offline-registration`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/add-offline-registration`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -220,15 +226,47 @@ function OfflineRegistration() {
                 message: 'Offline registration added successfully!',
                 severity: 'success'
             });
-            
-            // Reset form
-            reset();
+
+            // Reset form after successful submission
+            reset({
+                marathonName: '',
+                category: '',
+                TshirtSize: '',
+                additionalTshirt: 'No',
+                additionalTshirtQuantity: '0',
+                additionalBreakfast: '0',
+                donation: '',
+                fullName: '',
+                email: '',
+                mobNo: '',
+                dob: '',
+                gender: '',
+                bloodGroup: '',
+                address: '',
+                city: '',
+                state: '',
+                country: '',
+                nationality: '',
+                emergencyName: '',
+                emergencyNo: '',
+                paymentMethodType: '',
+                receiptNumber: '',
+                paymentNotes: ''
+            });
+
+            // Reset local states
             setMarathonName('');
             setCategory('');
             setTshirtSizes([]);
             setAdditionalTshirtQuantity(0);
             setTotalPrice(0);
-            
+
+            // Reset form values using setValue
+            setValue('additionalTshirt', 'No');
+            setValue('additionalTshirtQuantity', '0');
+            setValue('additionalBreakfast', '0');
+            setValue('donation', '');
+
         } catch (error) {
             console.error('Error adding offline registration:', error);
             setSnackbar({
@@ -261,13 +299,16 @@ function OfflineRegistration() {
                                 <FormControl fullWidth required error={!!errors.marathonName}>
                                     <InputLabel>Marathon</InputLabel>
                                     <Select
-                                        value={marathonName}
-                                        onChange={handleMarathonChange}
+                                        value={watch('marathonName', '')}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            setMarathonName(value);
+                                            setValue('marathonName', value);
+                                        }}
                                         label="Marathon"
-                                        {...register('marathonName', { required: 'Marathon is required' })}
                                     >
-                                        <MenuItem value="RFH She Run 2025">RFH She Run 2025</MenuItem>
-                                        <MenuItem value="RFH Juniors Run 2025">RFH Juniors Run 2025</MenuItem>
+                                        <MenuItem value="RFH She run 2025">RFH She run 2025</MenuItem>
+                                        <MenuItem value="RFH Juniors run 2025">RFH Juniors run 2025</MenuItem>
                                     </Select>
                                     {errors.marathonName && <FormHelperText>{errors.marathonName.message}</FormHelperText>}
                                 </FormControl>
@@ -277,10 +318,13 @@ function OfflineRegistration() {
                                 <FormControl fullWidth required disabled={!marathonName} error={!!errors.category}>
                                     <InputLabel>Category</InputLabel>
                                     <Select
-                                        value={category}
-                                        onChange={handleCategoryChange}
+                                        value={watch('category', '')}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            setCategory(value);
+                                            setValue('category', value);
+                                        }}
                                         label="Category"
-                                        {...register('category', { required: 'Category is required' })}
                                     >
                                         {marathonName && CATEGORIES[marathonName]?.map((option) => (
                                             <MenuItem key={option.value} value={option.value}>
@@ -359,9 +403,12 @@ function OfflineRegistration() {
                                 <FormControl fullWidth required error={!!errors.gender}>
                                     <InputLabel>Gender</InputLabel>
                                     <Select
+                                        value={watch('gender', '')}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            setValue('gender', value);
+                                        }}
                                         label="Gender"
-                                        defaultValue=""
-                                        {...register('gender', { required: 'Gender is required' })}
                                     >
                                         <MenuItem value="male">Male</MenuItem>
                                         <MenuItem value="female">Female</MenuItem>
@@ -375,9 +422,12 @@ function OfflineRegistration() {
                                 <FormControl fullWidth required error={!!errors.bloodGroup}>
                                     <InputLabel>Blood Group</InputLabel>
                                     <Select
+                                        value={watch('bloodGroup', '')}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            setValue('bloodGroup', value);
+                                        }}
                                         label="Blood Group"
-                                        defaultValue=""
-                                        {...register('bloodGroup', { required: 'Blood group is required' })}
                                     >
                                         <MenuItem value="A+">A+</MenuItem>
                                         <MenuItem value="A-">A-</MenuItem>
@@ -426,13 +476,16 @@ function OfflineRegistration() {
                                 <FormControl fullWidth required error={!!errors.state}>
                                     <InputLabel>State</InputLabel>
                                     <Select
+                                        value={watch('state', '')}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            setValue('state', value);
+                                        }}
                                         label="State"
-                                        defaultValue=""
-                                        {...register('state', { required: 'State is required' })}
                                     >
                                         {indianStates.map((state) => (
-                                            <MenuItem key={state} value={state}>
-                                                {state}
+                                            <MenuItem key={state.code} value={state.code}>
+                                                {state.name}
                                             </MenuItem>
                                         ))}
                                     </Select>
@@ -444,13 +497,16 @@ function OfflineRegistration() {
                                 <FormControl fullWidth required error={!!errors.country}>
                                     <InputLabel>Country</InputLabel>
                                     <Select
+                                        value={watch('country', '')}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            setValue('country', value);
+                                        }}
                                         label="Country"
-                                        defaultValue="India"
-                                        {...register('country', { required: 'Country is required' })}
                                     >
                                         {countries.map((country) => (
-                                            <MenuItem key={country} value={country}>
-                                                {country}
+                                            <MenuItem key={country.code} value={country.code}>
+                                                {country.name}
                                             </MenuItem>
                                         ))}
                                     </Select>
@@ -481,9 +537,12 @@ function OfflineRegistration() {
                                 <FormControl fullWidth required disabled={!marathonName} error={!!errors.TshirtSize}>
                                     <InputLabel>T-Shirt Size</InputLabel>
                                     <Select
+                                        value={watch('TshirtSize', '')}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            setValue('TshirtSize', value);
+                                        }}
                                         label="T-Shirt Size"
-                                        defaultValue=""
-                                        {...register('TshirtSize', { required: 'T-shirt size is required' })}
                                     >
                                         {marathonName && TSHIRT_SIZE_OPTIONS[marathonName]?.map((option) => (
                                             <MenuItem key={option.value} value={option.value}>
@@ -499,9 +558,12 @@ function OfflineRegistration() {
                                 <FormControl fullWidth>
                                     <InputLabel>Additional T-Shirt</InputLabel>
                                     <Select
+                                        value={watch('additionalTshirt', '')}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            setValue('additionalTshirt', value);
+                                        }}
                                         label="Additional T-Shirt"
-                                        defaultValue="No"
-                                        {...register('additionalTshirt')}
                                     >
                                         <MenuItem value="Yes">Yes</MenuItem>
                                         <MenuItem value="No">No</MenuItem>
@@ -515,10 +577,12 @@ function OfflineRegistration() {
                                         <FormControl fullWidth>
                                             <InputLabel>Additional T-Shirt Quantity</InputLabel>
                                             <Select
-                                                label="Additional T-Shirt Quantity"
-                                                value={additionalTshirtQuantity.toString()}
-                                                onChange={handleTshirtQuantityChange}
-                                                {...register('additionalTshirtQuantity')}
+                                                value={watch('additionalTshirtQuantity', '0')}
+                                                onChange={(e) => {
+                                                    const value = e.target.value;
+                                                    setAdditionalTshirtQuantity(parseInt(value));
+                                                    setValue('additionalTshirtQuantity', value);
+                                                }}
                                             >
                                                 {[0, 1, 2, 3, 4, 5].map((num) => (
                                                     <MenuItem key={num} value={num.toString()}>
@@ -540,7 +604,6 @@ function OfflineRegistration() {
                                                         <FormControl fullWidth>
                                                             <InputLabel>Size {index + 1}</InputLabel>
                                                             <Select
-                                                                label={`Size ${index + 1}`}
                                                                 value={tshirtSizes[index] || ''}
                                                                 onChange={(e) => handleSizeChange(index, e.target.value)}
                                                             >
@@ -563,9 +626,12 @@ function OfflineRegistration() {
                                 <FormControl fullWidth>
                                     <InputLabel>Additional Breakfast</InputLabel>
                                     <Select
+                                        value={watch('additionalBreakfast', '0')}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            setValue('additionalBreakfast', value);
+                                        }}
                                         label="Additional Breakfast"
-                                        defaultValue="0"
-                                        {...register('additionalBreakfast')}
                                     >
                                         {[0, 1, 2, 3, 4, 5].map((num) => (
                                             <MenuItem key={num} value={num.toString()}>
@@ -633,9 +699,12 @@ function OfflineRegistration() {
                                 <FormControl fullWidth required error={!!errors.paymentMethodType}>
                                     <InputLabel>Payment Method</InputLabel>
                                     <Select
+                                        value={watch('paymentMethodType', '')}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            setValue('paymentMethodType', value);
+                                        }}
                                         label="Payment Method"
-                                        defaultValue=""
-                                        {...register('paymentMethodType', { required: 'Payment method is required' })}
                                     >
                                         <MenuItem value="cash">Cash</MenuItem>
                                         <MenuItem value="upi">UPI</MenuItem>

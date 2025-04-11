@@ -418,7 +418,7 @@ function RfhSheRun2025() {
             setPaymentStatus("Initiating Razorpay payment...");
             setValue("totalPrice", totalPrice)
             // setValue("totalPrice", 1) // make 1 rupee for testing
-            setValue("marathonName", "RFH She Run 2025")
+            setValue("marathonName", "RFH She run 2025")
 
             const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/initiate-razorpay-payment`, {
                 method: "POST",
