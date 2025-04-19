@@ -186,9 +186,10 @@ function EventParticipants() {
             if (item.paymentDetails &&
                 item.paymentDetails.success &&
                 item.paymentDetails.data &&
-                item.paymentDetails.data.amount) {
+                (item.paymentDetails.data.amount || item.paymentDetails.amount)) {
                 // Filter out transactions with amount = 100 (1 rupee)
-                return Number(item.paymentDetails.data.amount) !== 100;
+                const amount = item.paymentDetails.data.amount || item.paymentDetails.amount;
+                return Number(amount) !== 100;
             }
             return true; // Keep items without payment details or failed payments
         });
@@ -330,20 +331,33 @@ function EventParticipants() {
             if (item.paymentDetails &&
                 item.paymentDetails.success &&
                 item.paymentDetails.data &&
-                item.paymentDetails.data.amount) {
+                item.paymentDetails.data?.amount || item.paymentDetails.amount) {
                 // Check if amount is 100 (1 rupee)
-                return Number(item.paymentDetails.data.amount) !== 100;
+                const amount = item.paymentDetails.data?.amount || item.paymentDetails.amount;
+                return Number(amount) !== 100;
             }
             return true; // Keep items without payment details or failed payments
         });
 
         const successfulParticipants = filteredData.filter(item => item.paymentDetails && item.paymentDetails.success);
-
+       const noAmount = filteredData.filter(item => {
+           return item.paymentDetails && 
+                  item.paymentDetails.success && 
+                  !item.paymentDetails.data;
+       });
+       console.log("noAmount", noAmount);
         let stats = {
             totalParticipants: successfulParticipants.length,
             successfulPayments: successfulParticipants.length,
             failedPayments: data.length - successfulParticipants.length,
-            totalAmount: successfulParticipants.reduce((sum, item) => sum + (item.paymentDetails.data.amount ? item.paymentDetails.data.amount / 100 : 0), 0),
+            totalAmount: successfulParticipants.reduce((sum, item) => {
+                if (item.paymentDetails?.data?.amount) {
+                    return sum + (item.paymentDetails.data.amount / 100);
+                } else if (item.paymentDetails?.amount) {
+                    return sum + (item.paymentDetails.amount / 100);
+                }
+                return sum;
+            }, 0),
             tshirtCount: {
                 total: 0,
                 sizes: {}
@@ -848,7 +862,9 @@ function EventParticipants() {
                                                 <TableCell>
                                                     {item?.paymentDetails?.data?.amount
                                                         ? (Number(item.paymentDetails.data.amount) / 100).toLocaleString()
-                                                        : item?.userDetails?.totalPrice || "N/A"}
+                                                        : item?.paymentDetails?.amount
+                                                            ? (Number(item.paymentDetails.amount) / 100).toLocaleString()
+                                                            : item?.userDetails?.totalPrice || "N/A"}
                                                 </TableCell>
                                                 <TableCell>
                                                     {item?.paymentDetails?.data?.paymentInstrument?.type || "N/A"}
