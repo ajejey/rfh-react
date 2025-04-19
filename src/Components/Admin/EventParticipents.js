@@ -186,9 +186,9 @@ function EventParticipants() {
             if (item.paymentDetails &&
                 item.paymentDetails.success &&
                 item.paymentDetails.data &&
-                (item.paymentDetails.data.amount || item.paymentDetails.amount)) {
+                (item.paymentDetails?.data?.amount || item.paymentDetails?.amount)) {
                 // Filter out transactions with amount = 100 (1 rupee)
-                const amount = item.paymentDetails.data.amount || item.paymentDetails.amount;
+                const amount = item.paymentDetails?.data?.amount || item.paymentDetails?.amount;
                 return Number(amount) !== 100;
             }
             return true; // Keep items without payment details or failed payments
@@ -331,9 +331,9 @@ function EventParticipants() {
             if (item.paymentDetails &&
                 item.paymentDetails.success &&
                 item.paymentDetails.data &&
-                item.paymentDetails.data?.amount || item.paymentDetails.amount) {
+                item.paymentDetails?.data?.amount || item?.paymentDetails?.amount) {
                 // Check if amount is 100 (1 rupee)
-                const amount = item.paymentDetails.data?.amount || item.paymentDetails.amount;
+                const amount = item.paymentDetails?.data?.amount || item.paymentDetails?.amount;
                 return Number(amount) !== 100;
             }
             return true; // Keep items without payment details or failed payments
@@ -352,9 +352,9 @@ function EventParticipants() {
             failedPayments: data.length - successfulParticipants.length,
             totalAmount: successfulParticipants.reduce((sum, item) => {
                 if (item.paymentDetails?.data?.amount) {
-                    return sum + (item.paymentDetails.data.amount / 100);
+                    return sum + (item.paymentDetails?.data?.amount / 100);
                 } else if (item.paymentDetails?.amount) {
-                    return sum + (item.paymentDetails.amount / 100);
+                    return sum + (item.paymentDetails?.amount / 100);
                 }
                 return sum;
             }, 0),
@@ -861,9 +861,9 @@ function EventParticipants() {
                                                 </TableCell>
                                                 <TableCell>
                                                     {item?.paymentDetails?.data?.amount
-                                                        ? (Number(item.paymentDetails.data.amount) / 100).toLocaleString()
+                                                        ? (Number(item.paymentDetails?.data?.amount) / 100).toLocaleString()
                                                         : item?.paymentDetails?.amount
-                                                            ? (Number(item.paymentDetails.amount) / 100).toLocaleString()
+                                                            ? (Number(item.paymentDetails?.amount) / 100).toLocaleString()
                                                             : item?.userDetails?.totalPrice || "N/A"}
                                                 </TableCell>
                                                 <TableCell>
