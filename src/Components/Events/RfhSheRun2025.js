@@ -17,7 +17,7 @@ import { useNavigate } from 'react-router-dom';
 const EVENT_DETAILS = {
     name: "RFH She Run 2025",
     date: new Date("2025-05-25T23:59:00+05:30"),
-    lastDate: new Date("2025-04-28T23:59:00+05:30"),
+    lastDate: new Date("2025-05-05T23:59:00+05:30"),
     time: "7:00 AM IST",
     venue: "https://www.google.com/maps/place/Bal+Bhavan+Auditorium/@12.9766439,77.5952091,17z/data=!3m1!4b1!4m6!3m5!1s0x3bae1671b1cd3b1f:0xb72fa25e5df4598d!8m2!3d12.9766439!4d77.597784!16s%2Fg%2F11csqwx6mm?entry=ttu&g_ep=EgoyMDI1MDIxMi4wIKXMDSoASAFQAw%3D%3D",
     venueName: "Cubbon Park, Bengaluru",
@@ -55,6 +55,7 @@ function RfhSheRun2025() {
     const [paymentDetails, setPaymentDetails] = useState(null)
     const [tshirtSizes, setTshirtSizes] = useState([]);
     const [tshirtValidationError, setTshirtValidationError] = useState("");
+    const [showExtensionAlert, setShowExtensionAlert] = useState(true);
     const [additionalBreakfast, setAdditionalBreakfast] = useState(0);
     const category = watch('category');
     const navigate = useNavigate()
@@ -619,23 +620,133 @@ function RfhSheRun2025() {
                             flex-direction: column;
                             gap: 0.5rem;
                         }
-
+                        .event-card {
+                            border-radius: 12px;
+                            padding: 1rem;
+                            margin-bottom: 1.5rem;
+                            transition: transform 0.3s ease;
+                            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                        }
+                        
+                        .event-card:hover {
+                            transform: translateY(-5px);
+                        }
+                        
+                        .event-card h3 {
+                            color: #fff;
+                            font-size: 1.4rem;
+                            margin-bottom: 0.8rem;
+                        }
+                        
+                        .event-highlight {
+                            background: linear-gradient(135deg, #FF416C, #FF4B2B);
+                            color: white;
+                            padding: 0.3rem 0.8rem;
+                            border-radius: 20px;
+                            display: inline-block;
+                            font-weight: bold;
+                            margin: 0.5rem 0;
+                            animation: pulse 2s infinite;
+                        }
+                        
+                        .registration-extension {
+                            position: relative;
+                            z-index: 1030;
+                            margin: 20px auto;
+                            width: 95%;
+                            max-width: 800px;
+                            background: linear-gradient(45deg, #2a2a2a, #333333);
+                            border-radius: 10px;
+                            border-left: 4px solid #ff416c;
+                            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+                            overflow: hidden;
+                            transform: translateY(0);
+                            animation: float 3s ease-in-out infinite;
+                        }
+                        
+                        .registration-extension::before {
+                            content: '';
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+                            animation: shine 2s infinite;
+                        }
+                        
+                        @keyframes float {
+                            0% { transform: translateY(0px); }
+                            50% { transform: translateY(-10px); }
+                            100% { transform: translateY(0px); }
+                        }
+                        
+                        @keyframes shine {
+                            0% { transform: translateX(-100%); }
+                            100% { transform: translateX(100%); }
+                        }
+                        
+                        @keyframes pulse {
+                            0% { transform: scale(1); }
+                            50% { transform: scale(1.05); box-shadow: 0 0 15px rgba(255,65,108,0.7); }
+                            100% { transform: scale(1); }
+                        }
+                        
                         .tshirt-number {
                             font-size: 0.9rem;
-                            color: #f39c12;
+                            color: #f8c471;
                             font-weight: 500;
                         }
 
                         .form-select:focus {
-                            background-color: #1a1a1a;
+                            background-color: #222;
                             color: #fff;
-                            border-color: #f39c12;
-                            box-shadow: 0 0 0 0.2rem rgba(243, 156, 18, 0.25);
+                            border-color: #ff416c;
+                            box-shadow: 0 0 0 0.2rem rgba(255, 65, 108, 0.25);
+                        }
+                        
+                        .date-highlight {
+                            background-image: linear-gradient(to right, #F27121, #E94057, #8A2387);
+                            background-size: 200% auto;
+                            color: white;
+                            padding: 0.2rem 0.6rem;
+                            border-radius: 4px;
+                            font-weight: bold;
+                            animation: gradient 3s ease infinite;
+                        }
+                        
+                        @keyframes gradient {
+                            0% { background-position: 0% 50%; }
+                            50% { background-position: 100% 50%; }
+                            100% { background-position: 0% 50%; }
+                        }
+                        
+                        @media (max-width: 768px) {
+                            .registration-extension {
+                                width: 98%;
+                                padding: 0.8rem;
+                            }
+                            .date-highlight {
+                                display: inline-block;
+                                margin-top: 0.5rem;
+                            }
                         }
                     `}
                 </style>
             </Helmet>
             <Header />
+            {showExtensionAlert && (
+                <div className="alert alert-primary alert-dismissible fade show registration-extension" role="alert">
+                    <div className="d-flex flex-column flex-md-row align-items-md-center">
+                        <i className="fas fa-calendar-plus me-md-3 mb-2 mb-md-0 fa-lg text-white"></i>
+                        <div>
+                            <strong className="d-block mb-1" style={{fontSize: "1.2rem", color: "#ff416c"}}>Registration Extended!</strong>
+                            <span style={{color: "lightgray"}}>RFH She Run 2025 registrations are now open until <span className="date-highlight">May 5th</span>. Join us for this empowering event celebrating women's strength and resilience!</span>
+                        </div>
+                    </div>
+                    <button type="button" className="btn-close btn-close-white" onClick={() => setShowExtensionAlert(false)} aria-label="Close"></button>
+                </div>
+            )}
             <main>
                 {(submitted === false) ?
                     <section id="registration-form">

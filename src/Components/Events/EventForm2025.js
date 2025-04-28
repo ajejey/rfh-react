@@ -17,7 +17,7 @@ import { useNavigate } from 'react-router-dom';
 const EVENT_DETAILS = {
     name: "RFH Juniors Run 2025",
     date: new Date("2025-05-25T00:00:00+05:30"), // May 25th, 2025
-    lastDate: new Date("2025-04-28T23:59:00+05:30"),
+    lastDate: new Date("2025-05-05T23:59:00+05:30"),
     time: "8:00 AM IST",
     venue: "https://www.google.com/maps/place/Bal+Bhavan+Auditorium/@12.9766439,77.5952091,17z/data=!3m1!4b1!4m6!3m5!1s0x3bae1671b1cd3b1f:0xb72fa25e5df4598d!8m2!3d12.9766439!4d77.597784!16s%2Fg%2F11csqwx6mm?entry=ttu&g_ep=EgoyMDI1MDIxMi4wIKXMDSoASAFQAw%3D%3D",
     venueName: "Cubbon Park, Bengaluru",
@@ -49,6 +49,7 @@ function EventForm2025() {
     const [additionalBreakfast, setAdditionalBreakfast] = useState(0)
     const [tshirtValidationError, setTshirtValidationError] = useState("")
     const [tshirtSizes, setTshirtSizes] = useState([]);
+    const [showExtensionAlert, setShowExtensionAlert] = useState(true);
     const category = watch('category');
     const navigate = useNavigate()
 
@@ -624,16 +625,91 @@ function EventForm2025() {
                 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
                 <style>
                     {`
+                        .registration-extension {
+                            margin: 1rem auto 2rem;
+                            width: 95%;
+                            max-width: 800px;
+                            box-shadow: 0 8px 20px rgba(40,167,69,0.35);
+                            border-radius: 10px;
+                            border-left: 5px solid #28a745;
+                            background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.85) 100%);
+                            transform-origin: center;
+                            animation: bounce 2.5s infinite;
+                            overflow: hidden;
+                            position: relative;
+                        }
+                        
+                        @keyframes bounce {
+                            0%, 100% { transform: translateY(0); }
+                            50% { transform: translateY(-8px); }
+                        }
+                        
+                        .registration-extension::before {
+                            content: '';
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+                            animation: shimmer 3s infinite;
+                        }
+                        
+                        @keyframes shimmer {
+                            0% { transform: translateX(-100%); }
+                            100% { transform: translateX(100%); }
+                        }
+                        
+                        .registration-extension .alert-text {
+                            color: #ffffff;
+                            font-weight: 500;
+                        }
+                        
+                        .registration-extension .highlight-date {
+                            background-color: #f39c12;
+                            color: #000000;
+                            font-weight: 700;
+                            padding: 0.25rem 0.5rem;
+                            border-radius: 4px;
+                            display: inline-block;
+                            margin: 0 0.3rem;
+                        }
+                        
                         .form-control, .form-select {
                             background-color: #1a1a1a;
                             color: #fff;
                             border: 1px solid #333;
+                        }
+                        
+                        @media (max-width: 576px) {
+                            .registration-extension {
+                                margin: 0.5rem auto 1.5rem;
+                                padding: 0.75rem;
+                            }
+                            .registration-extension .d-flex {
+                                flex-direction: column;
+                                align-items: flex-start !important;
+                            }
+                            .registration-extension .fa-spin {
+                                margin-bottom: 0.5rem;
+                            }
                         }
                         ${additionalStyles}
                     `}
                 </style>
             </Helmet>
             <Header />
+            {showExtensionAlert && (
+                <div className="alert alert-success alert-dismissible fade show registration-extension" role="alert">
+                    <div className="d-flex align-items-center">
+                        <i className="fas fa-star-of-life fa-spin me-3"></i>
+                        <div className="alert-text">
+                            <strong className="me-2">EXTENDED!</strong> Registrations now open until <span className="highlight-date">May 5th, 2025</span>! Secure your child's spot in the RFH Juniors Run today!
+                        </div>
+                    </div>
+                    <button type="button" className="btn-close" onClick={() => setShowExtensionAlert(false)} aria-label="Close"></button>
+                </div>
+            )}
             <main>
                 {(submitted === false) ?
                     <section id="registration-form">
