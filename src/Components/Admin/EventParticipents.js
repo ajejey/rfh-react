@@ -33,7 +33,7 @@ import { styled } from '@mui/material/styles';
 import useSWR from 'swr';
 import Header from '../Header';
 import { convertCamelCase } from '../../Constants/commonFunctions';
-import CSVDownloader from '../CSVDownloader';
+import Papa from 'papaparse';
 // Icons
 import DownloadIcon from '@mui/icons-material/Download';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
@@ -160,6 +160,77 @@ const sampleRazorpayData = {
     }
 
 function EventParticipants() {
+    // Function to download CSV data
+    const downloadCSV = (data) => {
+        // Format the data for CSV export
+        const csvData = data.map((item) => {
+            // Get payment amount in a readable format
+            let amount = 0;
+            if (item.paymentDetails?.data?.amount) {
+                amount = item.paymentDetails.data.amount / 100;
+            } else if (item.paymentDetails?.amount) {
+                amount = item.paymentDetails.amount / 100;
+            }
+
+            // Create a comprehensive data object with all relevant fields
+            return {
+                'Date': new Date(item.date).toLocaleString(),
+                'Transaction ID': item?.merchantTransactionId || '',
+                'PhonePe Transaction ID': item?.paymentDetails?.data?.transactionId || '',
+                'Full Name': item?.userDetails?.fullName || '',
+                'Email': item?.userDetails?.email || '',
+                'Phone': item?.userDetails?.mobNo || '',
+                'Gender': item?.userDetails?.gender || '',
+                'Category': item?.userDetails?.category || '',
+                'T-shirt Size': item?.userDetails?.TshirtSize || '',
+                'Additional T-shirt': item?.userDetails?.additionalTshirt || 'No',
+                'Additional T-shirt Size': item?.userDetails?.additionalTshirtSize || '',
+                'Additional T-shirt Quantity': item?.userDetails?.additionalTshirtQuantity || '0',
+                'Additional Breakfast': item?.userDetails?.additionalBreakfast || '0',
+                'Total Breakfast Count': (Number(item?.userDetails?.additionalBreakfast || 0) + 1).toString(),
+                'Blood Group': item?.userDetails?.bloodGroup || '',
+                'Address': item?.userDetails?.address || '',
+                'City': item?.userDetails?.city || '',
+                'State': item?.userDetails?.state || '',
+                'Country': item?.userDetails?.country || '',
+                'Nationality': item?.userDetails?.nationality || '',
+                'Date of Birth': item?.userDetails?.dob || '',
+                'Emergency Contact Name': item?.userDetails?.emergencyName || '',
+                'Emergency Contact Number': item?.userDetails?.emergencyNo || '',
+                'Reference': item?.userDetails?.reference || '',
+                'Donation Amount': item?.userDetails?.donation || '0',
+                'Total Amount (₹)': amount.toFixed(2),
+                'Payment Status': item?.paymentDetails?.success ? 'Success' : 'Failed',
+                'Payment Gateway': item?.paymentDetails?.paymentGateway || (item?.paymentDetails?.success ? 'PhonePe' : 'N/A')
+            };
+        });
+
+        // Convert to CSV
+        const csv = Papa.unparse(csvData);
+
+        // Create a Blob
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+
+        // Create a download link
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.setAttribute('download', `${marathonName}_participants_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+
+        // Trigger download
+        link.click();
+
+        // Clean up
+        document.body.removeChild(link);
+        
+        // Show success notification
+        setSnackbar({
+            open: true,
+            message: 'CSV file downloaded successfully!',
+            severity: 'success'
+        });
+    };
     const { data: marathonNames, error, isLoading } = useSWR('api/payments/all-marathon-names', fetcher);
     const [marathonName, setMarathonName] = useState('');
     const { data: participantsData, error: participantsError, isLoading: participantsLoading, mutate } = useSWR(
@@ -709,8 +780,10 @@ function EventParticipants() {
                                             size="small"
                                             startIcon={<DownloadIcon />}
                                             onClick={() => {
-                                                // The CSV download button already exists
-                                                document.querySelector('button[aria-label="Download CSV"]')?.click();
+                                                // Trigger the CSV download function directly
+                                                if (filteredData && filteredData.length > 0) {
+                                                    downloadCSV(filteredData);
+                                                }
                                             }}
                                         >
                                             Export CSV
@@ -733,22 +806,7 @@ function EventParticipants() {
                             </Tabs>
                         </Box>
 
-                        {/* Hide the CSV Downloader but keep it functional */}
-                        <Box sx={{ display: 'none' }}>
-                            <CSVDownloader
-                                data={participantsData.map((item) => {
-                                    return {
-                                        date: new Date(item.date).toLocaleString(),
-                                        merchantTransactionId: item?.merchantTransactionId,
-                                        ...item?.userDetails,
-                                        paymentStatus: item?.paymentDetails?.code,
-                                        phonePeTransactionId: item?.paymentDetails?.data?.transactionId,
-                                        paymentGateway: item?.paymentDetails?.paymentGateway || (item?.paymentDetails?.success ? "PhonePe" : "N/A")
-                                    }
-                                })}
-                                filename={`${marathonName}_participants`}
-                            />
-                        </Box>
+                        {/* We'll use our own CSV download function instead of the hidden component */}
 
                         {/* Tab Panels */}
                         {tabValue === 0 && (
