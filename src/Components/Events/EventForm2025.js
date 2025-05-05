@@ -17,7 +17,7 @@ import { useNavigate } from 'react-router-dom';
 const EVENT_DETAILS = {
     name: "RFH Juniors Run 2025",
     date: new Date("2025-05-25T00:00:00+05:30"), // May 25th, 2025
-    lastDate: new Date("2025-05-05T23:59:00+05:30"),
+    lastDate: new Date("2025-05-10T23:59:00+05:30"),
     time: "8:00 AM IST",
     venue: "https://www.google.com/maps/place/Bal+Bhavan+Auditorium/@12.9766439,77.5952091,17z/data=!3m1!4b1!4m6!3m5!1s0x3bae1671b1cd3b1f:0xb72fa25e5df4598d!8m2!3d12.9766439!4d77.597784!16s%2Fg%2F11csqwx6mm?entry=ttu&g_ep=EgoyMDI1MDIxMi4wIKXMDSoASAFQAw%3D%3D",
     venueName: "Cubbon Park, Bengaluru",
@@ -1408,7 +1408,7 @@ function EventForm2025() {
                                                 </tr>
                                             </tbody>
                                         </table>
-                                        <button onClick={handlePaymentClick} disabled={disablePaymentButton} type="button" className="w-100 btn btn-lg btn-primary">Pay with PhonePe</button>
+                                        {/* <button onClick={handlePaymentClick} disabled={disablePaymentButton} type="button" className="w-100 btn btn-lg btn-primary">Pay with PhonePe</button> */}
                                         <button onClick={handleRazorpayClick} disabled={disablePaymentButton || paymentLoading} type="button" className="w-100 btn btn-lg btn-primary mt-4">Pay with Razorpay</button>
                                     </div>
                                 </div>
