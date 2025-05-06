@@ -704,7 +704,7 @@ function EventForm2025() {
                     <div className="d-flex align-items-center">
                         <i className="fas fa-star-of-life fa-spin me-3"></i>
                         <div className="alert-text">
-                            <strong className="me-2">EXTENDED!</strong> Registrations now open until <span className="highlight-date">May 5th, 2025</span>! Secure your child's spot in the RFH Juniors Run today!
+                            <strong className="me-2">EXTENDED!</strong> Registrations now open until <span className="highlight-date">{EVENT_DETAILS.lastDate.toLocaleDateString('en-US', dateOptions)}</span>! Secure your child's spot in the RFH Juniors Run today!
                         </div>
                     </div>
                     <button type="button" className="btn-close" onClick={() => setShowExtensionAlert(false)} aria-label="Close"></button>

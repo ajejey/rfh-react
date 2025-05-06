@@ -741,7 +741,7 @@ function RfhSheRun2025() {
                         <i className="fas fa-calendar-plus me-md-3 mb-2 mb-md-0 fa-lg text-white"></i>
                         <div>
                             <strong className="d-block mb-1" style={{fontSize: "1.2rem", color: "#ff416c"}}>Registration Extended!</strong>
-                            <span style={{color: "lightgray"}}>RFH She Run 2025 registrations are now open until <span className="date-highlight">May 5th</span>. Join us for this empowering event celebrating women's strength and resilience!</span>
+                            <span style={{color: "lightgray"}}>RFH She Run 2025 registrations are now open until <span className="date-highlight">{EVENT_DETAILS.lastDate.toLocaleDateString('en-US', dateOptions)}</span>. Join us for this empowering event celebrating women's strength and resilience!</span>
                         </div>
                     </div>
                     <button type="button" className="btn-close btn-close-white" onClick={() => setShowExtensionAlert(false)} aria-label="Close"></button>
