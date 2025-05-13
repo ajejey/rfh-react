@@ -700,11 +700,18 @@ function EventForm2025() {
             </Helmet>
             <Header />
             {showExtensionAlert && (
-                <div className="alert alert-success alert-dismissible fade show registration-extension" role="alert">
+                <div className="alert alert-danger alert-dismissible fade show registration-extension" role="alert">
                     <div className="d-flex align-items-center">
-                        <i className="fas fa-star-of-life fa-spin me-3"></i>
+                        <i className="fas fa-ban me-3"></i>
                         <div className="alert-text">
-                            <strong className="me-2">EXTENDED!</strong> Registrations now open until <span className="highlight-date">{EVENT_DETAILS.lastDate.toLocaleDateString('en-US', dateOptions)}</span>! Secure your child's spot in the RFH Juniors Run today!
+                            <strong className="me-2">🚫 Oops, you just missed it!</strong>
+                            <p>Registrations are officially CLOSED for this year. 😬<br/>
+                            The ship has sailed, the gates are shut, and the confetti's already flying without you! 🎉😅</p>
+                            <p>But hey — better luck next time!<br/>
+                            Got questions or already planning for next year? Reach out to our awesome team below. 👇📞<br/>
+                            Sripada : +91 9964046022<br/>
+                            Raghu : +91 9164358027<br/>
+                            Deepthi : +91 9986387435</p>
                         </div>
                     </div>
                     <button type="button" className="btn-close" onClick={() => setShowExtensionAlert(false)} aria-label="Close"></button>
@@ -1206,7 +1213,7 @@ function EventForm2025() {
                                         <button
                                             className="btn btn-primary"
                                             type="submit"
-                                        // disabled={new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }) > new Date("2025-02-10T23:59:00+05:30").toLocaleString("en-US", { timeZone: "Asia/Kolkata" })}
+                                            disabled={true}
                                         >
                                             Submit
                                         </button>
@@ -1409,7 +1416,7 @@ function EventForm2025() {
                                             </tbody>
                                         </table>
                                         {/* <button onClick={handlePaymentClick} disabled={disablePaymentButton} type="button" className="w-100 btn btn-lg btn-primary">Pay with PhonePe</button> */}
-                                        <button onClick={handleRazorpayClick} disabled={disablePaymentButton || paymentLoading} type="button" className="w-100 btn btn-lg btn-primary mt-4">Pay with Razorpay</button>
+                                        <button onClick={handleRazorpayClick} disabled={true} type="button" className="w-100 btn btn-lg btn-primary mt-4">Pay with Razorpay</button>
                                     </div>
                                 </div>
                             </div>

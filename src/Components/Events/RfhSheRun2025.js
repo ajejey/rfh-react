@@ -736,12 +736,18 @@ function RfhSheRun2025() {
             </Helmet>
             <Header />
             {showExtensionAlert && (
-                <div className="alert alert-primary alert-dismissible fade show registration-extension" role="alert">
+                <div className="alert alert-danger alert-dismissible fade show registration-extension" role="alert">
                     <div className="d-flex flex-column flex-md-row align-items-md-center">
-                        <i className="fas fa-calendar-plus me-md-3 mb-2 mb-md-0 fa-lg text-white"></i>
+                        <i className="fas fa-ban me-md-3 mb-2 mb-md-0 fa-lg text-white"></i>
                         <div>
-                            <strong className="d-block mb-1" style={{fontSize: "1.2rem", color: "#ff416c"}}>Registration Extended!</strong>
-                            <span style={{color: "lightgray"}}>RFH She Run 2025 registrations are now open until <span className="date-highlight">{EVENT_DETAILS.lastDate.toLocaleDateString('en-US', dateOptions)}</span>. Join us for this empowering event celebrating women's strength and resilience!</span>
+                            <strong className="d-block mb-1" style={{fontSize: "1.2rem", color: "#ff416c"}}>🚫 Oops, you just missed it!</strong>
+                            <span style={{color: "lightgray"}}>Registrations are officially CLOSED for this year. 😬<br/>
+                            The ship has sailed, the gates are shut, and the confetti's already flying without you! 🎉😅<br/><br/>
+                            But hey — better luck next time!<br/>
+                            Got questions or already planning for next year? Reach out to our awesome team below. 👇📞<br/>
+                            Sripada : +91 9964046022<br/>
+                            Raghu : +91 9164358027<br/>
+                            Deepthi : +91 9986387435</span>
                         </div>
                     </div>
                     <button type="button" className="btn-close btn-close-white" onClick={() => setShowExtensionAlert(false)} aria-label="Close"></button>
@@ -1265,7 +1271,7 @@ function RfhSheRun2025() {
                                         <button
                                             className="btn btn-primary"
                                             type="submit"
-                                        // disabled={new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }) > new Date("2025-02-10T23:59:00+05:30").toLocaleString("en-US", { timeZone: "Asia/Kolkata" })}
+                                            disabled={true}
                                         >
                                             Submit
                                         </button>
@@ -1335,7 +1341,7 @@ function RfhSheRun2025() {
                                     <button
                                         className="btn btn-primary w-100"
                                         onClick={handleSubmit(handleRazorpayClick)}
-                                        disabled={disablePaymentButton || paymentLoading}
+                                        disabled={true}
                                     >
                                         {paymentLoading ? "Processing..." : "Pay with Razorpay"}
                                     </button>
