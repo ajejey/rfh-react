@@ -8,7 +8,8 @@ import AccessTimeTwoToneIcon from '@mui/icons-material/AccessTimeTwoTone';
 import PlaceTwoToneIcon from '@mui/icons-material/PlaceTwoTone';
 import MilitaryTechTwoToneIcon from '@mui/icons-material/MilitaryTechTwoTone';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
-import { Button, Dialog } from '@mui/material';
+import { Button, Dialog, Box, Typography } from '@mui/material';
+import RegistrationDetailsDialog from './RegistrationDetailsDialog';
 import { Helmet } from 'react-helmet-async';
 import tShirtGuide from '../../assets/images/tShirtGuide.jpeg'
 import { toast } from 'sonner';
@@ -50,6 +51,7 @@ function EventForm2025() {
     const [tshirtValidationError, setTshirtValidationError] = useState("")
     const [tshirtSizes, setTshirtSizes] = useState([]);
     const [showExtensionAlert, setShowExtensionAlert] = useState(true);
+    const [openRegistrationDialog, setOpenRegistrationDialog] = useState(false);
     const category = watch('category');
     const navigate = useNavigate()
 
@@ -707,8 +709,18 @@ function EventForm2025() {
                             <strong className="me-2">🚫 Oops, you just missed it!</strong>
                             <p>Registrations are officially CLOSED for this year. 😬<br/>
                             The ship has sailed, the gates are shut, and the confetti's already flying without you! 🎉😅</p>
-                            <p>But hey — better luck next time!<br/>
-                            Got questions or already planning for next year? Reach out to our awesome team below. 👇📞<br/>
+                            <p>But hey — better luck next time!</p>
+                            <p>Already registered? Check your registration details below:</p>
+                            <Button 
+                                variant="contained" 
+                                color="primary"
+                                size="small"
+                                onClick={() => setOpenRegistrationDialog(true)}
+                                sx={{ mt: 1, mb: 2 }}
+                            >
+                                View My Registration
+                            </Button>
+                            <p>Got questions or already planning for next year? Reach out to our awesome team below. 👇📞<br/>
                             Sripada : +91 9964046022<br/>
                             Raghu : +91 9164358027<br/>
                             Deepthi : +91 9986387435</p>
@@ -811,6 +823,8 @@ function EventForm2025() {
                                 </div>
 
                             </div>
+
+                            <RegistrationDetailsDialog open={openRegistrationDialog} onClose={() => setOpenRegistrationDialog(false)} eventName="RFH Juniors run 2025" />
 
                             <div ref={myRef} className="regestration-form">
 

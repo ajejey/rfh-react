@@ -13,6 +13,7 @@ import { Helmet } from 'react-helmet-async';
 import tShirtGuide from '../../assets/images/tShirtGuide.jpeg'
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import RegistrationDetailsDialog from './RegistrationDetailsDialog';
 
 const EVENT_DETAILS = {
     name: "RFH She Run 2025",
@@ -57,6 +58,7 @@ function RfhSheRun2025() {
     const [tshirtValidationError, setTshirtValidationError] = useState("");
     const [showExtensionAlert, setShowExtensionAlert] = useState(true);
     const [additionalBreakfast, setAdditionalBreakfast] = useState(0);
+    const [openRegistrationDialog, setOpenRegistrationDialog] = useState(false);
     const category = watch('category');
     const navigate = useNavigate()
 
@@ -744,6 +746,17 @@ function RfhSheRun2025() {
                             <span style={{color: "lightgray"}}>Registrations are officially CLOSED for this year. 😬<br/>
                             The ship has sailed, the gates are shut, and the confetti's already flying without you! 🎉😅<br/><br/>
                             But hey — better luck next time!<br/>
+                            <p>Already registered? Check your registration details below:</p>
+                            <Button 
+                                variant="contained" 
+                                color="primary"
+                                size="small"
+                                onClick={() => setOpenRegistrationDialog(true)}
+                                sx={{ mt: 1, mb: 2 }}
+                            >
+                                View My Registration
+                            </Button>
+                            <br/>
                             Got questions or already planning for next year? Reach out to our awesome team below. 👇📞<br/>
                             Sripada : +91 9964046022<br/>
                             Raghu : +91 9164358027<br/>
@@ -884,6 +897,7 @@ function RfhSheRun2025() {
 
                             </div>
 
+                            <RegistrationDetailsDialog open={openRegistrationDialog} onClose={() => setOpenRegistrationDialog(false)} eventName="RFH She run 2025" />
                             <div ref={myRef} className="regestration-form">
 
                                 <form onSubmit={handleSubmit(onSubmit)}>
