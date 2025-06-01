@@ -14,6 +14,7 @@ import { Helmet } from 'react-helmet-async';
 import tShirtGuide from '../../assets/images/tShirtGuide.jpeg'
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import FeedbackCard from './FeedbackCard';
 
 const EVENT_DETAILS = {
     name: "RFH Juniors Run 2025",
@@ -50,7 +51,7 @@ function EventForm2025() {
     const [additionalBreakfast, setAdditionalBreakfast] = useState(0)
     const [tshirtValidationError, setTshirtValidationError] = useState("")
     const [tshirtSizes, setTshirtSizes] = useState([]);
-    const [showExtensionAlert, setShowExtensionAlert] = useState(true);
+    const [showExtensionAlert, setShowExtensionAlert] = useState(false);
     const [openRegistrationDialog, setOpenRegistrationDialog] = useState(false);
     const category = watch('category');
     const navigate = useNavigate()
@@ -701,6 +702,7 @@ function EventForm2025() {
                 </style>
             </Helmet>
             <Header />
+            <FeedbackCard eventId={EVENT_DETAILS.name} eventName={EVENT_DETAILS.name} />
             {showExtensionAlert && (
                 <div className="alert alert-danger alert-dismissible fade show registration-extension" role="alert">
                     <div className="d-flex align-items-center">
@@ -1513,6 +1515,7 @@ function EventForm2025() {
                     }
                 `}
             </style>
+            
         </div>
     )
 }

@@ -14,6 +14,7 @@ import tShirtGuide from '../../assets/images/tShirtGuide.jpeg'
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import RegistrationDetailsDialog from './RegistrationDetailsDialog';
+import FeedbackCard from './FeedbackCard';
 
 const EVENT_DETAILS = {
     name: "RFH She Run 2025",
@@ -56,7 +57,7 @@ function RfhSheRun2025() {
     const [paymentDetails, setPaymentDetails] = useState(null)
     const [tshirtSizes, setTshirtSizes] = useState([]);
     const [tshirtValidationError, setTshirtValidationError] = useState("");
-    const [showExtensionAlert, setShowExtensionAlert] = useState(true);
+    const [showExtensionAlert, setShowExtensionAlert] = useState(false);
     const [additionalBreakfast, setAdditionalBreakfast] = useState(0);
     const [openRegistrationDialog, setOpenRegistrationDialog] = useState(false);
     const category = watch('category');
@@ -737,6 +738,7 @@ function RfhSheRun2025() {
                 </style>
             </Helmet>
             <Header />
+            <FeedbackCard eventId={EVENT_DETAILS.name} eventName={EVENT_DETAILS.name} />
             {showExtensionAlert && (
                 <div className="alert alert-danger alert-dismissible fade show registration-extension" role="alert">
                     <div className="d-flex flex-column flex-md-row align-items-md-center">
@@ -1541,6 +1543,7 @@ function RfhSheRun2025() {
                     </div>
                 </div>
             )}
+            
         </div>
     )
 }
