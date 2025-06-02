@@ -83,13 +83,26 @@ const feedbackSchema = yup.object().shape({
   venue: yup.number().required('Please rate the venue').min(1, 'Rating is required'),
   trackRoute: yup.number().required('Please rate the track/route').min(1, 'Rating is required'),
   kitDistribution: yup.number().required('Please rate kit distribution').min(1, 'Rating is required'),
-  onCourseSupport: yup.number().required('Please rate on-course support').min(1, 'Rating is required'),
-  postRaceArrangements: yup.number().required('Please rate post-race arrangements').min(1, 'Rating is required'),
+  onCourseSupport: yup.number().required('Please rate on-track support').min(1, 'Rating is required'),
+  medalCertificateDistribution: yup.number().required('Please rate medal and certificate distribution').min(1, 'Rating is required'),
+  breakfastDistribution: yup.number().required('Please rate breakfast distribution and taste').min(1, 'Rating is required'),
   eventCommunication: yup.number().required('Please rate event communication').min(1, 'Rating is required'),
   
   // Impact & Engagement
   awarenessIncreased: yup.string().required('This field is required'),
-  motivation: yup.string().required('Please select your primary motivation'),
+  motivation: yup
+    .string()
+    .oneOf(
+      [
+        'To run in Cubbon Park',
+        'Supporting the cause',
+        'Health & fitness',
+        'Community involvement',
+        'Other'
+      ],
+      'Please select a valid option'
+    )
+    .required('Please select your primary motivation'),
   motivationOther: yup.string().when('motivation', {
     is: 'Other',
     then: yup.string().required('Please specify your motivation'),
@@ -143,7 +156,8 @@ const FeedbackFormDialog = ({ open, onClose, eventId, eventName }) => {
       trackRoute: 0,
       kitDistribution: 0,
       onCourseSupport: 0,
-      postRaceArrangements: 0,
+      medalCertificateDistribution: 0,
+      breakfastDistribution: 0,
       eventCommunication: 0,
       awarenessIncreased: '',
       motivation: '',
@@ -181,7 +195,8 @@ const FeedbackFormDialog = ({ open, onClose, eventId, eventName }) => {
       1: ['overallRating', 'recommendLikelihood', 'futureParticipationLikelihood'], // Overall Experience
       2: [ // Event Logistics
         'registrationCheckin', 'venue', 'trackRoute', 
-        'kitDistribution', 'onCourseSupport', 'postRaceArrangements', 'eventCommunication'
+        'kitDistribution', 'onCourseSupport', 'medalCertificateDistribution', 
+        'breakfastDistribution', 'eventCommunication'
       ],
       3: ['awarenessIncreased', 'motivation', 'interestedInFutureSupport'] // Impact & Engagement
     };
@@ -277,7 +292,8 @@ const FeedbackFormDialog = ({ open, onClose, eventId, eventName }) => {
         'trackRoute',
         'kitDistribution',
         'onCourseSupport',
-        'postRaceArrangements',
+        'medalCertificateDistribution',
+        'breakfastDistribution',
         'eventCommunication'
       ];
       
@@ -664,8 +680,9 @@ const FeedbackFormDialog = ({ open, onClose, eventId, eventName }) => {
                   { name: 'venue', label: 'Venue' },
                   { name: 'trackRoute', label: 'Track/Route' },
                   { name: 'kitDistribution', label: 'Kit Distribution' },
-                  { name: 'onCourseSupport', label: 'On-course Support' },
-                  { name: 'postRaceArrangements', label: 'Post-race Arrangements' },
+                  { name: 'onCourseSupport', label: 'On-track Support' },
+                  { name: 'medalCertificateDistribution', label: 'Medal and Certificate Distribution' },
+                  { name: 'breakfastDistribution', label: 'Breakfast Distribution and Taste' },
                   { name: 'eventCommunication', label: 'Event Communication' },
                 ].map(({ name, label }) => (
                   <Box key={name} sx={{ mb: 4 }}>
@@ -758,10 +775,10 @@ const FeedbackFormDialog = ({ open, onClose, eventId, eventName }) => {
                       control={control}
                       render={({ field }) => (
                         <RadioGroup {...field}>
+                          <FormControlLabel value="To run in Cubbon Park" control={<Radio />} label="To run in Cubbon Park" />
                           <FormControlLabel value="Supporting the cause" control={<Radio />} label="Supporting the cause" />
                           <FormControlLabel value="Health & fitness" control={<Radio />} label="Health & fitness" />
                           <FormControlLabel value="Community involvement" control={<Radio />} label="Community involvement" />
-                          <FormControlLabel value="Personal challenge" control={<Radio />} label="Personal challenge" />
                           <FormControlLabel value="Other" control={<Radio />} label="Other" />
                         </RadioGroup>
                       )}
