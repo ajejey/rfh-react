@@ -33,6 +33,7 @@ import OurTeamMain from './Components/OurTeam/OurTeamMain';
 import EventForm2025 from './Components/Events/EventForm2025';
 import RfhSheRun2025 from './Components/Events/RfhSheRun2025';
 import DonationPaymentRedirect from './Components/DonationPaymentRedirect';
+import FeedbackPage from './Components/Events/FeedbackPage';
 
 
 
@@ -71,6 +72,7 @@ function App() {
             {/* <Route path='/rfh-juniors-run-2024' element={<EventForm />} /> */}
             <Route path='/rfh-juniors-run-2025' element={<EventForm2025 />} />
             <Route path='/rfh-she-run-2025' element={<RfhSheRun2025 />} />
+            <Route path='/rfhrun2025-feedback' element={<FeedbackPage />} />
             <Route path='/blog' element={<IndexPage />} />
             <Route path='/post/:path' element={<PostPage />} />
             <Route path='/edit/:path' element={<EditPost />} />
