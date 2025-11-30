@@ -34,6 +34,9 @@ import EventForm2025 from './Components/Events/EventForm2025';
 import RfhSheRun2025 from './Components/Events/RfhSheRun2025';
 import DonationPaymentRedirect from './Components/DonationPaymentRedirect';
 import FeedbackPage from './Components/Events/FeedbackPage';
+import ActivitiesMain from './Components/Activities/ActivitiesMain';
+
+
 
 
 
@@ -57,6 +60,7 @@ function App() {
             <Route path='/forgot-password' element={<ForgotPassword />} />
             <Route path='events/*' element={<EventsMain />} />
             <Route path='our-team/*' element={<OurTeamMain />} />
+            <Route path='activities/*' element={<ActivitiesMain />} />
             <Route path='/gallery' element={<Gallery />} />
             <Route path='/volunteer-register' element={<VolunteerForm />} />
             <Route path='/refund-policy' element={<PrivacyPolicy />} />
