@@ -37,11 +37,13 @@ function a11yProps(index) {
 
 function AdminHome() {
   const [tabNumber, setTabNumber] = useState(0);
-  const { handleSubmit, register, reset } = useForm();
+  const { handleSubmit, register, reset, setValue, getValues } = useForm();
   const [downloadLink, setDownloadLink] = useState(null);
   const [loading, setLoading] = useState(false);
   const [buttonDisabled, setButtonDisabled] = useState(true);
   const [apiError, setApiError] = useState('');
+  const [donorLookupLoading, setDonorLookupLoading] = useState(false);
+  const [donorLookupError, setDonorLookupError] = useState('');
   const [downloadCSVLoading, setDownloadCSVLoading] = useState(false);
   const [csvDownloadLink, setCsvDownloadLink] = useState(null);
   const downloadLinkRef = useRef(null);
@@ -62,9 +64,9 @@ function AdminHome() {
   };
 
   const body = [
-    'fullName',
     'email',
     'mobNo',
+    'fullName',
     'PANno',
     'cause',
     'transactionNo',
@@ -113,6 +115,65 @@ function AdminHome() {
 
   const handleInputChange = () => {
     setButtonDisabled(false);
+  };
+
+  const lookupAndAutofillDonor = async () => {
+    const email = (getValues('email') || '').toString().trim();
+    const mobNo = (getValues('mobNo') || '').toString().trim();
+
+    const hasValidEmail = email.includes('@') && email.includes('.');
+    const hasValidMobNo = mobNo.length >= 8;
+
+    if (!hasValidEmail && !hasValidMobNo) return;
+
+    setDonorLookupError('');
+    setDonorLookupLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (hasValidEmail) params.set('email', email);
+      if (hasValidMobNo) params.set('mobNo', mobNo);
+
+      const url = `${process.env.REACT_APP_BACKEND_BASE_URL}/api/donations/donor-lookup?${params.toString()}`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        if (response.status === 404) {
+          setDonorLookupError('No existing donor found for the given email/phone');
+          return;
+        }
+        throw new Error('Failed to lookup donor');
+      }
+
+      const data = await response.json();
+      const donor = data?.user;
+      if (!donor) return;
+
+      const current = {
+        fullName: (getValues('fullName') || '').toString().trim(),
+        email: (getValues('email') || '').toString().trim(),
+        mobNo: (getValues('mobNo') || '').toString().trim(),
+        PANno: (getValues('PANno') || '').toString().trim(),
+        donationAmount: (getValues('donationAmount') || '').toString().trim(),
+        cause: (getValues('cause') || '').toString().trim(),
+      };
+
+      if (!current.fullName && donor.fullName) setValue('fullName', donor.fullName);
+      if (!current.email && donor.email) setValue('email', donor.email);
+      if (!current.mobNo && donor.mobNo) setValue('mobNo', donor.mobNo);
+      if (!current.PANno && donor.PANno) setValue('PANno', donor.PANno);
+
+      const latest = data?.latestDonation;
+      if (latest) {
+        if (!current.cause && latest.cause) setValue('cause', latest.cause);
+        if (!current.donationAmount && (latest.donationAmount || latest.donationAmount === 0)) {
+          setValue('donationAmount', String(latest.donationAmount));
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      setDonorLookupError('Could not lookup donor details');
+    } finally {
+      setDonorLookupLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -181,8 +242,10 @@ function AdminHome() {
                 type="text"
                 id={field}
                 className="form-control"
-                {...register(field)}
-                onChange={handleInputChange}
+                {...register(field, {
+                  onChange: handleInputChange,
+                  onBlur: field === 'email' || field === 'mobNo' ? lookupAndAutofillDonor : undefined,
+                })}
               />
             </div>
           ))}
@@ -193,10 +256,17 @@ function AdminHome() {
               id="date"
               defaultValue={today}
               className="form-control"
-              {...register('date')}
-              onChange={handleInputChange}
+              {...register('date', { onChange: handleInputChange })}
             />
           </div>
+          {donorLookupLoading && (
+            <div className="alert alert-info" role="alert">
+              Looking up donor details...
+            </div>
+          )}
+          {donorLookupError && !donorLookupLoading && (
+            <div className="alert alert-warning" role="alert">{donorLookupError}</div>
+          )}
           <button type="submit" disabled={buttonDisabled} className="btn btn-primary">
             {loading ? (
               <div className="spinner-border spinner-border-sm text-light me-2" role="status">
