@@ -279,9 +279,17 @@ function AdminHome() {
         {apiError && <div className="alert alert-danger mt-3" role="alert">{apiError}</div>}
         <br />
         {downloadLink && (
-          <div ref={downloadLinkRef} className="mt-3">
-            <p>Download the invoice:</p>
+          <div ref={downloadLinkRef} className="my-4">
+            <p><strong>Download the receipt:</strong></p>
             <div dangerouslySetInnerHTML={{ __html: downloadLink }} />
+            <div className="alert alert-info" role="alert">
+              <strong>✓ Receipt Generated Successfully!</strong>
+              <ul className="mb-0 mt-2">
+                <li>Email is being sent to the donor in the background</li>
+                <li><strong>Important:</strong> Please download and save this receipt using the link below</li>
+                <li>If the donor doesn't receive the email, you can manually send them this receipt</li>
+              </ul>
+            </div>
           </div>
         )}
       </div>
