@@ -156,18 +156,12 @@ function AdminHome() {
         cause: (getValues('cause') || '').toString().trim(),
       };
 
+      // Only autofill donor personal information (name, email, mobile, PAN)
+      // Do NOT autofill previous donation details (cause, amount)
       if (!current.fullName && donor.fullName) setValue('fullName', donor.fullName);
       if (!current.email && donor.email) setValue('email', donor.email);
       if (!current.mobNo && donor.mobNo) setValue('mobNo', donor.mobNo);
       if (!current.PANno && donor.PANno) setValue('PANno', donor.PANno);
-
-      const latest = data?.latestDonation;
-      if (latest) {
-        if (!current.cause && latest.cause) setValue('cause', latest.cause);
-        if (!current.donationAmount && (latest.donationAmount || latest.donationAmount === 0)) {
-          setValue('donationAmount', String(latest.donationAmount));
-        }
-      }
     } catch (error) {
       console.error(error);
       setDonorLookupError('Could not lookup donor details');
