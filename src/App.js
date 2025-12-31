@@ -27,6 +27,7 @@ import AdminMain from './Components/Admin/AdminMain';
 import ForgotPassword from './Components/AuthComponent/ForgotPassword';
 import { Toaster } from 'sonner'
 import PrivacyPolicy from './Components/PrivacyPolicy/PrivacyPolicy';
+import RefundPolicy from './Components/PrivacyPolicy/RefundPolicy';
 import TermsAndConditions from './Components/PrivacyPolicy/TermsAndConditions';
 import Gallery from './Components/Gallery/Gallery';
 import OurTeamMain from './Components/OurTeam/OurTeamMain';
@@ -63,7 +64,8 @@ function App() {
             <Route path='activities/*' element={<ActivitiesMain />} />
             <Route path='/gallery' element={<Gallery />} />
             <Route path='/volunteer-register' element={<VolunteerForm />} />
-            <Route path='/refund-policy' element={<PrivacyPolicy />} />
+            <Route path='/privacy-policy' element={<PrivacyPolicy />} />
+            <Route path='/refund-policy' element={<RefundPolicy />} />
             <Route path='/terms-and-conditions' element={<TermsAndConditions />} />
             <Route path='/verifyEmail/:id/:token' element={<EmailVerification />} />
             {/* <Route path='/payment-redirect' element={<PaymentRedirect />} /> */}

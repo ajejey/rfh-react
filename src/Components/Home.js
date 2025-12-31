@@ -568,8 +568,9 @@ function Home() {
             {/* footer */}
 
             <footer id="footer">
-                <p>© Copyright 2023 Rupee for Humanity</p>
+                <p>© Copyright {new Date().getFullYear()} Rupee for Humanity</p>
                 <div style={{ display: "flex", justifyContent: "center", gap: "16px" }}>
+                    <Link to="/privacy-policy" >Privacy Policy</Link>
                     <Link to="/refund-policy" >Refund Policy</Link>
                     <Link to="/terms-and-conditions" >Terms and Conditions</Link>
                 </div>
