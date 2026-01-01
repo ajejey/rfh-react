@@ -39,6 +39,7 @@ function AdminHome() {
   const [tabNumber, setTabNumber] = useState(0);
   const { handleSubmit, register, reset, setValue, getValues } = useForm();
   const [downloadLink, setDownloadLink] = useState(null);
+  const [emailData, setEmailData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [buttonDisabled, setButtonDisabled] = useState(true);
   const [apiError, setApiError] = useState('');
@@ -46,6 +47,7 @@ function AdminHome() {
   const [donorLookupError, setDonorLookupError] = useState('');
   const [downloadCSVLoading, setDownloadCSVLoading] = useState(false);
   const [csvDownloadLink, setCsvDownloadLink] = useState(null);
+  const [copySuccess, setCopySuccess] = useState('');
   const downloadLinkRef = useRef(null);
 
   const downloadCsv = async () => {
@@ -94,11 +96,19 @@ function AdminHome() {
 
       const responseData = await response.json();
 
-      // Extract the download link from the response
-      const { downloadLink } = responseData;
+      // Extract the download link and email data from the response
+      const { downloadLink, emailData } = responseData;
 
-      // Set the download link state to make it available for rendering
-      setDownloadLink(downloadLink);
+      // Extract the base64 data and filename from the download link
+      // downloadLink format: <a href="data:application/pdf;base64,..." download="filename.pdf">Download Receipt</a>
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(downloadLink, 'text/html');
+      const linkElement = doc.querySelector('a');
+      const pdfDataUrl = linkElement?.href || '';
+
+      // Set the download link and email data state to make them available for rendering
+      setDownloadLink(pdfDataUrl);
+      setEmailData(emailData);
       setLoading(false);
       // Reset the form
       reset();
@@ -115,6 +125,32 @@ function AdminHome() {
 
   const handleInputChange = () => {
     setButtonDisabled(false);
+  };
+
+  const copyEmailBody = () => {
+    if (!emailData) return;
+
+    // Copy the HTML email body exactly as server sends it
+    navigator.clipboard.writeText(emailData.body).then(() => {
+      setCopySuccess('Email body copied! Paste it into Gmail.');
+      setTimeout(() => setCopySuccess(''), 3000);
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+      setCopySuccess('Failed to copy');
+    });
+  };
+
+  const openGmailCompose = () => {
+    if (!emailData) return;
+
+    // Convert HTML to plain text for the URL (Gmail compose link has character limits)
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = emailData.body;
+    const plainTextBody = tempDiv.textContent || tempDiv.innerText || '';
+
+    const mailtoLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(emailData.to)}&su=${encodeURIComponent(emailData.subject)}&body=${encodeURIComponent(plainTextBody)}`;
+
+    window.open(mailtoLink, '_blank');
   };
 
   const lookupAndAutofillDonor = async () => {
@@ -272,17 +308,70 @@ function AdminHome() {
         </form>
         {apiError && <div className="alert alert-danger mt-3" role="alert">{apiError}</div>}
         <br />
-        {downloadLink && (
-          <div ref={downloadLinkRef} className="my-4">
-            <p><strong>Download the receipt:</strong></p>
-            <div dangerouslySetInnerHTML={{ __html: downloadLink }} />
-            <div className="alert alert-info" role="alert">
+        {downloadLink && emailData && (
+          <div ref={downloadLinkRef} className="card my-4">
+            <div className="card-header bg-success text-white">
               <strong>✓ Receipt Generated Successfully!</strong>
-              <ul className="mb-0 mt-2">
-                <li>Email is being sent to the donor in the background</li>
-                <li><strong>Important:</strong> Please download and save this receipt using the link below</li>
-                <li>If the donor doesn't receive the email, you can manually send them this receipt</li>
-              </ul>
+            </div>
+            <div className="card-body">
+              <div className="alert alert-info mb-3" role="alert">
+                <strong>Email Status:</strong> Being sent automatically in the background.
+                <br />
+                <strong>If email fails:</strong> Use the quick tools below to send manually.
+              </div>
+
+              <div className="mb-3">
+                <strong>Receipt Details:</strong><br />
+                <strong>Receipt Number:</strong> {emailData.receiptNo}<br />
+                <strong>Recipient:</strong> {emailData.to}<br />
+                <strong>Filename:</strong> {emailData.receiptFilename}
+              </div>
+
+              <div className="d-flex gap-2 flex-wrap mb-3">
+                <a
+                  href={downloadLink}
+                  download={emailData.receiptFilename}
+                  className="btn btn-primary"
+                  title="Download the receipt PDF"
+                >
+                  📥 Download Receipt
+                </a>
+
+                <button
+                  className="btn btn-success"
+                  onClick={openGmailCompose}
+                  title="Opens Gmail with pre-filled recipient, subject, and body"
+                >
+                  📧 Open in Gmail
+                </button>
+
+                <button
+                  className="btn btn-outline-primary"
+                  onClick={copyEmailBody}
+                  title="Copy the exact HTML email body to clipboard"
+                >
+                  📋 Copy Email Body
+                </button>
+              </div>
+
+              {copySuccess && (
+                <div className="alert alert-success" role="alert">
+                  {copySuccess}
+                </div>
+              )}
+
+              <div className="alert alert-light mb-0" role="alert">
+                <strong>Quick Send Instructions:</strong>
+                <ol className="mb-0 mt-2">
+                  <li><strong>Click "Download Receipt"</strong> above (saves as {emailData.receiptFilename})</li>
+                  <li><strong>Click "Open in Gmail"</strong> - Opens Gmail with recipient, subject, and body pre-filled</li>
+                  <li><strong>Attach the downloaded PDF</strong> to the Gmail compose window</li>
+                  <li><strong>Click Send</strong> in Gmail</li>
+                </ol>
+                <p className="mb-0 mt-2 text-muted small">
+                  <strong>Note:</strong> Gmail doesn't allow auto-attaching files for security reasons, so you'll need to attach the PDF manually. However, everything else is pre-filled to save you time!
+                </p>
+              </div>
             </div>
           </div>
         )}
