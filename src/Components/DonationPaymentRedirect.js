@@ -64,6 +64,25 @@ function DonationPaymentRedirect({path = '/app/payment-status'}) {
                     setStatus(data);
                     setLoading(false)
 
+                    // If payment successful and shouldSendEmail flag is set, send email via separate endpoint
+                    if (data.statusColor === 'green' && data.shouldSendEmail && data.merchantTransactionId) {
+                        console.log('Sending payment receipt email...');
+                        try {
+                            const emailRes = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/send-payment-receipt`, {
+                                method: 'POST',
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({ merchantTransactionId: data.merchantTransactionId })
+                            });
+                            const emailData = await emailRes.json();
+                            console.log('Email send result:', emailData);
+                        } catch (emailError) {
+                            console.error('Error sending email:', emailError);
+                            // Don't fail the whole flow if email fails - user still got their payment
+                        }
+                    }
+
                     // Check if payment is still pending
                     // if (data.success === true && data.data.state === 'PENDING') {
                     //     setTimeout(fetchStatus, 3000);
