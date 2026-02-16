@@ -156,7 +156,7 @@ function VolunteerForm() {
                     setLoading(false)
                 }
             } else {
-                throw { message: "Looks like you are not human!" }
+                throw new Error("Looks like you are not human!")
             }
         } catch (error) {
             console.error(error);
@@ -187,7 +187,7 @@ function VolunteerForm() {
         } else {
             setSearchParams({ form: "form" })
         }
-    }, [])
+    }, [reset, setSearchParams])
 
     return (
         <div className='volunteer-container'>

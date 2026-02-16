@@ -1,6 +1,5 @@
 import React from 'react'
 import { Route, Routes } from 'react-router-dom'
-import EventForm from './EventForm'
 import Events from './Events'
 import CreateEvent from './CreateEvent'
 import Event from './Event'
