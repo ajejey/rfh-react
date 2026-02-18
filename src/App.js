@@ -31,7 +31,7 @@ import RefundPolicy from './Components/PrivacyPolicy/RefundPolicy';
 import TermsAndConditions from './Components/PrivacyPolicy/TermsAndConditions';
 import Gallery from './Components/Gallery/Gallery';
 import OurTeamMain from './Components/OurTeam/OurTeamMain';
-import EventForm2025 from './Components/Events/EventForm2025';
+import EventForm2026 from './Components/Events/EventForm2025';
 import RfhSheRun2025 from './Components/Events/RfhSheRun2025';
 import DonationPaymentRedirect from './Components/DonationPaymentRedirect';
 import FeedbackPage from './Components/Events/FeedbackPage';
@@ -78,7 +78,8 @@ function App() {
             <Route path='/donate' element={<Donate />} />
             <Route path='/nivanshfightsma' element={<NivanshFightSma />} />
             {/* <Route path='/rfh-juniors-run-2024' element={<EventForm />} /> */}
-            <Route path='/rfh-juniors-run-2025' element={<EventForm2025 />} />
+            <Route path='/rfh-juniors-run-2025' element={<EventForm2026 />} />
+            <Route path='/rfh-juniors-run-2026' element={<EventForm2026 />} />
             <Route path='/rfh-she-run-2025' element={<RfhSheRun2025 />} />
             <Route path='/rfhrun2025-feedback' element={<FeedbackPage />} />
             <Route path='/blog' element={<IndexPage />} />

@@ -17,22 +17,17 @@ import { useNavigate } from 'react-router-dom';
 import FeedbackCard from './FeedbackCard';
 
 const EVENT_DETAILS = {
-    name: "RFH Juniors Run 2025",
-    date: new Date("2025-05-25T00:00:00+05:30"), // May 25th, 2025
-    lastDate: new Date("2025-05-10T23:59:00+05:30"),
+    name: "RFH Juniors Run 2026",
+    date: new Date("2026-05-24T00:00:00+05:30"),
+    lastDate: new Date("2026-05-10T23:59:00+05:30"),
     time: "8:00 AM IST",
     venue: "https://www.google.com/maps/place/Bal+Bhavan+Auditorium/@12.9766439,77.5952091,17z/data=!3m1!4b1!4m6!3m5!1s0x3bae1671b1cd3b1f:0xb72fa25e5df4598d!8m2!3d12.9766439!4d77.597784!16s%2Fg%2F11csqwx6mm?entry=ttu&g_ep=EgoyMDI1MDIxMi4wIKXMDSoASAFQAw%3D%3D",
     venueName: "Cubbon Park, Bengaluru",
 }
 
-const requiredChanges = `
-Juniors run : 
-1. Update early bird offer as 499/-
-2. Update date (till offer lasts)
-3. Remove 1re payment and update the actual payment cost.`
 
 
-function EventForm2025() {
+function EventForm2026() {
     const { register, control, handleSubmit, getValues, setValue, formState: { errors }, watch } = useForm();
     const myRef = useRef(null)
     const [submitted, setSubmitted] = useState(false)
@@ -57,11 +52,9 @@ function EventForm2025() {
     const navigate = useNavigate()
 
     const DISCOUNT_PRICE = 599
-    const PRICE = 599
-    // const DISCOUNT_PRICE = 1
-    // const PRICE = 1
+    const PRICE = 699
     const ADDITIONAL_TSHIRT_PRICE = 225
-    const DISCOUNT_DATE = new Date("2025-05-25T00:00:00+05:30");
+    const DISCOUNT_DATE = new Date("2026-04-30T23:59:00+05:30");
 
     const TSHIRT_SIZE_OPTIONS = [
         { value: '24', label: 'Size 24' },
@@ -249,7 +242,7 @@ function EventForm2025() {
         localStorage.removeItem('merchantTransactionId');
         localStorage.removeItem('cause');
         setValue("totalPrice", totalPrice)
-        setValue("marathonName", "RFH Juniors run 2025")
+        setValue("marathonName", "RFH Juniors Run 2026")
         try {
             setPaymentStatus("Initiating payment...");
             const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/initiate-payment`, {
@@ -270,7 +263,7 @@ function EventForm2025() {
             }
 
             localStorage.setItem('merchantTransactionId', data?.data?.merchantTransactionId);
-            localStorage.setItem('cause', "RFH Juniors run 2025");
+            localStorage.setItem('cause', "RFH Juniors Run 2026");
 
             // Detect if user is on iOS/Safari
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
@@ -318,7 +311,7 @@ function EventForm2025() {
             setDisablePaymentButton(true);
             setPaymentStatus("Initiating Razorpay payment...");
             setValue("totalPrice", totalPrice)
-            setValue("marathonName", "RFH Juniors run 2025")
+            setValue("marathonName", "RFH Juniors Run 2026")
 
             const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/initiate-razorpay-payment`, {
                 method: "POST",
@@ -338,7 +331,7 @@ function EventForm2025() {
                 amount: data.amount,
                 currency: data.currency,
                 name: "Rupee For Humanity",
-                description: "RFH Juniors Run 2025 Registration",
+                description: "RFH Juniors Run 2026 Registration",
                 order_id: data.orderId,
                 handler: async function (response) {
                     try {
@@ -359,7 +352,7 @@ function EventForm2025() {
 
                         if (verifyData.status === 'success') {
                             localStorage.setItem('merchantTransactionId', data.merchantTransactionId);
-                            localStorage.setItem('cause', "RFH Juniors Run 2025");
+                            localStorage.setItem('cause', "RFH Juniors Run 2026");
 
                             // Show success dialog with payment details
                             console.log('Payment details for dialog:', verifyData.payment);
@@ -624,7 +617,7 @@ function EventForm2025() {
     return (
         <div style={{ backgroundColor: "#040002", color: "lightgray", minHeight: "100vh" }}>
             <Helmet>
-                <title>RFH Juniors Run 2025</title>
+                <title>RFH Juniors Run 2026</title>
                 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
                 <style>
                     {`
@@ -702,7 +695,7 @@ function EventForm2025() {
                 </style>
             </Helmet>
             <Header />
-            <FeedbackCard eventId={EVENT_DETAILS.name} eventName={EVENT_DETAILS.name} />
+            {/* <FeedbackCard eventId={EVENT_DETAILS.name} eventName={EVENT_DETAILS.name} /> */}
             {showExtensionAlert && (
                 <div className="alert alert-danger alert-dismissible fade show registration-extension" role="alert">
                     <div className="d-flex align-items-center">
@@ -736,14 +729,14 @@ function EventForm2025() {
                     <section id="registration-form">
                         <div className="container-md">
                             <h1 className="h1" style={{ fontWeight: "800" }}>
-                                RFH Juniors run 2025 <br />
+                                RFH Juniors Run 2026 <br />
                                 {/* <span className='highlight' style={{ cursor: "pointer" }} onClick={executeScroll}>Virtual Run</span> */}
                             </h1>
                             <div className="row">
                                 <div className="col-md-4">
                                     <span> <strong><EventTwoToneIcon /> Date:</strong>
                                         {/* {EVENT_DETAILS.date.toLocaleDateString('en-US', dateOptions)}  */}
-                                        May 25th, 2025
+                                        {EVENT_DETAILS.date.toLocaleDateString('en-US', dateOptions)}
                                     </span>
                                 </div>
                                 <div className="col-md-4">
@@ -762,7 +755,7 @@ function EventForm2025() {
                                 Rupee For Humanity (RFH) is a government-registered online NGO founded by a group of passionate engineers dedicated to the nation's progress. As a non-profit organization, its mission is to eliminate illiteracy at its core and contribute to India's advancement as a developed nation.
                             </p>
                             <p>
-                                We are proud to host the event again this year <b>“RFH Juniors run 2025”!</b>
+                                We are proud to host the event again this year <b>"RFH Juniors Run 2026"!</b>
                             </p>
 
                             {seeMore === true && expandedText()}
@@ -826,7 +819,7 @@ function EventForm2025() {
 
                             </div>
 
-                            <RegistrationDetailsDialog open={openRegistrationDialog} onClose={() => setOpenRegistrationDialog(false)} eventName="RFH Juniors run 2025" />
+                            <RegistrationDetailsDialog open={openRegistrationDialog} onClose={() => setOpenRegistrationDialog(false)} eventName="RFH Juniors Run 2026" />
 
                             <div ref={myRef} className="regestration-form">
 
@@ -1229,7 +1222,6 @@ function EventForm2025() {
                                         <button
                                             className="btn btn-primary"
                                             type="submit"
-                                            disabled={true}
                                         >
                                             Submit
                                         </button>
@@ -1432,7 +1424,7 @@ function EventForm2025() {
                                             </tbody>
                                         </table>
                                         {/* <button onClick={handlePaymentClick} disabled={disablePaymentButton} type="button" className="w-100 btn btn-lg btn-primary">Pay with PhonePe</button> */}
-                                        <button onClick={handleRazorpayClick} disabled={true} type="button" className="w-100 btn btn-lg btn-primary mt-4">Pay with Razorpay</button>
+                                        <button onClick={handleRazorpayClick} disabled={disablePaymentButton || paymentLoading} type="button" className="w-100 btn btn-lg btn-primary mt-4">{paymentLoading ? "Processing..." : "Pay with Razorpay"}</button>
                                     </div>
                                 </div>
                             </div>
@@ -1520,4 +1512,4 @@ function EventForm2025() {
     )
 }
 
-export default EventForm2025
+export default EventForm2026

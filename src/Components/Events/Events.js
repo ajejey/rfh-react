@@ -10,6 +10,7 @@ import { Grid, Card, CardMedia, CardContent, Typography, Skeleton } from '@mui/m
 import useSWR from 'swr';
 import useAuthStatus from '../../CustomHooks/useAuthStatus'
 import rfhjuniorsRun2025Poster from '../../assets/images/rfh-juniors-run-2025-poster.jpeg'
+import rfhjuniorsRun2026Poster from '../../assets/images/rfh-juniors-run-2025-poster.jpeg'
 import rfhSheRun2025Poster from '../../assets/images/rfh-she-run-2025-poster.jpeg'
 
 const fetcher = async (url) => {
@@ -100,13 +101,13 @@ function Events() {
 
     <Grid container spacing={2}>
         <Grid item xs={12} sm={6} md={4}>
-        <Link to={'/rfh-juniors-run-2025'}>
+        <Link to={'/rfh-juniors-run-2026'}>
             <Card style={{ cursor: 'pointer' }}>
                 <CardMedia
                     component="img"
                     height="350"
-                    image={rfhjuniorsRun2025Poster}
-                    alt="RFH Juniors Run 2025"
+                    image={rfhjuniorsRun2026Poster}
+                    alt="RFH Juniors Run 2026"
                     sx={{
                         objectFit: "contain",
                         objectPosition: "center",
@@ -114,10 +115,10 @@ function Events() {
                 />
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="div">
-                        RFH Juniors Run 2025
+                        RFH Juniors Run 2026
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                        Join us for the exciting RFH Juniors Run 2025!
+                        Join us for the exciting RFH Juniors Run 2026!
                     </Typography>
                 </CardContent>
             </Card>
