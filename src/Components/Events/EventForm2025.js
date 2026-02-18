@@ -51,9 +51,13 @@ function EventForm2026() {
     const category = watch('category');
     const navigate = useNavigate()
 
-    const DISCOUNT_PRICE = 599
+    // const DISCOUNT_PRICE = 599
+    const DISCOUNT_PRICE = 1
     const PRICE = 699
-    const ADDITIONAL_TSHIRT_PRICE = 225
+    // const ADDITIONAL_TSHIRT_PRICE = 225
+    const ADDITIONAL_TSHIRT_PRICE = 1
+    const ADDITIONAL_BREAKFAST_PRICE = 1
+
     const DISCOUNT_DATE = new Date("2026-04-30T23:59:00+05:30");
 
     const TSHIRT_SIZE_OPTIONS = [
@@ -192,7 +196,7 @@ function EventForm2026() {
 
         // Add cost for additional breakfast
         if (formData.additionalBreakfast) {
-            totalPrice += Number(formData.additionalBreakfast) * 80;
+            totalPrice += Number(formData.additionalBreakfast) * ADDITIONAL_BREAKFAST_PRICE;
         }
 
         // Add the donation amount
