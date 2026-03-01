@@ -42,15 +42,40 @@ function OfflineRegistration() {
     const [tshirtSizes, setTshirtSizes] = useState([]);
     const [additionalTshirtQuantity, setAdditionalTshirtQuantity] = useState(0);
 
-    // Constants for pricing
+    // Constants for pricing — add new events here when needed
     const PRICE_MAP = {
         'RFH She run 2025': 800,
-        'RFH Juniors run 2025': 599
+        'RFH Juniors run 2025': 599,
+        'RFH Juniors Run 2026': 699,
     };
-    const ADDITIONAL_TSHIRT_PRICE = 225;
-    const BREAKFAST_PRICE = 80;
+    const ADDITIONAL_TSHIRT_PRICE_MAP = {
+        'RFH She run 2025': 225,
+        'RFH Juniors run 2025': 225,
+        'RFH Juniors Run 2026': 250,
+    };
+    const BREAKFAST_PRICE_MAP = {
+        'RFH She run 2025': 80,
+        'RFH Juniors run 2025': 80,
+        'RFH Juniors Run 2026': 100,
+    };
+    const ADDITIONAL_TSHIRT_PRICE = ADDITIONAL_TSHIRT_PRICE_MAP[marathonName] || 225;
+    const BREAKFAST_PRICE = BREAKFAST_PRICE_MAP[marathonName] || 80;
 
     // T-shirt size options based on marathon
+    const KIDS_TSHIRT_SIZES = [
+        { value: '24', label: 'Size 24' },
+        { value: '26', label: 'Size 26' },
+        { value: '28', label: 'Size 28' },
+        { value: '30', label: 'Size 30' },
+        { value: '32', label: 'Size 32' },
+        { value: '34', label: 'Size 34' },
+        { value: '36', label: 'Size 36' },
+        { value: '38', label: 'Size 38' },
+        { value: '40', label: 'Size 40' },
+        { value: '42', label: 'Size 42' },
+        { value: '44', label: 'Size 44' },
+        { value: '46', label: 'Size 46' }
+    ];
     const TSHIRT_SIZE_OPTIONS = {
         'RFH She run 2025': [
             { value: 'XS', label: 'Extra Small (XS)' },
@@ -60,20 +85,8 @@ function OfflineRegistration() {
             { value: 'XL', label: 'Extra Large (XL)' },
             { value: 'XXL', label: 'Double XL (XXL)' }
         ],
-        'RFH Juniors run 2025': [
-            { value: '24', label: 'Size 24' },
-            { value: '26', label: 'Size 26' },
-            { value: '28', label: 'Size 28' },
-            { value: '30', label: 'Size 30' },
-            { value: '32', label: 'Size 32' },
-            { value: '34', label: 'Size 34' },
-            { value: '36', label: 'Size 36' },
-            { value: '38', label: 'Size 38' },
-            { value: '40', label: 'Size 40' },
-            { value: '42', label: 'Size 42' },
-            { value: '44', label: 'Size 44' },
-            { value: '46', label: 'Size 46' }
-        ]
+        'RFH Juniors run 2025': KIDS_TSHIRT_SIZES,
+        'RFH Juniors Run 2026': KIDS_TSHIRT_SIZES,
     };
 
     // Categories based on marathon
@@ -86,6 +99,12 @@ function OfflineRegistration() {
             { value: 'Champs-Run', label: 'Champs Run (Ages 3-6, 800m)' },
             { value: 'Power-Run', label: 'Power Run (Ages 7-13, 1.5K)' },
             { value: 'Bolts-Run', label: 'Bolts Run (Ages 14-18, 2.5K)' }
+        ],
+        'RFH Juniors Run 2026': [
+            { value: 'Champs-Run', label: 'Champs Run (Ages 3-6, 800m)' },
+            { value: 'Power-Run', label: 'Power Run (Ages 7-10, 1.1K)' },
+            { value: 'Bolts-Run', label: 'Bolts Run (Ages 11-15, 1.6K)' },
+            { value: 'Open-Run', label: 'Open Run (Ages 16+, 1.6K)' }
         ]
     };
 
@@ -152,21 +171,20 @@ function OfflineRegistration() {
         if (!marathonName) return;
 
         let price = PRICE_MAP[marathonName] || 0;
-        
-        // Add additional t-shirts cost
+        const tshirtPrice = ADDITIONAL_TSHIRT_PRICE_MAP[marathonName] || 225;
+        const breakfastPrice = BREAKFAST_PRICE_MAP[marathonName] || 80;
+
         if (watchAdditionalTshirt === 'Yes') {
-            const additionalTshirtQuantity = parseInt(watchAdditionalTshirtQuantity) || 0;
-            price += additionalTshirtQuantity * ADDITIONAL_TSHIRT_PRICE;
+            const qty = parseInt(watchAdditionalTshirtQuantity) || 0;
+            price += qty * tshirtPrice;
         }
-        
-        // Add additional breakfast cost
+
         const additionalBreakfast = parseInt(watchAdditionalBreakfast) || 0;
-        price += additionalBreakfast * BREAKFAST_PRICE;
-        
-        // Add donation
+        price += additionalBreakfast * breakfastPrice;
+
         const donation = parseInt(watchDonation) || 0;
         price += donation;
-        
+
         setTotalPrice(price);
     };
 
@@ -309,6 +327,7 @@ function OfflineRegistration() {
                                     >
                                         <MenuItem value="RFH She run 2025">RFH She run 2025</MenuItem>
                                         <MenuItem value="RFH Juniors run 2025">RFH Juniors run 2025</MenuItem>
+                                        <MenuItem value="RFH Juniors Run 2026">RFH Juniors Run 2026</MenuItem>
                                     </Select>
                                     {errors.marathonName && <FormHelperText>{errors.marathonName.message}</FormHelperText>}
                                 </FormControl>
@@ -639,7 +658,7 @@ function OfflineRegistration() {
                                             </MenuItem>
                                         ))}
                                     </Select>
-                                    <FormHelperText>₹80 per additional breakfast</FormHelperText>
+                                    <FormHelperText>₹{BREAKFAST_PRICE_MAP[marathonName] || 80} per additional breakfast</FormHelperText>
                                 </FormControl>
                             </Grid>
                             

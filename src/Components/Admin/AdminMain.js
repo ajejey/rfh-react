@@ -6,6 +6,8 @@ import useAuthStatus from '../../CustomHooks/useAuthStatus'
 import EventParticipants from './EventParticipents'
 import OfflineRegistration from './OfflineRegistration'
 import FeedbackDashboard from './FeedbackDashboard'
+import AdminEventConfig from './AdminEventConfig'
+import AdminCheckIn from './AdminCheckIn'
 
 const AdminMain = () => {
     console.log("admin main")
@@ -51,6 +53,8 @@ const AdminMain = () => {
                 <Route path='/marathon-participants' element={<EventParticipants />} />
                 <Route path='/offline-registration' element={<OfflineRegistration />} />
                 <Route path='/feedback-dashboard' element={<FeedbackDashboard />} />
+                <Route path='/event-config' element={<AdminEventConfig />} />
+                <Route path='/checkin' element={<AdminCheckIn />} />
 
             </Routes>
         </div>

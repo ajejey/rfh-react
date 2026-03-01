@@ -36,6 +36,7 @@ import RfhSheRun2025 from './Components/Events/RfhSheRun2025';
 import DonationPaymentRedirect from './Components/DonationPaymentRedirect';
 import FeedbackPage from './Components/Events/FeedbackPage';
 import ActivitiesMain from './Components/Activities/ActivitiesMain';
+import CheckInScanner from './Components/CheckIn/CheckInScanner';
 
 
 
@@ -82,6 +83,7 @@ function App() {
             <Route path='/rfh-juniors-run-2026' element={<EventForm2026 />} />
             <Route path='/rfh-she-run-2025' element={<RfhSheRun2025 />} />
             <Route path='/rfhrun2025-feedback' element={<FeedbackPage />} />
+            <Route path='/checkin' element={<CheckInScanner />} />
             <Route path='/blog' element={<IndexPage />} />
             <Route path='/post/:path' element={<PostPage />} />
             <Route path='/edit/:path' element={<EditPost />} />

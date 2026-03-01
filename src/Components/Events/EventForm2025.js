@@ -16,14 +16,7 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import FeedbackCard from './FeedbackCard';
 
-const EVENT_DETAILS = {
-    name: "RFH Juniors Run 2026",
-    date: new Date("2026-05-24T00:00:00+05:30"),
-    lastDate: new Date("2026-05-10T23:59:00+05:30"),
-    time: "8:00 AM IST",
-    venue: "https://www.google.com/maps/place/Bal+Bhavan+Auditorium/@12.9766439,77.5952091,17z/data=!3m1!4b1!4m6!3m5!1s0x3bae1671b1cd3b1f:0xb72fa25e5df4598d!8m2!3d12.9766439!4d77.597784!16s%2Fg%2F11csqwx6mm?entry=ttu&g_ep=EgoyMDI1MDIxMi4wIKXMDSoASAFQAw%3D%3D",
-    venueName: "Cubbon Park, Bengaluru",
-}
+const EVENT_SLUG = 'rfh-juniors-run-2026';
 
 
 
@@ -48,17 +41,39 @@ function EventForm2026() {
     const [tshirtSizes, setTshirtSizes] = useState([]);
     const [showExtensionAlert, setShowExtensionAlert] = useState(false);
     const [openRegistrationDialog, setOpenRegistrationDialog] = useState(false);
+    const [couponCode, setCouponCode] = useState("")
+    const [couponApplied, setCouponApplied] = useState(false)
+    const [couponError, setCouponError] = useState("")
+    const [couponValidating, setCouponValidating] = useState(false)
+    const [accompanyingCount, setAccompanyingCount] = useState(0)
+    const [accompanyingPeople, setAccompanyingPeople] = useState([])
+    const [eventConfig, setEventConfig] = useState(null)
+    const [configLoading, setConfigLoading] = useState(true)
     const category = watch('category');
     const navigate = useNavigate()
 
-    // const DISCOUNT_PRICE = 599
-    const DISCOUNT_PRICE = 1
-    const PRICE = 699
-    // const ADDITIONAL_TSHIRT_PRICE = 225
-    const ADDITIONAL_TSHIRT_PRICE = 1
-    const ADDITIONAL_BREAKFAST_PRICE = 1
+    useEffect(() => {
+        fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/event-config/${EVENT_SLUG}`)
+            .then(r => r.ok ? r.json() : null)
+            .then(data => { setEventConfig(data); setConfigLoading(false); })
+            .catch(() => setConfigLoading(false));
+    }, []);
 
-    const DISCOUNT_DATE = new Date("2026-04-30T23:59:00+05:30");
+    // Config-backed constants (fall back to hardcoded values if config not loaded)
+    const DISCOUNT_PRICE = eventConfig?.discountPrice ?? 649
+    const PRICE = eventConfig?.price ?? 699
+    const ADDITIONAL_TSHIRT_PRICE = eventConfig?.tshirtPrice ?? 250
+    const ADDITIONAL_BREAKFAST_PRICE = eventConfig?.breakfastPrice ?? 100
+    const DISCOUNT_DATE = new Date(eventConfig?.discountDeadline ?? "2026-05-31T23:59:00+05:30")
+
+    const EVENT_DETAILS = {
+        name: eventConfig?.eventName ?? "RFH Juniors Run 2026",
+        date: new Date(eventConfig?.eventDate ?? "2026-06-14T00:00:00+05:30"),
+        lastDate: new Date(eventConfig?.lastRegistrationDate ?? "2026-05-31T23:59:00+05:30"),
+        time: "8:00 AM IST",
+        venue: eventConfig?.venueUrl ?? "https://www.google.com/maps/place/Indian+Institute+Of+Management%E2%80%93Bangalore+(IIM%E2%80%93Bangalore)/data=!4m2!3m1!1s0x0:0x25bdb9da743f9bdd?sa=X&ved=1t:2428&ictx=111",
+        venueName: eventConfig?.venueName ?? "IIM-B, Bengaluru",
+    }
 
     const TSHIRT_SIZE_OPTIONS = [
         { value: '24', label: 'Size 24' },
@@ -111,12 +126,14 @@ function EventForm2026() {
         const age = calculateAge(dob);
 
         // Update the category based on the age
-        if (age >= 1 && age <= 6) {
+        if (age >= 3 && age <= 6) {
             setSelectedCategory('Champs-Run');
-        } else if (age >= 7 && age <= 13) {
+        } else if (age >= 7 && age <= 10) {
             setSelectedCategory('Power-Run');
-        } else if (age >= 14 && age <= 18) {
+        } else if (age >= 11 && age <= 15) {
             setSelectedCategory('Bolts-Run');
+        } else if (age >= 16) {
+            setSelectedCategory('Open-Run');
         } else {
             setSelectedCategory('');
         }
@@ -178,33 +195,30 @@ function EventForm2026() {
     }
 
     function calculateTotalPrice(formData) {
-        // Get the current date
         const currentDate = new Date();
-
-        // Set the registration fee based on the current date
         const registrationFee = currentDate < new Date(DISCOUNT_DATE) ? DISCOUNT_PRICE : PRICE;
-        console.log("registrationFee ", registrationFee)
-        // Calculate the total price
         let totalPrice = registrationFee;
 
-        // Add cost for additional T-shirts
         if (formData.additionalTshirtQuantity) {
-            console.log("formData.additionalTshirtQuantity ", formData.additionalTshirtQuantity)
             const additionalTshirtCost = Number(formData.additionalTshirtQuantity) * ADDITIONAL_TSHIRT_PRICE;
             totalPrice += additionalTshirtCost;
         }
 
-        // Add cost for additional breakfast
         if (formData.additionalBreakfast) {
             totalPrice += Number(formData.additionalBreakfast) * ADDITIONAL_BREAKFAST_PRICE;
         }
 
-        // Add the donation amount
+        // Apply coupon discount (excluding donation)
+        if (couponApplied) {
+            const matched = VALID_COUPONS.find(c => c.code.toUpperCase() === couponCode.trim().toUpperCase())
+            const discountPct = matched?.discount ?? 5
+            totalPrice = Math.round(totalPrice * (1 - discountPct / 100));
+        }
+
+        // Donation is added after discount
         if (formData.donation) {
             totalPrice += parseInt(formData.donation, 10);
         }
-
-        console.log("totalPrice ", totalPrice)
 
         return totalPrice;
     }
@@ -316,6 +330,16 @@ function EventForm2026() {
             setPaymentStatus("Initiating Razorpay payment...");
             setValue("totalPrice", totalPrice)
             setValue("marathonName", "RFH Juniors Run 2026")
+            setValue("eventSlug", EVENT_SLUG)
+            // Coupon — store code and discount % so the backend can validate and the receipt can show it
+            if (couponApplied && couponCode.trim()) {
+                const matched = VALID_COUPONS.find(c => c.code.toUpperCase() === couponCode.trim().toUpperCase())
+                setValue("couponCode", couponCode.trim().toUpperCase())
+                setValue("couponDiscount", matched?.discount ?? 5)
+            } else {
+                setValue("couponCode", "")
+                setValue("couponDiscount", 0)
+            }
 
             const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/initiate-razorpay-payment`, {
                 method: "POST",
@@ -437,6 +461,55 @@ function EventForm2026() {
         setSeeMore(!seeMore)
     }
 
+    // Coupon codes from admin config (active coupons only) — used for price calculation
+    const VALID_COUPONS = (eventConfig?.coupons ?? []).filter(c => c.active)
+
+    const handleCouponApply = async () => {
+        if (!couponCode.trim()) {
+            setCouponError("Please enter a coupon code")
+            setCouponApplied(false)
+            return
+        }
+        setCouponValidating(true)
+        setCouponError("")
+        setCouponApplied(false)
+        try {
+            const res = await fetch(
+                `${process.env.REACT_APP_BACKEND_BASE_URL}/api/event-config/${EVENT_SLUG}/validate-coupon`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ couponCode: couponCode.trim() }),
+                }
+            )
+            const data = await res.json()
+            if (data.valid) {
+                setCouponApplied(true)
+                setCouponError("")
+            } else {
+                setCouponApplied(false)
+                setCouponError(data.message || "Invalid coupon code")
+            }
+        } catch (err) {
+            setCouponApplied(false)
+            setCouponError("Could not validate coupon. Please check your connection and try again.")
+        } finally {
+            setCouponValidating(false)
+        }
+    }
+
+    const handleAccompanyingCountChange = (count) => {
+        setAccompanyingCount(count)
+        setAccompanyingPeople(Array(count).fill({ name: '', age: '' }))
+    }
+
+    const handleAccompanyingPersonChange = (index, field, value) => {
+        const updated = [...accompanyingPeople]
+        updated[index] = { ...updated[index], [field]: value }
+        setAccompanyingPeople(updated)
+        setValue(`accompanyingPerson${index + 1}${field.charAt(0).toUpperCase() + field.slice(1)}`, value)
+    }
+
     console.log("price total ", totalPrice)
     console.log("getValues() ", getValues())
 
@@ -491,13 +564,13 @@ function EventForm2026() {
                         onChange={(e) => setAdditionalBreakfast(Number(e.target.value))}
                     >
                         <option value="0">No additional breakfast</option>
-                        <option value="1">1 person (₹80)</option>
-                        <option value="2">2 persons (₹160)</option>
-                        <option value="3">3 persons (₹240)</option>
-                        <option value="4">4 persons (₹320)</option>
-                        <option value="5">5 persons (₹400)</option>
+                        <option value="1">1 person (₹100)</option>
+                        <option value="2">2 persons (₹200)</option>
+                        <option value="3">3 persons (₹300)</option>
+                        <option value="4">4 persons (₹400)</option>
+                        <option value="5">5 persons (₹500)</option>
                     </select>
-                    <small className="form-text text-light-50">Breakfast is already included for the participant</small>
+                    <small className="form-text" style={{ color: '#e0e0e0' }}>Breakfast is already included for the participant</small>
                 </div>
             </div>
         </div>
@@ -617,6 +690,33 @@ function EventForm2026() {
             box-shadow: 0 0 0 0.2rem rgba(243, 156, 18, 0.25);
         }
     `;
+
+    // Config loading — brief spinner
+    if (configLoading) {
+        return (
+            <div style={{ backgroundColor: "#040002", color: "lightgray", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Header />
+                <div className="spinner-border text-warning" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        )
+    }
+
+    // Registration gate — admin can close registrations from admin panel
+    if (eventConfig && !eventConfig.registrationOpen) {
+        return (
+            <div style={{ backgroundColor: "#040002", color: "lightgray", minHeight: "100vh" }}>
+                <Header />
+                <div className="container text-center" style={{ marginTop: '6rem' }}>
+                    <h2 style={{ color: "lightgray" }}>
+                        {eventConfig.closedMessage || "Registrations are now closed."}
+                    </h2>
+                    <p style={{ color: "#aaa", marginTop: "1rem" }}>Thank you for your interest in {eventConfig.eventName ?? "this event"}.</p>
+                </div>
+            </div>
+        )
+    }
 
     return (
         <div style={{ backgroundColor: "#040002", color: "lightgray", minHeight: "100vh" }}>
@@ -787,13 +887,18 @@ function EventForm2026() {
                                         </tr>
                                         <tr>
                                             <td className="fs-6">Power Run</td>
-                                            <td>7-13 years</td>
-                                            <td>1.5 kms</td>
+                                            <td>7-10 years</td>
+                                            <td>1.1 kms</td>
                                         </tr>
                                         <tr>
                                             <td className="fs-6">Bolts Run</td>
-                                            <td>14-18 years</td>
-                                            <td>2.5 kms</td>
+                                            <td>11-15 years</td>
+                                            <td>1.6 kms</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="fs-6">Open Run</td>
+                                            <td>16+ years</td>
+                                            <td>1.6 kms</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -806,7 +911,7 @@ function EventForm2026() {
                                         <li><strong>Champs run:</strong> Should be accompanied by a parent/guardian.</li>
                                         <li><strong>Registration Cost:</strong> Early Bird (till offer lasts) - ₹{DISCOUNT_PRICE}, Regular - ₹{PRICE}</li>
                                         <li><strong>Additional T-shirt:</strong> ₹{ADDITIONAL_TSHIRT_PRICE} per T-shirt</li>
-                                        <li><strong>Breakfast:</strong> Included for participants. Additional breakfast available at ₹80 per person.</li>
+                                        <li><strong>Breakfast:</strong> Included for participants. Additional breakfast available at ₹{ADDITIONAL_BREAKFAST_PRICE} per person.</li>
                                     </ul>
                                 </div>
 
@@ -995,7 +1100,7 @@ function EventForm2026() {
                                                 <label htmlFor="date">
                                                     Date of Birth
                                                     <small>
-                                                        <i>(eligible only if born after 2002)</i>
+                                                        <i>(eligible from age 3 onwards; age is auto-calculated as of today)</i>
                                                     </small>{" "}
                                                     <span style={{ color: "red" }}>*</span>
                                                 </label>
@@ -1005,8 +1110,8 @@ function EventForm2026() {
                                                     className="form-control"
                                                     id="date"
                                                     placeholder="date"
-                                                    max={new Date().toISOString().split("T")[0]} // Set max date to today
-                                                    min="2002-01-01" // Set min date to January 1, 2002
+                                                    max={new Date().toISOString().split("T")[0]}
+                                                    min="2008-01-01"
                                                 />
                                                 {errors.dob && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
@@ -1024,7 +1129,7 @@ function EventForm2026() {
                                                     <option value="Power-Run">Power Run</option>
                                                     <option value="Bolts-Run">Bolts Run</option>
                                                 </select> */}
-                                                {errors.category && <p><span style={{ color: "red" }}>This field is mandatory.</span> <span style={{ color: "#f39c12" }}>Make sure your age is less than 21 to be eligible</span>  </p>}
+                                                {errors.category && <p><span style={{ color: "red" }}>This field is mandatory.</span> <span style={{ color: "#f39c12" }}>Age must be 3+ years. Champs: 3-6, Power: 7-10, Bolts: 11-15, Open: 16+</span></p>}
                                             </div>
                                         </div>
                                         {category === 'Champs-Run' && (
@@ -1037,6 +1142,67 @@ function EventForm2026() {
                                             </div>
                                         )}
                                     </div>
+                                    {/* Accompanying People — IIM-B security requirement */}
+                                    {selectedCategory && (
+                                        <div className="row">
+                                            <div className="col-md-12">
+                                                <div className="form-group">
+                                                    <label>
+                                                        Number of Accompanying People
+                                                        <small className="d-block mt-1" style={{ color: "#f39c12" }}>
+                                                            ⚠️ These details must exactly match at IIM-B entrance (mandatory as per security protocol).
+                                                            {selectedCategory === 'Champs-Run' ? ' Maximum 1 accompanying person allowed.' : ' Maximum 2 accompanying persons allowed.'}
+                                                        </small>
+                                                    </label>
+                                                    <select
+                                                        {...register("accompanyingCount")}
+                                                        className="form-select"
+                                                        onChange={(e) => handleAccompanyingCountChange(parseInt(e.target.value))}
+                                                    >
+                                                        <option value="0">0 (No accompanying person)</option>
+                                                        <option value="1">+1 person</option>
+                                                        {selectedCategory !== 'Champs-Run' && (
+                                                            <option value="2">+2 persons</option>
+                                                        )}
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            {accompanyingPeople.map((person, index) => (
+                                                <div key={index} className="col-md-12 mb-3">
+                                                    <div className="row">
+                                                        <div className="col-md-6">
+                                                            <div className="form-group">
+                                                                <label>Accompanying Person {index + 1} — Full Name <span style={{ color: "red" }}>*</span></label>
+                                                                <input
+                                                                    {...register(`accompanyingPerson${index + 1}Name`, { required: accompanyingCount > 0 })}
+                                                                    className="form-control"
+                                                                    type="text"
+                                                                    placeholder="Full Name"
+                                                                    onChange={(e) => handleAccompanyingPersonChange(index, 'name', e.target.value)}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <div className="col-md-3">
+                                                            <div className="form-group">
+                                                                <label>Age <span style={{ color: "red" }}>*</span></label>
+                                                                <input
+                                                                    {...register(`accompanyingPerson${index + 1}Age`, { required: accompanyingCount > 0 })}
+                                                                    className="form-control"
+                                                                    type="number"
+                                                                    placeholder="Age"
+                                                                    min="1"
+                                                                    max="100"
+                                                                    onChange={(e) => handleAccompanyingPersonChange(index, 'age', e.target.value)}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
                                     <div className="row">
                                         {/* <div className="col-md-6">
                                             <div className="form-group">
@@ -1121,6 +1287,47 @@ function EventForm2026() {
 
                                     {additionalBreakfastSection}
 
+                                    {/* Coupon Code — shown only when admin has enabled coupons */}
+                                    {eventConfig?.couponsEnabled && (
+                                    <div className="row">
+                                        <div className="col-md-6">
+                                            <div className="form-group">
+                                                <label htmlFor="couponCode">Coupon Code (if any)</label>
+                                                <div className="d-flex gap-2">
+                                                    <input
+                                                        type="text"
+                                                        className="form-control"
+                                                        id="couponCode"
+                                                        value={couponCode}
+                                                        onChange={(e) => { setCouponCode(e.target.value); setCouponApplied(false); setCouponError("") }}
+                                                        placeholder="Enter coupon code"
+                                                        style={{ textTransform: "uppercase" }}
+                                                        disabled={couponValidating}
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-outline-warning"
+                                                        onClick={handleCouponApply}
+                                                        disabled={couponValidating}
+                                                        style={{ minWidth: "80px" }}
+                                                    >
+                                                        {couponValidating
+                                                            ? <span className="spinner-border spinner-border-sm" role="status" />
+                                                            : "Apply"
+                                                        }
+                                                    </button>
+                                                </div>
+                                                {couponApplied && (() => {
+                                                    const matched = VALID_COUPONS.find(c => c.code.toUpperCase() === couponCode.trim().toUpperCase())
+                                                    const discountPct = matched?.discount ?? 5
+                                                    return <p style={{ color: "#28a745" }}>Coupon applied! {discountPct}% discount on registration cost.</p>
+                                                })()}
+                                                {couponError && <p style={{ color: "red" }}>{couponError}</p>}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    )}
+
                                     <br />
                                     <hr />
                                     <br />
@@ -1152,6 +1359,21 @@ function EventForm2026() {
                                                 <label htmlFor="reference">How did you come to know about this event? <span style={{ color: "red" }}>*</span></label>
                                                 <textarea rows={2} {...register("reference", { required: true })} className="form-control" type="text-field" id="reference" />
                                                 {errors.reference && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="row">
+                                        <div className="col-md-6">
+                                            <div className="form-group">
+                                                <label htmlFor="brandAmbassador">Brand Ambassador through whom you came to know about this event?</label>
+                                                <select {...register("brandAmbassador")} className="form-select" id="brandAmbassador">
+                                                    <option value="">Select (if applicable)</option>
+                                                    {(eventConfig?.brandAmbassadors ?? []).map(name => (
+                                                        <option key={name} value={name}>{name}</option>
+                                                    ))}
+                                                    <option value="other">Other</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -1413,13 +1635,24 @@ function EventForm2026() {
                                                     <td className="fs-6">Additional T-shirt</td>
                                                     <td> INR {getValues("additionalTshirt") === "Yes" ? getValues("additionalTshirtQuantity") * ADDITIONAL_TSHIRT_PRICE : 0} </td>
                                                 </tr>
+                                                {couponApplied && (() => {
+                                                    const matched = VALID_COUPONS.find(c => c.code.toUpperCase() === couponCode.trim().toUpperCase())
+                                                    const discountPct = matched?.discount ?? 5
+                                                    const basePrice = new Date() < new Date(DISCOUNT_DATE) ? DISCOUNT_PRICE : PRICE
+                                                    return (
+                                                        <tr>
+                                                            <td className="fs-6" style={{ color: "#28a745" }}>Coupon Discount ({discountPct}%)</td>
+                                                            <td style={{ color: "#28a745" }}>- INR {Math.round(basePrice * discountPct / 100)}</td>
+                                                        </tr>
+                                                    )
+                                                })()}
                                                 <tr>
                                                     <td className="fs-6">Donation</td>
                                                     <td> INR {getValues("donation") === "" ? 0 : getValues("donation")}</td>
                                                 </tr>
                                                 <tr>
                                                     <td className="fs-6">Additional Breakfast</td>
-                                                    <td> INR {getValues("additionalBreakfast") * 80} </td>
+                                                    <td> INR {getValues("additionalBreakfast") * ADDITIONAL_BREAKFAST_PRICE} </td>
                                                 </tr>
                                                 <tr>
                                                     <td className="fs-6"><strong>Total</strong></td>

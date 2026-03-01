@@ -241,6 +241,18 @@ function AdminHome() {
           <hr />
         </section>
         <section className="mb-4">
+          <h3>Event Config</h3>
+          <p>Control registration open/close, pricing, coupon codes, and brand ambassadors for each event form</p>
+          <Link to="/admin/event-config" className="btn btn-primary">Manage Event Config</Link>
+          <hr />
+        </section>
+        <section className="mb-4">
+          <h3>Gate Check-In Dashboard</h3>
+          <p>View live check-in stats, manually check in / undo participants, set volunteer PIN, and reset check-ins</p>
+          <Link to="/admin/checkin" className="btn btn-primary">Open Check-In Dashboard</Link>
+          <hr />
+        </section>
+        <section className="mb-4">
           <h3>Generate Donations CSV</h3>
           <div className="d-flex justify-content-center align-items-center mt-3 gap-3">
             <button className="btn btn-primary mr-2" onClick={downloadCsv}>
