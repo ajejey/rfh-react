@@ -8,7 +8,7 @@ import AccessTimeTwoToneIcon from '@mui/icons-material/AccessTimeTwoTone';
 import PlaceTwoToneIcon from '@mui/icons-material/PlaceTwoTone';
 import MilitaryTechTwoToneIcon from '@mui/icons-material/MilitaryTechTwoTone';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
-import { Button, Dialog, Box, Typography } from '@mui/material';
+import { Button, Dialog, Box, Typography, Skeleton } from '@mui/material';
 import RegistrationDetailsDialog from './RegistrationDetailsDialog';
 import { Helmet } from 'react-helmet-async';
 import tShirtGuide from '../../assets/images/tShirtGuide.jpeg'
@@ -691,14 +691,55 @@ function EventForm2026() {
         }
     `;
 
-    // Config loading — brief spinner
+    // Config loading — skeleton layout
     if (configLoading) {
         return (
-            <div style={{ backgroundColor: "#040002", color: "lightgray", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ backgroundColor: "#040002", minHeight: "100vh" }}>
                 <Header />
-                <div className="spinner-border text-warning" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                </div>
+
+                {/* Hero skeleton — mimics the dark event info banner */}
+                <Box sx={{ backgroundColor: "#040002", px: { xs: 2, md: 8 }, pt: 5, pb: 4 }}>
+                    <Skeleton variant="text" width={320} height={48} sx={{ bgcolor: '#1a1a1a', mb: 1, mx: 'auto' }} />
+                    <Skeleton variant="text" width={200} height={28} sx={{ bgcolor: '#1a1a1a', mb: 3, mx: 'auto' }} />
+
+                    {/* Event info chips row */}
+                    <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap', mb: 4 }}>
+                        {[160, 140, 180].map((w, i) => (
+                            <Skeleton key={i} variant="rounded" width={w} height={36} sx={{ bgcolor: '#1a1a1a' }} />
+                        ))}
+                    </Box>
+
+                    {/* Category table skeleton */}
+                    <Box sx={{ maxWidth: 680, mx: 'auto', mb: 2 }}>
+                        <Skeleton variant="rounded" width="100%" height={44} sx={{ bgcolor: '#1a1a1a', mb: 1 }} />
+                        {[1, 2, 3, 4].map(i => (
+                            <Skeleton key={i} variant="rounded" width="100%" height={40} sx={{ bgcolor: '#151515', mb: 0.75 }} />
+                        ))}
+                    </Box>
+                </Box>
+
+                {/* Form section skeleton — mimics the light registration form area */}
+                <Box sx={{ backgroundColor: '#f8f4ef', px: { xs: 2, md: 8 }, py: 5 }}>
+                    <Box sx={{ maxWidth: 800, mx: 'auto' }}>
+                        <Skeleton variant="text" width={260} height={36} sx={{ mb: 3 }} />
+
+                        {/* Two-column form rows */}
+                        {[1, 2, 3].map(i => (
+                            <Box key={i} sx={{ display: 'flex', gap: 2, mb: 2.5 }}>
+                                <Skeleton variant="rounded" width="50%" height={52} />
+                                <Skeleton variant="rounded" width="50%" height={52} />
+                            </Box>
+                        ))}
+                        {/* Full-width rows */}
+                        <Skeleton variant="rounded" width="100%" height={52} sx={{ mb: 2.5 }} />
+                        <Skeleton variant="rounded" width="100%" height={52} sx={{ mb: 2.5 }} />
+
+                        {/* Submit button skeleton */}
+                        <Box sx={{ textAlign: 'center', mt: 4 }}>
+                            <Skeleton variant="rounded" width={200} height={48} sx={{ mx: 'auto' }} />
+                        </Box>
+                    </Box>
+                </Box>
             </div>
         )
     }
