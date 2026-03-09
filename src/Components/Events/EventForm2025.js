@@ -159,6 +159,12 @@ function EventForm2026() {
 
     useEffect(() => {
         setValue("category", selectedCategory)
+        // Champs Run only allows 1 accompanying person — reset if the previous selection was 2
+        if (selectedCategory === 'Champs-Run' && accompanyingCount > 1) {
+            setAccompanyingCount(0)
+            setAccompanyingPeople([])
+            setValue("accompanyingCount", "0")
+        }
     }, [selectedCategory])
 
     const handleCategoryChange = () => {
@@ -1009,7 +1015,7 @@ function EventForm2026() {
                                                 <select {...register("gender", { required: true })} id="gender" className="form-select" aria-label="Default select example">
                                                     <option value="">select</option>
                                                     <option value="female">Female</option>
-                                                    <option value="male">Male</option>
+                                                    <option value="Male">Male</option>
                                                     <option value="transGender">Transgender</option>
                                                     <option value="nonBinary">Non-binary/non-conforming</option>
                                                     <option value="noResponse">Prefer not to respond</option>
@@ -1453,16 +1459,14 @@ function EventForm2026() {
                                     <br />
                                     <div className="form-group">
                                         <textarea
-                                            defaultValue="&#x2022; All registration are non-refundable, nontransferable and cannot be modified. 
-                                            &#x2022; Provide us correct mobile number &amp; email address that you can assess regularly, as this will be our primary resources of contacting you during the run up to the event.
-                                            &#x2022; By registering you agree that participating is an extreme sport and can be injures to body and health. You take full responsibility for participating in the RFH Juniors Run and do not hold the organizing committee of RFH Juniors Run, Rupee for Humanity or other organizing person or entities responsible of any injury or accident. 
-                                            &#x2022; For Champs run, parent/guardian holds complete responsbility for safery measurements of your own kids.  You take full responsibility for participating in the RFH Juniors Run and do not hold the organizing committee of RFH Juniors Run, Rupee for Humanity or other organizing person or entities responsible of any injury or accident. 
-                                            &#x2022; You also assume all risks associated with participating in this event including, but not limited to falls, contact with other participants, the effects of the weather, including high heat or humidity, traffic and the condition of the road, arson or terrorist threats and all others risks associated with public event. Atleast one parent/guardinan must accompany for kids participating in Champs run. You cannot carry the kid while running and if happens, you are not eligible for trophies but can complete the run and collect medal for the kids. RFH volunteers will monitor in the entire track and there words will be final on the event day.                 
-                                            &#x2022; You agree that organizing committee, Rupee for Humanity and associated companies or entities that organize the run shall not be liable for any loss, damage, illness or injury that might occur as a result of participating in the event.
-                                            &#x2022; You confirm that, in the event of adverse weather conditions, major incidents or threats on the day, the organizers reserve the right to stop/ cancel/ postpone the Event.
-                                            &#x2022; You understand that confirmed registrations and merchandise order are non-refundable, non-transferable and cannot be modified. The organizers reserve the right to reject any application without providing reasons. Any amount collected from rejected applications alone will be refundable in full (excluding bank charges wherever applicable).
-                                            &#x2022; The organizer will contact the participant only by email &amp; text msg. Any notice or message sent to the email or mobile number registered with the organizers shell be deemed as received by the participants.
-                                            &#x2022; Please remember you are participating for fun + noble cause run. So do not rush or panic and enjoy every moment of the event."
+                                            defaultValue="&#x2022; Registration Policy: All registrations are non-refundable, non-transferable, and cannot be modified.
+&#x2022; Contact Information: Participants must provide a valid mobile number and email address for event-related communication.
+&#x2022; Participation Risk: By registering, participants acknowledge that running involves physical activity and possible risks of injury and agree to participate at their own responsibility.
+&#x2022; Liability Waiver: Participants agree not to hold the RFH Juniors Run organizing committee, Rupee for Humanity, sponsors, or volunteers liable for any injury, loss, or damage resulting from participation in the event.
+&#x2022; Champs Run (Kids Category): A parent/guardian must accompany children participating in the Champs Run. Parents cannot carry the child while running. If carried, the child will not be eligible for trophies, but may still receive a participation medal.
+&#x2022; Event Monitoring: RFH volunteers will monitor the entire track, and their decision will be final on the event day.
+&#x2022; Event Changes: The organizers reserve the right to cancel, postpone, or stop the event due to adverse weather or unforeseen circumstances.
+&#x2022; Event Spirit: This is a fun run for a noble cause. Participants are encouraged to run safely and enjoy the event."
                                             className="form-control"
                                             style={{ fontSize: "0.8rem" }}
                                             id="address"
@@ -1605,6 +1609,10 @@ function EventForm2026() {
                                         <div className="receipt-note">
                                             <i className="fas fa-envelope"></i>
                                             <span style={{ color: "#000" }}>A receipt has been sent to {paymentDetails?.email}</span>
+                                        </div>
+
+                                        <div style={{ textAlign: "center", marginTop: "1rem", color: "#000", fontWeight: "500" }}>
+                                            Thank you for supporting this noble cause.
                                         </div>
 
                                         <div className="action-buttons">
