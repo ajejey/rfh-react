@@ -262,6 +262,9 @@ function Home() {
                         <Link to="/rfh-juniors-run-2026" className="btn btn-warning btn-lg download-button">
                             RFH Juniors Run 2026
                         </Link>
+                        <Link to="/rfh-akshara-run-2026" className="btn btn-warning btn-lg download-button">
+                            RFH Akshara Run 2026
+                        </Link>
                     </div>
                 </div>
                 <Fab onClick={executeScroll} aria-label="contact-us" style={{ position: "fixed", bottom: "2%", right: "2%", backgroundColor: "#efb442" }}>

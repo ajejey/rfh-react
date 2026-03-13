@@ -16,11 +16,12 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import FeedbackCard from './FeedbackCard';
 
-const EVENT_SLUG = 'rfh-juniors-run-2026';
+const EVENT_SLUG = 'rfh-akshara-run-2026';
+const MARATHON_NAME = 'RFH Akshara Run 2026';
 
 
 
-function EventForm2026() {
+function AksharaRun2026() {
     const { register, control, handleSubmit, getValues, setValue, formState: { errors }, watch } = useForm();
     const myRef = useRef(null)
     const [submitted, setSubmitted] = useState(false)
@@ -60,34 +61,30 @@ function EventForm2026() {
     }, []);
 
     // Config-backed constants (fall back to hardcoded values if config not loaded)
-    const DISCOUNT_PRICE = eventConfig?.discountPrice ?? 649
-    const PRICE = eventConfig?.price ?? 699
+    const DISCOUNT_PRICE = eventConfig?.discountPrice ?? 749
+    const PRICE = eventConfig?.price ?? 849
     const ADDITIONAL_TSHIRT_PRICE = eventConfig?.tshirtPrice ?? 250
     const ADDITIONAL_BREAKFAST_PRICE = eventConfig?.breakfastPrice ?? 100
-    const DISCOUNT_DATE = new Date(eventConfig?.discountDeadline ?? "2026-05-31T23:59:00+05:30")
+    const DISCOUNT_DATE = new Date(eventConfig?.discountDeadline ?? "2026-06-01T23:59:00+05:30")
+    const VALID_COUPONS = (eventConfig?.coupons ?? []).filter(c => c.active)
+    const BRAND_AMBASSADORS = eventConfig?.brandAmbassadors ?? []
 
     const EVENT_DETAILS = {
-        name: eventConfig?.eventName ?? "RFH Juniors Run 2026",
+        name: eventConfig?.eventName ?? "RFH Akshara Run 2026",
         date: new Date(eventConfig?.eventDate ?? "2026-06-14T00:00:00+05:30"),
-        lastDate: new Date(eventConfig?.lastRegistrationDate ?? "2026-05-31T23:59:00+05:30"),
-        time: "8:00 AM IST",
+        lastDate: new Date(eventConfig?.lastRegistrationDate ?? "2026-06-01T23:59:00+05:30"),
+        time: "6:45 AM IST",
         venue: eventConfig?.venueUrl ?? "https://www.google.com/maps/place/Indian+Institute+Of+Management%E2%80%93Bangalore+(IIM%E2%80%93Bangalore)/data=!4m2!3m1!1s0x0:0x25bdb9da743f9bdd?sa=X&ved=1t:2428&ictx=111",
         venueName: eventConfig?.venueName ?? "IIM-B, Bengaluru",
     }
 
     const TSHIRT_SIZE_OPTIONS = [
-        { value: '24', label: 'Size 24' },
-        { value: '26', label: 'Size 26' },
-        { value: '28', label: 'Size 28' },
-        { value: '30', label: 'Size 30' },
-        { value: '32', label: 'Size 32' },
-        { value: '34', label: 'Size 34' },
-        { value: '36', label: 'Size 36' },
-        { value: '38', label: 'Size 38' },
-        { value: '40', label: 'Size 40' },
-        { value: '42', label: 'Size 42' },
-        { value: '44', label: 'Size 44' },
-        { value: '46', label: 'Size 46' }
+        { value: 'XS', label: 'Extra Small (XS)' },
+        { value: 'S', label: 'Small (S)' },
+        { value: 'M', label: 'Medium (M)' },
+        { value: 'L', label: 'Large (L)' },
+        { value: 'XL', label: 'Extra Large (XL)' },
+        { value: 'XXL', label: 'Double XL (XXL)' }
     ];
 
     const executeScroll = () => myRef.current.scrollIntoView()
@@ -121,52 +118,15 @@ function EventForm2026() {
         return age;
     };
 
-    const handleDateChange = () => {
-        const dob = watch('dob');
-        const age = calculateAge(dob);
-
-        // Update the category based on the age
-        if (age >= 3 && age <= 6) {
-            setSelectedCategory('Champs-Run');
-        } else if (age >= 7 && age <= 10) {
-            setSelectedCategory('Power-Run');
-        } else if (age >= 11 && age <= 15) {
-            setSelectedCategory('Bolts-Run');
-        } else {
-            setSelectedCategory('');
-        }
-    };
-
-    // Watch for changes in the 'dob' field
+    // Watch for changes in form fields
     const dob = watch('dob');
     const donation = watch('donation');
-    const categoryWatch = watch('category');
 
     const handleDonationChange = (e) => {
         const enteredValue = e.target.value;
-        setValue('donation', enteredValue);
-
-        // Clear the other input field when one is entered
-        setValue('customDonation', '');
-    };
-
-    useEffect(() => {
-        // Update the category whenever 'dob' changes
-        handleDateChange();
-    }, [dob]);
-
-    useEffect(() => {
-        setValue("category", selectedCategory)
-        // Champs Run only allows 1 accompanying person — reset if the previous selection was 2
-        if (selectedCategory === 'Champs-Run' && accompanyingCount > 1) {
-            setAccompanyingCount(0)
-            setAccompanyingPeople([])
-            setValue("accompanyingCount", "0")
+        if (enteredValue === "" || /^\d+$/.test(enteredValue)) {
+            setValue("donation", enteredValue);
         }
-    }, [selectedCategory])
-
-    const handleCategoryChange = () => {
-        console.log("selectedCategory ", selectedCategory)
     }
 
     const handleTshirtQuantityChange = (e) => {
@@ -265,7 +225,7 @@ function EventForm2026() {
         localStorage.removeItem('merchantTransactionId');
         localStorage.removeItem('cause');
         setValue("totalPrice", totalPrice)
-        setValue("marathonName", "RFH Juniors Run 2026")
+        setValue("marathonName", MARATHON_NAME)
         try {
             setPaymentStatus("Initiating payment...");
             const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/initiate-payment`, {
@@ -286,7 +246,7 @@ function EventForm2026() {
             }
 
             localStorage.setItem('merchantTransactionId', data?.data?.merchantTransactionId);
-            localStorage.setItem('cause', "RFH Juniors Run 2026");
+            localStorage.setItem('cause', MARATHON_NAME);
 
             // Detect if user is on iOS/Safari
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
@@ -334,7 +294,7 @@ function EventForm2026() {
             setDisablePaymentButton(true);
             setPaymentStatus("Initiating Razorpay payment...");
             setValue("totalPrice", totalPrice)
-            setValue("marathonName", "RFH Juniors Run 2026")
+            setValue("marathonName", MARATHON_NAME)
             setValue("eventSlug", EVENT_SLUG)
             // Coupon — store code and discount % so the backend can validate and the receipt can show it
             if (couponApplied && couponCode.trim()) {
@@ -364,7 +324,7 @@ function EventForm2026() {
                 amount: data.amount,
                 currency: data.currency,
                 name: "Rupee For Humanity",
-                description: "RFH Juniors Run 2026 Registration",
+                description: `${MARATHON_NAME} Registration`,
                 order_id: data.orderId,
                 handler: async function (response) {
                     try {
@@ -385,7 +345,7 @@ function EventForm2026() {
 
                         if (verifyData.status === 'success') {
                             localStorage.setItem('merchantTransactionId', data.merchantTransactionId);
-                            localStorage.setItem('cause', "RFH Juniors Run 2026");
+                            localStorage.setItem('cause', MARATHON_NAME);
 
                             // Show success dialog with payment details
                             console.log('Payment details for dialog:', verifyData.payment);
@@ -465,9 +425,6 @@ function EventForm2026() {
     const handleSeeMore = () => {
         setSeeMore(!seeMore)
     }
-
-    // Coupon codes from admin config (active coupons only) — used for price calculation
-    const VALID_COUPONS = (eventConfig?.coupons ?? []).filter(c => c.active)
 
     const handleCouponApply = async () => {
         if (!couponCode.trim()) {
@@ -767,7 +724,7 @@ function EventForm2026() {
     return (
         <div style={{ backgroundColor: "#040002", color: "lightgray", minHeight: "100vh" }}>
             <Helmet>
-                <title>RFH Juniors Run 2026</title>
+                <title>RFH Akshara Run 2026</title>
                 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
                 <style>
                     {`
@@ -879,7 +836,7 @@ function EventForm2026() {
                     <section id="registration-form">
                         <div className="container-md">
                             <h1 className="h1" style={{ fontWeight: "800" }}>
-                                RFH Juniors Run 2026 <br />
+                                RFH Akshara Run 2026 <br />
                                 {/* <span className='highlight' style={{ cursor: "pointer" }} onClick={executeScroll}>Virtual Run</span> */}
                             </h1>
                             <div className="row">
@@ -905,7 +862,7 @@ function EventForm2026() {
                                 Rupee For Humanity (RFH) is a government-registered online NGO founded by a group of passionate engineers dedicated to the nation's progress. As a non-profit organization, its mission is to eliminate illiteracy at its core and contribute to India's advancement as a developed nation.
                             </p>
                             <p>
-                                We are proud to host the event again this year <b>"RFH Juniors Run 2026"!</b>
+                                We are proud to host the event again this year <b>"RFH Akshara Run 2026"!</b>
                             </p>
 
                             {seeMore === true && expandedText()}
@@ -927,19 +884,14 @@ function EventForm2026() {
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td className="fs-6">Champs Run</td>
-                                            <td>3-6 years</td>
-                                            <td>800 meters</td>
+                                            <td className="fs-6">Fun Run</td>
+                                            <td>All ages</td>
+                                            <td>2.5 kms</td>
                                         </tr>
                                         <tr>
-                                            <td className="fs-6">Power Run</td>
-                                            <td>7-10 years</td>
-                                            <td>1.1 kms</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="fs-6">Bolts Run</td>
-                                            <td>11-15 years</td>
-                                            <td>1.6 kms</td>
+                                            <td className="fs-6">Challenge Run</td>
+                                            <td>All ages</td>
+                                            <td>5 kms</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -949,7 +901,6 @@ function EventForm2026() {
                                         Each participant receives a Tshirt, Medal, Bib, Finisher certificate, Breakfast and witnesses the noble cause of Rupee For Humanity.
                                     </p>
                                     <ul>
-                                        <li><strong>Champs run:</strong> Should be accompanied by a parent/guardian.</li>
                                         <li><strong>Registration Cost:</strong> Early Bird (till offer lasts) - ₹{DISCOUNT_PRICE}, Regular - ₹{PRICE}</li>
                                         <li><strong>Additional T-shirt:</strong> ₹{ADDITIONAL_TSHIRT_PRICE} per T-shirt</li>
                                         <li><strong>Breakfast:</strong> Included for participants. Additional breakfast available at ₹{ADDITIONAL_BREAKFAST_PRICE} per person.</li>
@@ -969,7 +920,7 @@ function EventForm2026() {
 
                             </div>
 
-                            <RegistrationDetailsDialog open={openRegistrationDialog} onClose={() => setOpenRegistrationDialog(false)} eventName="RFH Juniors Run 2026" />
+                            <RegistrationDetailsDialog open={openRegistrationDialog} onClose={() => setOpenRegistrationDialog(false)} eventName="RFH Akshara Run 2026" />
 
                             <div ref={myRef} className="regestration-form">
 
@@ -1139,11 +1090,7 @@ function EventForm2026() {
                                         <div className="col-md-6">
                                             <div className="form-group">
                                                 <label htmlFor="date">
-                                                    Date of Birth
-                                                    <small>
-                                                        <i>(eligible from age 3 onwards; age is auto-calculated as of today)</i>
-                                                    </small>{" "}
-                                                    <span style={{ color: "red" }}>*</span>
+                                                    Date of Birth <span style={{ color: "red" }}>*</span>
                                                 </label>
                                                 <input
                                                     {...register("dob", { required: true })}
@@ -1152,7 +1099,6 @@ function EventForm2026() {
                                                     id="date"
                                                     placeholder="date"
                                                     max={new Date().toISOString().split("T")[0]}
-                                                    min="2008-01-01"
                                                 />
                                                 {errors.dob && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
@@ -1163,25 +1109,36 @@ function EventForm2026() {
                                     <div className="row">
                                         <div className="col-md-6">
                                             <div className="form-group">
-                                                <label htmlFor="category">Select Category <small> <i>(Auto-populated based on your age)</i> </small> <span style={{ color: "red" }}>*</span></label>
-                                                <input type='text' id="category" {...register("category", { required: true })} value={getValues("category")} className="form-select" aria-label="Select Category" readOnly />
-                                                {/* <option value="">select</option>
-                                                    <option value="Champs-Run">Champs Run</option>
-                                                    <option value="Power-Run">Power Run</option>
-                                                    <option value="Bolts-Run">Bolts Run</option>
-                                                </select> */}
-                                                {errors.category && <p><span style={{ color: "red" }}>This field is mandatory.</span> <span style={{ color: "#f39c12" }}>Age must be between 3-15 years. Champs: 3-6, Power: 7-10, Bolts: 11-15</span></p>}
+                                                <label htmlFor="category">Select Category <span style={{ color: "red" }}>*</span></label>
+                                                <select id="category" {...register("category", { required: true })} className="form-select" aria-label="Select Category">
+                                                    <option value="">-- Select Category --</option>
+                                                    <option value="Fun-Run">Fun Run (2.5 kms)</option>
+                                                    <option value="Challenge-Run">Challenge Run (5 kms)</option>
+                                                </select>
+                                                {errors.category && <p><span style={{ color: "red" }}>This field is mandatory.</span></p>}
                                             </div>
                                         </div>
-                                        {category === 'Champs-Run' && (
-                                            <div className="col-md-6">
-                                                <div className="form-group">
-                                                    <label htmlFor='parentName'>Accompanying parent name <span style={{ color: "red" }}>*</span></label>
-                                                    <input {...register("parentName", { required: true })} className="form-control" type="text" name="parentName" id="parentName" />
-                                                    {errors.parentName && <p style={{ color: "red" }}>This field is mandatory</p>}
-                                                </div>
+                                        <div className="col-md-6">
+                                            <div className="form-group">
+                                                <label htmlFor='brandAmbassador'>How did you hear about this event?</label>
+                                                <select id="brandAmbassador" {...register("brandAmbassador")} className="form-select">
+                                                    <option value="">-- Select --</option>
+                                                    {BRAND_AMBASSADORS && BRAND_AMBASSADORS.length > 0 ? (
+                                                        BRAND_AMBASSADORS.map((ambassador, idx) => (
+                                                            <option key={idx} value={ambassador}>{ambassador}</option>
+                                                        ))
+                                                    ) : (
+                                                        <>
+                                                            <option value="Social Media">Social Media</option>
+                                                            <option value="Friends/Family">Friends/Family</option>
+                                                            <option value="RFH Website">RFH Website</option>
+                                                            <option value="Event Poster">Event Poster</option>
+                                                            <option value="Other">Other</option>
+                                                        </>
+                                                    )}
+                                                </select>
                                             </div>
-                                        )}
+                                        </div>
                                     </div>
                                     {/* Accompanying People — IIM-B security requirement */}
                                     {selectedCategory && (
@@ -1192,7 +1149,7 @@ function EventForm2026() {
                                                         Number of Accompanying People
                                                         <small className="d-block mt-1" style={{ color: "#f39c12" }}>
                                                             ⚠️ These details must exactly match at IIM-B entrance (mandatory as per security protocol).
-                                                            {selectedCategory === 'Champs-Run' ? ' Maximum 1 accompanying person allowed.' : ' Maximum 2 accompanying persons allowed.'}
+                                                            Maximum 2 accompanying persons allowed.
                                                         </small>
                                                     </label>
                                                     <select
@@ -1202,9 +1159,7 @@ function EventForm2026() {
                                                     >
                                                         <option value="0">0 (No accompanying person)</option>
                                                         <option value="1">+1 person</option>
-                                                        {selectedCategory !== 'Champs-Run' && (
-                                                            <option value="2">+2 persons</option>
-                                                        )}
+                                                        <option value="2">+2 persons</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -1263,28 +1218,22 @@ function EventForm2026() {
                                                 <label htmlFor="tee-size">T-Shirt Size  <span style={{ color: "red" }}>*</span></label>
                                                 <select {...register("TshirtSize", { required: false })} id="tee-size" className="form-select" aria-label="T-Shirt Size">
                                                     <option value="">select</option>
-                                                    <option value="24">24</option>
-                                                    <option value="26">26</option>
-                                                    <option value="28">28</option>
-                                                    <option value="30">30</option>
-                                                    <option value="32">32</option>
-                                                    <option value="34">34</option>
-                                                    <option value="36">36</option>
-                                                    <option value="38">38</option>
-                                                    <option value="40">40</option>
-                                                    <option value="42">42</option>
-                                                    <option value="44">44</option>
-                                                    <option value="46">46</option>
+                                                    <option value="XS">Extra Small (XS)</option>
+                                                    <option value="S">Small (S)</option>
+                                                    <option value="M">Medium (M)</option>
+                                                    <option value="L">Large (L)</option>
+                                                    <option value="XL">Extra Large (XL)</option>
+                                                    <option value="XXL">Double XL (XXL)</option>
                                                 </select>
                                                 {errors.TshirtSize && <p style={{ color: "red" }}>This field is mandatory</p>}
                                             </div>
                                         </div>
-                                        <div onClick={() => setOpenTshirtGuide(true)} className="col-md-6" style={{ display: 'flex', alignItems: "flex-end", textDecoration: "underline", cursor: "pointer" }}>
+                                        {/* <div onClick={() => setOpenTshirtGuide(true)} className="col-md-6" style={{ display: 'flex', alignItems: "flex-end", textDecoration: "underline", cursor: "pointer" }}>
                                             T-shirt size guide
                                         </div>
                                         <Dialog open={openTshirtGuide} onClose={() => setOpenTshirtGuide(false)} >
                                             <img src={tShirtGuide} alt="RFH Tshirt Guide" />
-                                        </Dialog>
+                                        </Dialog> */}
                                     </div>
                                     {/* New row for additional T-shirt question */}
                                     <div className="row">
@@ -1456,8 +1405,7 @@ function EventForm2026() {
                                             defaultValue="&#x2022; Registration Policy: All registrations are non-refundable, non-transferable, and cannot be modified.
 &#x2022; Contact Information: Participants must provide a valid mobile number and email address for event-related communication.
 &#x2022; Participation Risk: By registering, participants acknowledge that running involves physical activity and possible risks of injury and agree to participate at their own responsibility.
-&#x2022; Liability Waiver: Participants agree not to hold the RFH Juniors Run organizing committee, Rupee for Humanity, sponsors, or volunteers liable for any injury, loss, or damage resulting from participation in the event.
-&#x2022; Champs Run (Kids Category): A parent/guardian must accompany children participating in the Champs Run. Parents cannot carry the child while running. If carried, the child will not be eligible for trophies, but may still receive a participation medal.
+&#x2022; Liability Waiver: Participants agree not to hold the RFH Akshara Run organizing committee, Rupee for Humanity, sponsors, or volunteers liable for any injury, loss, or damage resulting from participation in the event.
 &#x2022; Event Monitoring: RFH volunteers will monitor the entire track, and their decision will be final on the event day.
 &#x2022; Event Changes: The organizers reserve the right to cancel, postpone, or stop the event due to adverse weather or unforeseen circumstances.
 &#x2022; Event Spirit: This is a fun run for a noble cause. Participants are encouraged to run safely and enjoy the event."
@@ -1792,4 +1740,4 @@ function EventForm2026() {
     )
 }
 
-export default EventForm2026
+export default AksharaRun2026
