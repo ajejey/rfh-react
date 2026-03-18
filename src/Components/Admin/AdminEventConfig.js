@@ -43,6 +43,7 @@ export default function AdminEventConfig() {
     const [selectedSlug, setSelectedSlug] = useState('');
     const [form, setForm] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [configsLoading, setConfigsLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [saveSuccess, setSaveSuccess] = useState(false);
     const [error, setError] = useState('');
@@ -60,15 +61,22 @@ export default function AdminEventConfig() {
     }, []);
 
     async function fetchAllConfigs() {
+        setConfigsLoading(true);
         try {
+            console.log('Fetching configs from:', `${BASE_URL}/api/event-config`);
             const res = await fetch(`${BASE_URL}/api/event-config`, {
                 headers: { 'Content-Type': 'application/json' }
             });
-            if (!res.ok) throw new Error('Failed to load configs');
+            console.log('Response status:', res.status);
+            if (!res.ok) throw new Error(`Failed to load configs: ${res.status}`);
             const data = await res.json();
-            setAllConfigs(data);
+            console.log('Configs loaded:', data);
+            setAllConfigs(data || []);
         } catch (err) {
-            setError('Could not load event configs. Check your login.');
+            console.error('Error fetching configs:', err);
+            setError(`Could not load event configs: ${err.message}`);
+        } finally {
+            setConfigsLoading(false);
         }
     }
 
@@ -227,38 +235,50 @@ export default function AdminEventConfig() {
 
                 {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
-                {/* Event selector */}
-                <StyledPaper>
-                    <Grid container spacing={2} alignItems="center">
-                        <Grid item xs={12} md={6}>
-                            <FormControl fullWidth>
-                                <InputLabel>Select Event</InputLabel>
-                                <Select
-                                    value={selectedSlug}
-                                    label="Select Event"
-                                    onChange={e => handleSelectEvent(e.target.value)}
-                                >
-                                    <MenuItem value=""><em>— choose an event —</em></MenuItem>
-                                    {allConfigs.map(c => (
-                                        <MenuItem key={c.eventSlug} value={c.eventSlug}>
-                                            {c.eventName}
-                                            {!c.registrationOpen && ' (closed)'}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <Button
-                                variant="outlined"
-                                startIcon={<AddIcon />}
-                                onClick={() => setCreateOpen(true)}
-                            >
-                                New Event Config
-                            </Button>
-                        </Grid>
-                    </Grid>
-                </StyledPaper>
+                {/* Show loader while fetching configs */}
+                {configsLoading ? (
+                    <Box sx={{ textAlign: 'center', py: 8 }}>
+                        <CircularProgress size={60} />
+                        <Typography variant="body1" sx={{ mt: 2, color: 'text.secondary' }}>
+                            Loading event configurations...
+                        </Typography>
+                    </Box>
+                ) : (
+                    <>
+                        {/* Event selector */}
+                        <StyledPaper>
+                            <Grid container spacing={2} alignItems="center">
+                                <Grid item xs={12} md={6}>
+                                    <FormControl fullWidth>
+                                        <InputLabel>Select Event</InputLabel>
+                                        <Select
+                                            value={selectedSlug}
+                                            label="Select Event"
+                                            onChange={e => handleSelectEvent(e.target.value)}
+                                        >
+                                            <MenuItem value=""><em>— choose an event —</em></MenuItem>
+                                            {allConfigs.map(c => (
+                                                <MenuItem key={c.eventSlug} value={c.eventSlug}>
+                                                    {c.eventName}
+                                                    {!c.registrationOpen && ' (closed)'}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <Button
+                                        variant="outlined"
+                                        startIcon={<AddIcon />}
+                                        onClick={() => setCreateOpen(true)}
+                                    >
+                                        New Event Config
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                        </StyledPaper>
+                    </>
+                )}
 
                 {loading && <Box sx={{ textAlign: 'center', py: 4 }}><CircularProgress /></Box>}
 

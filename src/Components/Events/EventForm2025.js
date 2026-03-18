@@ -411,6 +411,10 @@ function EventForm2026() {
                 },
             };
 
+            if (!window.Razorpay) {
+                throw new Error('Razorpay SDK not loaded. Please refresh the page and try again.');
+            }
+
             const rzp = new window.Razorpay(options);
             rzp.on('payment.failed', function (response) {
                 toast.error('Payment failed. Please try again.');
@@ -512,7 +516,10 @@ function EventForm2026() {
         const updated = [...accompanyingPeople]
         updated[index] = { ...updated[index], [field]: value }
         setAccompanyingPeople(updated)
-        setValue(`accompanyingPerson${index + 1}${field.charAt(0).toUpperCase() + field.slice(1)}`, value)
+        // Ensure proper capitalization: 'name' -> 'Name', 'age' -> 'Age'
+        const capitalizedField = field.charAt(0).toUpperCase() + field.slice(1)
+        setValue(`accompanyingPerson${index + 1}${capitalizedField}`, value)
+        console.log(`Set accompanyingPerson${index + 1}${capitalizedField} to:`, value)
     }
 
     console.log("price total ", totalPrice)

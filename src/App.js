@@ -79,11 +79,14 @@ function App() {
             {/* </Route> */}
             <Route path='/donate' element={<Donate />} />
             <Route path='/nivanshfightsma' element={<NivanshFightSma />} />
+            {/* Old event routes - disabled */}
             {/* <Route path='/rfh-juniors-run-2024' element={<EventForm />} /> */}
-            <Route path='/rfh-juniors-run-2025' element={<EventForm2026 />} />
+            {/* <Route path='/rfh-juniors-run-2025' element={<EventForm2026 />} /> */}
+            {/* <Route path='/rfh-she-run-2025' element={<RfhSheRun2025 />} /> */}
+            
+            {/* Active 2026 events */}
             <Route path='/rfh-juniors-run-2026' element={<EventForm2026 />} />
             <Route path='/rfh-akshara-run-2026' element={<AksharaRun2026 />} />
-            <Route path='/rfh-she-run-2025' element={<RfhSheRun2025 />} />
             <Route path='/rfhrun2025-feedback' element={<FeedbackPage />} />
             <Route path='/checkin' element={<CheckInScanner />} />
             <Route path='/blog' element={<IndexPage />} />

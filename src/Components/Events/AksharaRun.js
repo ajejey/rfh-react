@@ -73,7 +73,7 @@ function AksharaRun2026() {
         name: eventConfig?.eventName ?? "RFH Akshara Run 2026",
         date: new Date(eventConfig?.eventDate ?? "2026-06-14T00:00:00+05:30"),
         lastDate: new Date(eventConfig?.lastRegistrationDate ?? "2026-06-01T23:59:00+05:30"),
-        time: "6:45 AM IST",
+        time: "6:30 AM IST",
         venue: eventConfig?.venueUrl ?? "https://www.google.com/maps/place/Indian+Institute+Of+Management%E2%80%93Bangalore+(IIM%E2%80%93Bangalore)/data=!4m2!3m1!1s0x0:0x25bdb9da743f9bdd?sa=X&ved=1t:2428&ictx=111",
         venueName: eventConfig?.venueName ?? "IIM-B, Bengaluru",
     }
@@ -370,6 +370,10 @@ function AksharaRun2026() {
                     color: "#040002",
                 },
             };
+
+            if (!window.Razorpay) {
+                throw new Error('Razorpay SDK not loaded. Please refresh the page and try again.');
+            }
 
             const rzp = new window.Razorpay(options);
             rzp.on('payment.failed', function (response) {
@@ -1091,16 +1095,31 @@ function AksharaRun2026() {
                                             <div className="form-group">
                                                 <label htmlFor="date">
                                                     Date of Birth <span style={{ color: "red" }}>*</span>
+                                                    <small>
+                                                        <i> (Minimum age: 16 years)</i>
+                                                    </small>
                                                 </label>
                                                 <input
-                                                    {...register("dob", { required: true })}
+                                                    {...register("dob", { 
+                                                        required: "Date of birth is required",
+                                                        validate: {
+                                                            minAge: (value) => {
+                                                                const today = new Date();
+                                                                const birthDate = new Date(value);
+                                                                const age = today.getFullYear() - birthDate.getFullYear();
+                                                                const monthDiff = today.getMonth() - birthDate.getMonth();
+                                                                const actualAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()) ? age - 1 : age;
+                                                                return actualAge >= 16 || "Participant must be at least 16 years old";
+                                                            }
+                                                        }
+                                                    })}
                                                     type="date"
                                                     className="form-control"
                                                     id="date"
                                                     placeholder="date"
                                                     max={new Date().toISOString().split("T")[0]}
                                                 />
-                                                {errors.dob && <p style={{ color: "red" }}>This field is mandatory</p>}
+                                                {errors.dob && <p style={{ color: "red" }}>{errors.dob.message || "This field is mandatory"}</p>}
                                             </div>
                                         </div>
 
