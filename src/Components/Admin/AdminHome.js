@@ -1,406 +1,234 @@
-import { Tab, Tabs, Box, Typography } from '@mui/material';
-import React, { useEffect, useRef, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import useSWR from 'swr';
-import Header from '../Header';
-import EventParticipants from './EventParticipents';
-import VolunteerList from './VolunteerList';
-import FeedbackDashboard from './FeedbackDashboard';
+import React from 'react';
+import { Box, Typography, Card, Grid, Chip, Avatar } from '@mui/material';
 import { Link } from 'react-router-dom';
+import PeopleAltRoundedIcon from '@mui/icons-material/PeopleAltRounded';
+import QrCodeScannerRoundedIcon from '@mui/icons-material/QrCodeScannerRounded';
+import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
+import FeedbackRoundedIcon from '@mui/icons-material/FeedbackRounded';
+import MonetizationOnRoundedIcon from '@mui/icons-material/MonetizationOnRounded';
+import TuneRoundedIcon from '@mui/icons-material/TuneRounded';
+import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded';
+import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
+import useAdminAuth from '../../CustomHooks/useAdminAuth';
 
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
+const CARD_BG   = '#1a2035';
+const BORDER    = 'rgba(255,255,255,0.06)';
+const ACCENT    = '#2f6e49';
+const ACCENT_LT = '#4ade80';
+const TEXT_PRI  = '#f1f5f9';
+const TEXT_SEC  = '#64748b';
 
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`admin-tabpanel-${index}`}
-      aria-labelledby={`admin-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          {children}
-        </Box>
-      )}
-    </div>
-  );
+const ALL_MODULES = [
+    {
+        key: 'runners',
+        icon: <PeopleAltRoundedIcon />,
+        label: 'Registered Runners',
+        description: 'View and manage all event registrations',
+        to: '/admin/marathon-participants',
+        permission: 'canViewRunners',
+        color: '#3b82f6',
+        bg: 'rgba(59,130,246,0.12)',
+    },
+    {
+        key: 'checkin',
+        icon: <QrCodeScannerRoundedIcon />,
+        label: 'Check-in Scanner',
+        description: 'Scan QR codes at event entrance',
+        to: '/admin/checkin',
+        permission: 'canUseCheckIn',
+        color: '#8b5cf6',
+        bg: 'rgba(139,92,246,0.12)',
+    },
+    {
+        key: 'offline',
+        icon: <EditNoteRoundedIcon />,
+        label: 'Offline Registration',
+        description: 'Add walk-in or manual registrations',
+        to: '/admin/offline-registration',
+        permission: 'canDoOfflineRegistration',
+        color: '#f59e0b',
+        bg: 'rgba(245,158,11,0.12)',
+    },
+    {
+        key: 'feedback',
+        icon: <FeedbackRoundedIcon />,
+        label: 'Feedback',
+        description: 'View participant feedback and ratings',
+        to: '/admin/feedback-dashboard',
+        permission: 'canViewFeedback',
+        color: '#ec4899',
+        bg: 'rgba(236,72,153,0.12)',
+    },
+    {
+        key: 'donations',
+        icon: <MonetizationOnRoundedIcon />,
+        label: 'Donations',
+        description: 'Browse and export donation records',
+        to: '/admin/get-all-donations',
+        permission: 'canViewDonations',
+        color: '#10b981',
+        bg: 'rgba(16,185,129,0.12)',
+    },
+    {
+        key: 'config',
+        icon: <TuneRoundedIcon />,
+        label: 'Event Config',
+        description: 'Manage pricing, coupons, and registration settings',
+        to: '/admin/event-config',
+        permission: null,
+        color: '#f97316',
+        bg: 'rgba(249,115,22,0.12)',
+    },
+    {
+        key: 'team',
+        icon: <GroupsRoundedIcon />,
+        label: 'Team Management',
+        description: 'Invite team members and manage their access',
+        to: '/admin/team',
+        permission: null,
+        color: '#06b6d4',
+        bg: 'rgba(6,182,212,0.12)',
+    },
+];
+
+function ModuleCard({ module }) {
+    return (
+        <Card
+            component={Link}
+            to={module.to}
+            elevation={0}
+            sx={{
+                p: 3,
+                bgcolor: CARD_BG,
+                border: `1px solid ${BORDER}`,
+                borderRadius: 3,
+                textDecoration: 'none',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2,
+                height: '100%',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                    transform: 'translateY(-3px)',
+                    borderColor: module.color + '66',
+                    boxShadow: `0 8px 32px ${module.color}22`,
+                },
+            }}
+        >
+            <Box sx={{
+                width: 44, height: 44, borderRadius: 2,
+                bgcolor: module.bg,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: module.color, flexShrink: 0,
+                '& svg': { fontSize: 22 },
+            }}>
+                {module.icon}
+            </Box>
+            <Box sx={{ flex: 1 }}>
+                <Typography sx={{ color: TEXT_PRI, fontWeight: 600, fontSize: '0.95rem', mb: 0.5 }}>
+                    {module.label}
+                </Typography>
+                <Typography sx={{ color: TEXT_SEC, fontSize: '0.8rem', lineHeight: 1.55 }}>
+                    {module.description}
+                </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <ArrowForwardRoundedIcon sx={{ color: TEXT_SEC, fontSize: 18 }} />
+            </Box>
+        </Card>
+    );
 }
 
-function a11yProps(index) {
-  return {
-    id: `admin-tab-${index}`,
-    'aria-controls': `admin-tabpanel-${index}`,
-  };
+function getGreeting() {
+    const h = new Date().getHours();
+    if (h < 12) return 'Good morning';
+    if (h < 17) return 'Good afternoon';
+    return 'Good evening';
 }
 
-function AdminHome() {
-  const [tabNumber, setTabNumber] = useState(0);
-  const { handleSubmit, register, reset, setValue, getValues } = useForm();
-  const [downloadLink, setDownloadLink] = useState(null);
-  const [emailData, setEmailData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [buttonDisabled, setButtonDisabled] = useState(true);
-  const [apiError, setApiError] = useState('');
-  const [donorLookupLoading, setDonorLookupLoading] = useState(false);
-  const [donorLookupError, setDonorLookupError] = useState('');
-  const [downloadCSVLoading, setDownloadCSVLoading] = useState(false);
-  const [csvDownloadLink, setCsvDownloadLink] = useState(null);
-  const [copySuccess, setCopySuccess] = useState('');
-  const downloadLinkRef = useRef(null);
+export default function AdminHome() {
+    const { user, isSuperAdmin, can } = useAdminAuth();
 
-  const downloadCsv = async () => {
-    try {
-      setDownloadCSVLoading(true);
-      const backendUrl = `${process.env.REACT_APP_BACKEND_BASE_URL}/api/donations/csv`;
-      const response = await fetch(backendUrl);
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      setCsvDownloadLink(url);
-      setDownloadCSVLoading(false);
-    } catch (error) {
-      console.error(error);
-      setDownloadCSVLoading(false);
-    }
-  };
-
-  const body = [
-    'email',
-    'mobNo',
-    'fullName',
-    'PANno',
-    'cause',
-    'transactionNo',
-    'paymentMode',
-    'donationAmount',
-  ];
-
-  const handleDonationFormSubmit = async (data) => {
-    setLoading(true);
-    setButtonDisabled(true);
-    const url = `${process.env.REACT_APP_BACKEND_BASE_URL}/create-receipt`;
-
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to create receipt');
-      }
-
-      const responseData = await response.json();
-
-      // Extract the download link and email data from the response
-      const { downloadLink, emailData } = responseData;
-
-      // Extract the base64 data and filename from the download link
-      // downloadLink format: <a href="data:application/pdf;base64,..." download="filename.pdf">Download Receipt</a>
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(downloadLink, 'text/html');
-      const linkElement = doc.querySelector('a');
-      const pdfDataUrl = linkElement?.href || '';
-
-      // Set the download link and email data state to make them available for rendering
-      setDownloadLink(pdfDataUrl);
-      setEmailData(emailData);
-      setLoading(false);
-      // Reset the form
-      reset();
-    } catch (error) {
-      console.error(error);
-      setLoading(false);
-      setApiError(error);
-    }
-  };
-
-  const handleTabChange = (event, newValue) => {
-    setTabNumber(newValue);
-  };
-
-  const handleInputChange = () => {
-    setButtonDisabled(false);
-  };
-
-  const copyEmailBody = () => {
-    if (!emailData) return;
-
-    // Copy the HTML email body exactly as server sends it
-    navigator.clipboard.writeText(emailData.body).then(() => {
-      setCopySuccess('Email body copied! Paste it into Gmail.');
-      setTimeout(() => setCopySuccess(''), 3000);
-    }).catch(err => {
-      console.error('Failed to copy: ', err);
-      setCopySuccess('Failed to copy');
+    const visibleModules = ALL_MODULES.filter(m => {
+        if (isSuperAdmin) return true;
+        if (!m.permission) return false;
+        return can(m.permission);
     });
-  };
 
-  const openGmailCompose = () => {
-    if (!emailData) return;
+    const dateStr = new Date().toLocaleDateString('en-IN', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+    });
 
-    // Convert HTML to plain text for the URL (Gmail compose link has character limits)
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = emailData.body;
-    const plainTextBody = tempDiv.textContent || tempDiv.innerText || '';
+    const initials = user?.name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
 
-    const mailtoLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(emailData.to)}&su=${encodeURIComponent(emailData.subject)}&body=${encodeURIComponent(plainTextBody)}`;
+    return (
+        <Box sx={{ p: { xs: 2, sm: 3, md: 5 }, maxWidth: 1100, mx: 'auto' }}>
+            {/* Welcome header */}
+            <Box sx={{ mb: 5 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+                    <Avatar sx={{ width: 52, height: 52, bgcolor: ACCENT, fontWeight: 700, fontSize: '1.1rem' }}>
+                        {initials}
+                    </Avatar>
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Typography sx={{ color: TEXT_SEC, fontSize: '0.78rem', mb: 0.25 }}>
+                            {dateStr}
+                        </Typography>
+                        <Typography variant="h5" sx={{ color: TEXT_PRI, fontWeight: 700, lineHeight: 1.25 }}>
+                            {getGreeting()}, {user?.name?.split(' ')[0] ?? 'Admin'}
+                        </Typography>
+                    </Box>
+                    <Chip
+                        label={isSuperAdmin ? 'Super Admin' : 'Viewer'}
+                        size="small"
+                        sx={{
+                            bgcolor: isSuperAdmin ? 'rgba(47,110,73,0.2)' : 'rgba(99,102,241,0.2)',
+                            color: isSuperAdmin ? ACCENT_LT : '#a5b4fc',
+                            border: `1px solid ${isSuperAdmin ? 'rgba(47,110,73,0.4)' : 'rgba(99,102,241,0.4)'}`,
+                            fontWeight: 600, fontSize: '0.7rem', height: 24,
+                        }}
+                    />
+                </Box>
 
-    window.open(mailtoLink, '_blank');
-  };
+                <Box sx={{
+                    mt: 3, pt: 3,
+                    borderTop: '1px solid rgba(255,255,255,0.06)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                }}>
+                    <Typography sx={{ color: TEXT_SEC, fontSize: '0.85rem' }}>
+                        {visibleModules.length} module{visibleModules.length !== 1 ? 's' : ''} available
+                    </Typography>
+                    <Box sx={{
+                        display: 'inline-flex', alignItems: 'center', gap: 0.75,
+                        bgcolor: 'rgba(74,222,128,0.08)', border: '1px solid rgba(74,222,128,0.18)',
+                        borderRadius: 2, px: 1.5, py: 0.5,
+                    }}>
+                        <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: ACCENT_LT }} />
+                        <Typography sx={{ color: ACCENT_LT, fontSize: '0.72rem', fontWeight: 600 }}>
+                            System Online
+                        </Typography>
+                    </Box>
+                </Box>
+            </Box>
 
-  const lookupAndAutofillDonor = async () => {
-    const email = (getValues('email') || '').toString().trim();
-    const mobNo = (getValues('mobNo') || '').toString().trim();
-
-    const hasValidEmail = email.includes('@') && email.includes('.');
-    const hasValidMobNo = mobNo.length >= 8;
-
-    if (!hasValidEmail && !hasValidMobNo) return;
-
-    setDonorLookupError('');
-    setDonorLookupLoading(true);
-    try {
-      const params = new URLSearchParams();
-      if (hasValidEmail) params.set('email', email);
-      if (hasValidMobNo) params.set('mobNo', mobNo);
-
-      const url = `${process.env.REACT_APP_BACKEND_BASE_URL}/api/donations/donor-lookup?${params.toString()}`;
-      const response = await fetch(url);
-      if (!response.ok) {
-        if (response.status === 404) {
-          setDonorLookupError('No existing donor found for the given email/phone');
-          return;
-        }
-        throw new Error('Failed to lookup donor');
-      }
-
-      const data = await response.json();
-      const donor = data?.user;
-      if (!donor) return;
-
-      const current = {
-        fullName: (getValues('fullName') || '').toString().trim(),
-        email: (getValues('email') || '').toString().trim(),
-        mobNo: (getValues('mobNo') || '').toString().trim(),
-        PANno: (getValues('PANno') || '').toString().trim(),
-        donationAmount: (getValues('donationAmount') || '').toString().trim(),
-        cause: (getValues('cause') || '').toString().trim(),
-      };
-
-      // Only autofill donor personal information (name, email, mobile, PAN)
-      // Do NOT autofill previous donation details (cause, amount)
-      if (!current.fullName && donor.fullName) setValue('fullName', donor.fullName);
-      if (!current.email && donor.email) setValue('email', donor.email);
-      if (!current.mobNo && donor.mobNo) setValue('mobNo', donor.mobNo);
-      if (!current.PANno && donor.PANno) setValue('PANno', donor.PANno);
-    } catch (error) {
-      console.error(error);
-      setDonorLookupError('Could not lookup donor details');
-    } finally {
-      setDonorLookupLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (downloadLink) {
-      if (downloadLinkRef.current) {
-        downloadLinkRef.current.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-  }, [downloadLink]);
-
-  const today = new Date().toISOString().split('T')[0]; // Get today's date as default value
-
-  return (
-    <div>
-      <Header />
-      <div className="container-md">
-        <h1 className="h1">Admin Panel</h1>
-        <hr />
-        <section>
-          <h3>See all Marathon Participants</h3>
-          <Link to="/admin/marathon-participants">See all participants</Link>
-          <br />
-          <hr />
-        </section>
-        <section className="mb-4">
-          <h3>See all Feedback</h3>
-          <Link to="/admin/feedback-dashboard">See all feedback</Link>
-          <br />
-          <hr />
-        </section>
-        <section className="mb-4">
-          <h3>Add Offline Registration</h3>
-          <p>Add offline registrations for participants who paid through other methods</p>
-          <Link to="/admin/offline-registration" className="btn btn-primary">Add Offline Registration</Link>
-          <hr />
-        </section>
-        <section className="mb-4">
-          <h3>Event Config</h3>
-          <p>Control registration open/close, pricing, coupon codes, and brand ambassadors for each event form</p>
-          <Link to="/admin/event-config" className="btn btn-primary">Manage Event Config</Link>
-          <hr />
-        </section>
-        <section className="mb-4">
-          <h3>Gate Check-In Dashboard</h3>
-          <p>View live check-in stats, manually check in / undo participants, set volunteer PIN, and reset check-ins</p>
-          <Link to="/admin/checkin" className="btn btn-primary">Open Check-In Dashboard</Link>
-          <hr />
-        </section>
-        <section className="mb-4">
-          <h3>Generate Donations CSV</h3>
-          <div className="d-flex justify-content-center align-items-center mt-3 gap-3">
-            <button className="btn btn-primary mr-2" onClick={downloadCsv}>
-              {downloadCSVLoading ? (
-                <div className="spinner-border spinner-border-sm text-light" role="status"></div>
-              ) : (
-                'Generate CSV'
-              )}
-            </button>
-            {csvDownloadLink && (
-              <a href={csvDownloadLink} download="donations.csv">
-                Download CSV
-              </a>
+            {/* Module grid */}
+            {visibleModules.length > 0 ? (
+                <Grid container spacing={2.5}>
+                    {visibleModules.map(module => (
+                        <Grid item xs={12} sm={6} md={4} key={module.key}>
+                            <ModuleCard module={module} />
+                        </Grid>
+                    ))}
+                </Grid>
+            ) : (
+                <Box sx={{ textAlign: 'center', py: 12 }}>
+                    <Typography sx={{ color: TEXT_SEC, fontSize: '1rem', mb: 1 }}>
+                        No modules are currently enabled for your account.
+                    </Typography>
+                    <Typography sx={{ color: 'rgba(100,116,139,0.6)', fontSize: '0.85rem' }}>
+                        Contact a super admin to request access.
+                    </Typography>
+                </Box>
             )}
-          </div>
-        </section>
-        <section className="mb-4">
-          <h3>Get All Donations</h3>
-          <Link to="/admin/get-all-donations">Download donations receipt table</Link>
-        </section>
-        <hr />
-
-        <h3 className="h3">Update offline donations</h3>
-        <form onSubmit={handleSubmit(handleDonationFormSubmit)}>
-          {body.map((field) => (
-            <div className="mb-3" key={field}>
-              <label htmlFor={field} className="form-label">{field}</label>
-              <input
-                type="text"
-                id={field}
-                className="form-control"
-                {...register(field, {
-                  onChange: handleInputChange,
-                  onBlur: field === 'email' || field === 'mobNo' ? lookupAndAutofillDonor : undefined,
-                })}
-              />
-            </div>
-          ))}
-          <div className="mb-3">
-            <label htmlFor="date" className="form-label">Date</label>
-            <input
-              type="date"
-              id="date"
-              defaultValue={today}
-              className="form-control"
-              {...register('date', { onChange: handleInputChange })}
-            />
-          </div>
-          {donorLookupLoading && (
-            <div className="alert alert-info" role="alert">
-              Looking up donor details...
-            </div>
-          )}
-          {donorLookupError && !donorLookupLoading && (
-            <div className="alert alert-warning" role="alert">{donorLookupError}</div>
-          )}
-          <button type="submit" disabled={buttonDisabled} className="btn btn-primary">
-            {loading ? (
-              <div className="spinner-border spinner-border-sm text-light me-2" role="status">
-                <span className="visually-hidden">Loading...</span>
-              </div>
-            ) : null}
-            Submit
-          </button>
-        </form>
-        {apiError && <div className="alert alert-danger mt-3" role="alert">{apiError}</div>}
-        <br />
-        {downloadLink && emailData && (
-          <div ref={downloadLinkRef} className="card my-4">
-            <div className="card-header bg-success text-white">
-              <strong>✓ Receipt Generated Successfully!</strong>
-            </div>
-            <div className="card-body">
-              <div className="alert alert-info mb-3" role="alert">
-                <strong>Email Status:</strong> Being sent automatically in the background.
-                <br />
-                <strong>If email fails:</strong> Use the quick tools below to send manually.
-              </div>
-
-              <div className="mb-3">
-                <strong>Receipt Details:</strong><br />
-                <strong>Receipt Number:</strong> {emailData.receiptNo}<br />
-                <strong>Recipient:</strong> {emailData.to}<br />
-                <strong>Filename:</strong> {emailData.receiptFilename}
-              </div>
-
-              <div className="d-flex gap-2 flex-wrap mb-3">
-                <a
-                  href={downloadLink}
-                  download={emailData.receiptFilename}
-                  className="btn btn-primary"
-                  title="Download the receipt PDF"
-                >
-                  📥 Download Receipt
-                </a>
-
-                <button
-                  className="btn btn-success"
-                  onClick={openGmailCompose}
-                  title="Opens Gmail with pre-filled recipient, subject, and body"
-                >
-                  📧 Open in Gmail
-                </button>
-
-                <button
-                  className="btn btn-outline-primary"
-                  onClick={copyEmailBody}
-                  title="Copy the exact HTML email body to clipboard"
-                >
-                  📋 Copy Email Body
-                </button>
-              </div>
-
-              {copySuccess && (
-                <div className="alert alert-success" role="alert">
-                  {copySuccess}
-                </div>
-              )}
-
-              <div className="alert alert-light mb-0" role="alert">
-                <strong>Quick Send Instructions:</strong>
-                <ol className="mb-0 mt-2">
-                  <li><strong>Click "Download Receipt"</strong> above (saves as {emailData.receiptFilename})</li>
-                  <li><strong>Click "Open in Gmail"</strong> - Opens Gmail with recipient, subject, and body pre-filled</li>
-                  <li><strong>Attach the downloaded PDF</strong> to the Gmail compose window</li>
-                  <li><strong>Click Send</strong> in Gmail</li>
-                </ol>
-                <p className="mb-0 mt-2 text-muted small">
-                  <strong>Note:</strong> Gmail doesn't allow auto-attaching files for security reasons, so you'll need to attach the PDF manually. However, everything else is pre-filled to save you time!
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+        </Box>
+    );
 }
-
-export default AdminHome;
-
-
-
-
-{/* <Tabs value={tabNumber} onChange={handleTabChange}>
-                    <Tab label="Volunteers" value={0} />
-                    <Tab label="Event Participant" value={1} />
-                </Tabs>
-                <br />
-                {tabNumber === 0 && <VolunteerList />}
-                {tabNumber === 1 && <EventParticipants />} */}

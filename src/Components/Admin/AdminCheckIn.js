@@ -8,7 +8,6 @@ import {
 } from '@mui/material';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import Header from '../Header';
 
 const BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL;
 
@@ -189,7 +188,6 @@ export default function AdminCheckIn() {
 
     return (
         <Box sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
-            <Header />
             <Container maxWidth="lg" sx={{ pt: 3, pb: 8 }}>
 
                 {/* Title */}

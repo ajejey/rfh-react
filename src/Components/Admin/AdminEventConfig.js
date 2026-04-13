@@ -7,7 +7,6 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import Header from '../Header';
 import { styled } from '@mui/material/styles';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
@@ -225,7 +224,6 @@ export default function AdminEventConfig() {
 
     return (
         <Box>
-            <Header />
             <Container maxWidth="lg" sx={{ mt: 4, mb: 8 }}>
                 <Typography variant="h4" gutterBottom>Event Config</Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>

@@ -24,6 +24,8 @@ import ScrollToTop from './Components/ScrollToTop/ScrollToTop';
 import NivanshFightSma from './Components/NivanshFightSma/NivanshFightSma';
 import EventForm from './Components/Events/EventForm';
 import AdminMain from './Components/Admin/AdminMain';
+import AdminLogin from './Components/Admin/AdminLogin';
+import AcceptInvite from './Components/Admin/AcceptInvite';
 import ForgotPassword from './Components/AuthComponent/ForgotPassword';
 import { Toaster } from 'sonner'
 import PrivacyPolicy from './Components/PrivacyPolicy/PrivacyPolicy';
@@ -74,6 +76,8 @@ function App() {
             <Route path='/verifyEmail/:id/:token' element={<EmailVerification />} />
             {/* <Route path='/payment-redirect' element={<PaymentRedirect />} /> */}
             <Route path='/payment-redirect' element={<DonationPaymentRedirect />} />
+            <Route path='/admin/login' element={<AdminLogin />} />
+            <Route path='/accept-invite' element={<AcceptInvite />} />
             {/* <Route path='/admin/*' element={<PrivateRoute />} > */}
             <Route path='admin/*' element={<AdminMain />} />
             {/* </Route> */}

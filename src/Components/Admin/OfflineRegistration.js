@@ -20,7 +20,6 @@ import {
     CardContent
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import Header from '../Header';
 import { countries, indianStates } from '../../Constants/constants';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
@@ -299,7 +298,6 @@ function OfflineRegistration() {
 
     return (
         <Box>
-            <Header />
             <Container maxWidth="lg" sx={{ mt: 4, mb: 8 }}>
                 <Typography variant="h4" gutterBottom>
                     Add Offline Registration

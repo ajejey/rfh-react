@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+﻿import React, { useEffect, useState, useMemo } from 'react';
 import {
     CircularProgress,
     FormControl,
@@ -27,11 +27,14 @@ import {
     TableCell,
     TablePagination,
     Snackbar,
-    Alert
+    Alert,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import useSWR from 'swr';
-import Header from '../Header';
 import { convertCamelCase } from '../../Constants/commonFunctions';
 import Papa from 'papaparse';
 // Icons
@@ -199,7 +202,7 @@ function EventParticipants() {
                 'Emergency Contact Number': item?.userDetails?.emergencyNo || '',
                 'Reference': item?.userDetails?.reference || '',
                 'Donation Amount': item?.userDetails?.donation || '0',
-                'Total Amount (₹)': amount.toFixed(2),
+                'Total Amount (â‚¹)': amount.toFixed(2),
                 'Payment Status': item?.paymentDetails?.success ? 'Success' : 'Failed',
                 'Payment Gateway': item?.paymentDetails?.paymentGateway || (item?.paymentDetails?.success ? 'PhonePe' : 'N/A')
             };
@@ -247,6 +250,9 @@ function EventParticipants() {
         message: '',
         severity: 'info'
     });
+    const [resendDialogOpen, setResendDialogOpen] = useState(false);
+    const [selectedReceiptRow, setSelectedReceiptRow] = useState(null);
+    const [sendingReceiptId, setSendingReceiptId] = useState('');
 
     // Filtered data based on search, filtering and test transaction exclusion
     const filteredData = useMemo(() => {
@@ -321,12 +327,28 @@ function EventParticipants() {
         setSnackbar(prev => ({ ...prev, open: false }));
     };
 
-    const sendEmailReceipt = async (item) => {
+    const handleOpenResendDialog = (item) => {
+        setSelectedReceiptRow(item);
+        setResendDialogOpen(true);
+    };
+
+    const handleCloseResendDialog = () => {
+        if (sendingReceiptId) return;
+        setResendDialogOpen(false);
+        setSelectedReceiptRow(null);
+    };
+
+    const sendEmailReceipt = async () => {
+        if (!selectedReceiptRow?.merchantTransactionId) {
+            return;
+        }
+
         try {
+            setSendingReceiptId(selectedReceiptRow.merchantTransactionId);
             // Show loading notification
             setSnackbar({
                 open: true,
-                message: 'Sending email...',
+                message: 'Sending receipt email...',
                 severity: 'info'
             });
 
@@ -336,26 +358,30 @@ function EventParticipants() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    merchantTransactionId: item.merchantTransactionId,
+                    merchantTransactionId: selectedReceiptRow.merchantTransactionId,
+                    forceResend: true,
                     formData: {
-                        merchantTransactionId: item.merchantTransactionId,
-                        cause: item.marathonName || marathonName
+                        merchantTransactionId: selectedReceiptRow.merchantTransactionId,
+                        cause: selectedReceiptRow.marathonName || marathonName
                     }
                 })
             });
 
             const result = await response.json();
-            console.log("result ", result);
+
+            if (!response.ok) {
+                throw new Error(result.message || 'Failed to send email');
+            }
 
             if (result.success) {
-                // Show success notification
+                setResendDialogOpen(false);
+                setSelectedReceiptRow(null);
                 setSnackbar({
                     open: true,
-                    message: 'Email sent successfully!',
+                    message: `Receipt email sent to ${selectedReceiptRow?.userDetails?.email || 'participant'} successfully!`,
                     severity: 'success'
                 });
 
-                // Refresh data
                 mutate();
             } else {
                 throw new Error(result.message || 'Failed to send email');
@@ -367,6 +393,8 @@ function EventParticipants() {
                 message: error.message || 'Error sending email',
                 severity: 'error'
             });
+        } finally {
+            setSendingReceiptId('');
         }
     };
 
@@ -518,34 +546,40 @@ function EventParticipants() {
     // For pagination
     const paginatedData = filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
-    return (
-        <Box sx={{ maxWidth: '100%', overflow: 'hidden' }}>
-            <Header />
+return (
+    <Box sx={{ maxWidth: '100%' }}>
+        <Box sx={{ p: 3 }}>
+            <Typography variant="h4" component="h1" gutterBottom sx={{ color: '#f1f5f9' }}>
+                Marathon Dashboard
+            </Typography>
 
-            <Box sx={{ p: 3 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                    <Typography variant="h4" component="h1" gutterBottom>
-                        Marathon Dashboard
-                    </Typography>
-
-                    <StyledFormControl>
-                        <InputLabel id="marathon-names-label">Select Marathon</InputLabel>
-                        <Select
-                            labelId="marathon-names-label"
-                            id="marathonNames"
-                            value={marathonName}
-                            label="Select Marathon"
-                            onChange={handleMarathonNameChange}
-                        >
-                            <MenuItem value="">
-                                <em>None</em>
+            <Box sx={{ mb: 3 }}>
+                <StyledFormControl fullWidth>
+                    <InputLabel id="marathon-names-label" sx={{ color: '#94a3b8', '&.Mui-focused': { color: '#4ade80' } }}>Select Marathon</InputLabel>
+                    <Select
+                        labelId="marathon-names-label"
+                        id="marathonNames"
+                        value={marathonName}
+                        label="Select Marathon"
+                        onChange={handleMarathonNameChange}
+                        sx={{
+                            color: '#f1f5f9',
+                            bgcolor: 'rgba(255,255,255,0.05)',
+                            '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.15)' },
+                            '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.3)' },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#2f6e49' },
+                            '& .MuiSvgIcon-root': { color: '#94a3b8' },
+                        }}
+                    >
+                        <MenuItem value="">
+                            <em>None</em>
+                        </MenuItem>
+                        {marathonNames?.marathonNames?.map((item) => (
+                            <MenuItem key={item} value={item}>
+                                {item}
                             </MenuItem>
-                            {marathonNames?.marathonNames?.map((item) => (
-                                <MenuItem key={item} value={item}>
-                                    {item}
-                                </MenuItem>
-                            ))}
-                        </Select>
+                        ))}
+                    </Select>
                     </StyledFormControl>
                 </Box>
 
@@ -615,7 +649,7 @@ function EventParticipants() {
                                         </StatsIcon>
                                         <Box>
                                             <Typography variant="h5" component="div">
-                                                ₹{stats.totalAmount.toLocaleString()}
+                                                â‚¹{stats.totalAmount.toLocaleString()}
                                             </Typography>
                                             <Typography color="text.secondary" variant="subtitle2">
                                                 Total Revenue
@@ -860,10 +894,15 @@ function EventParticipants() {
                                                         <Tooltip title="Send/Resend Email Receipt">
                                                             <IconButton
                                                                 size="small"
-                                                                onClick={() => sendEmailReceipt(item)}
+                                                                onClick={() => handleOpenResendDialog(item)}
                                                                 color="primary"
+                                                                disabled={sendingReceiptId === item?.merchantTransactionId}
                                                             >
-                                                                <EmailIcon fontSize="small" />
+                                                                {sendingReceiptId === item?.merchantTransactionId ? (
+                                                                    <CircularProgress size={16} color="inherit" />
+                                                                ) : (
+                                                                    <EmailIcon fontSize="small" />
+                                                                )}
                                                             </IconButton>
                                                         </Tooltip>
                                                     )}
@@ -893,7 +932,7 @@ function EventParticipants() {
                                             <TableCell>Full Name</TableCell>
                                             <TableCell>Date</TableCell>
                                             <TableCell>Payment Status</TableCell>
-                                            <TableCell>Amount (₹)</TableCell>
+                                            <TableCell>Amount (â‚¹)</TableCell>
                                             <TableCell>Payment Method</TableCell>
                                             <TableCell>Payment Gateway</TableCell>
                                             <TableCell>PhonePe Transaction ID</TableCell>
@@ -1075,6 +1114,28 @@ function EventParticipants() {
                     </Paper>
                 )}
             </Box>
+            <Dialog open={resendDialogOpen} onClose={handleCloseResendDialog} maxWidth="xs" fullWidth>
+                <DialogTitle>Resend registration receipt?</DialogTitle>
+                <DialogContent>
+                    <Typography variant="body2" color="text.secondary">
+                        This will resend the same registration receipt email to{' '}
+                        <strong>{selectedReceiptRow?.userDetails?.fullName || 'this participant'}</strong>
+                        {selectedReceiptRow?.userDetails?.email ? ` at ${selectedReceiptRow.userDetails.email}` : ''}.
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseResendDialog} disabled={Boolean(sendingReceiptId)}>
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={sendEmailReceipt}
+                        variant="contained"
+                        disabled={Boolean(sendingReceiptId)}
+                    >
+                        {sendingReceiptId ? 'Sending...' : 'Send Again'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
             <Snackbar
                 open={snackbar.open}
                 autoHideDuration={6000}
