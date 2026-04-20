@@ -952,8 +952,21 @@ function EventForm2026() {
                                 </table>
 
                                 <div className="mt-4">
+                                    <h3 style={{ color: '#f39c12', marginBottom: '12px', fontSize: '1.2rem' }}>
+                                        RACE INCLUSIONS / GIVEAWAYS
+                                    </h3>
+                                    <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 16px 0' }}>
+                                        <li>Dry-fit T-shirt</li>
+                                        <li>BIB</li>
+                                        <li>Pre, During & Post Race Hydration</li>
+                                        <li>Finishers Medal</li>
+                                        <li>Post Race Hot Breakfast</li>
+                                        <li>Medical Support</li>
+                                        <li>Certificate</li>
+                                        <li>Free Race Images</li>
+                                    </ul>
                                     <p>
-                                        Each participant receives a Tshirt, Medal, Bib, Finisher certificate, Breakfast and witnesses the noble cause of Rupee For Humanity.
+                                        Each participant receives the above and witnesses the noble cause of Rupee For Humanity.
                                     </p>
                                     <ul>
                                         <li><strong>Champs run:</strong> Should be accompanied by a parent/guardian.</li>
