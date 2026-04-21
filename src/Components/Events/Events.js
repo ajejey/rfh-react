@@ -9,9 +9,8 @@ import { Badge, Box, Button, CardActions, CardHeader } from '@mui/material'
 import { Grid, Card, CardMedia, CardContent, Typography, Skeleton } from '@mui/material';
 import useSWR from 'swr';
 import useAuthStatus from '../../CustomHooks/useAuthStatus'
-import rfhjuniorsRun2025Poster from '../../assets/images/rfh-juniors-run-2025-poster.jpeg'
-import rfhjuniorsRun2026Poster from '../../assets/images/rfh-juniors-run-2025-poster.jpeg'
-import rfhSheRun2025Poster from '../../assets/images/rfh-she-run-2025-poster.jpeg'
+import rfhjuniorsRun2026Poster from '../../assets/images/rfh-juniors-run-2026.PNG'
+import rfhaksharaRun2026Poster from '../../assets/images/rfh-akshara-run-2026.PNG'
 
 const fetcher = async (url) => {
     const response = await fetch(url);
@@ -125,13 +124,13 @@ function Events() {
             </Link>
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
-            <Link to={'/rfh-she-run-2025'}>
+            <Link to={'/rfh-akshara-run-2026'}>
             <Card  style={{ cursor: 'pointer' }}>
                 <CardMedia
                     component="img"
                     height="350"
-                    image={rfhSheRun2025Poster}
-                    alt="RFH She Run 2025"
+                    image={rfhaksharaRun2026Poster}
+                    alt="RFH Akshara Run 2026"
                     sx={{
                         objectFit: "contain",
                         objectPosition: "center",
@@ -139,10 +138,10 @@ function Events() {
                 />
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="div">
-                        RFH She Run 2025
+                        RFH Akshara Run 2026
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                        Empower women through the RFH She Run 2025!
+                        Join us for the RFH Akshara Run 2026 - Run for Literacy!
                     </Typography>
                 </CardContent>
             </Card>

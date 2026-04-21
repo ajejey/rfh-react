@@ -10,6 +10,7 @@ import QrCodeScannerRoundedIcon from '@mui/icons-material/QrCodeScannerRounded';
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import FeedbackRoundedIcon from '@mui/icons-material/FeedbackRounded';
 import MonetizationOnRoundedIcon from '@mui/icons-material/MonetizationOnRounded';
+import ReceiptRoundedIcon from '@mui/icons-material/ReceiptRounded';
 import TuneRoundedIcon from '@mui/icons-material/TuneRounded';
 import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
@@ -24,6 +25,7 @@ import EventParticipants from './EventParticipents';
 import OfflineRegistration from './OfflineRegistration';
 import FeedbackDashboard from './FeedbackDashboard';
 import GetAllDonations from './GetAllDonations';
+import DonationReceipt from './DonationReceipt';
 import TeamManagement from './TeamManagement';
 
 const SIDEBAR_WIDTH = 256;
@@ -91,6 +93,7 @@ function Sidebar({ collapsed, onToggle, user, isSuperAdmin, can, onLogout }) {
         { icon: <EditNoteRoundedIcon />,        label: 'Offline Reg',        to: '/admin/offline-registration', show: isSuperAdmin || can('canDoOfflineRegistration') },
         { icon: <FeedbackRoundedIcon />,        label: 'Feedback',           to: '/admin/feedback-dashboard',   show: isSuperAdmin || can('canViewFeedback') },
         { icon: <MonetizationOnRoundedIcon />,  label: 'Donations',          to: '/admin/get-all-donations',    show: isSuperAdmin || can('canViewDonations') },
+        { icon: <ReceiptRoundedIcon />,          label: 'Donation Receipt',   to: '/admin/donation-receipt',     show: isSuperAdmin },
         { icon: <TuneRoundedIcon />,            label: 'Event Config',       to: '/admin/event-config',         show: isSuperAdmin },
         { icon: <GroupsRoundedIcon />,          label: 'Team',               to: '/admin/team',                 show: isSuperAdmin },
     ];
@@ -217,6 +220,7 @@ export default function AdminMain() {
                     <Route path="/offline-registration" element={isSuperAdmin || can('canDoOfflineRegistration') ? <OfflineRegistration /> : <Navigate to="/admin" replace />} />
                     <Route path="/feedback-dashboard"   element={isSuperAdmin || can('canViewFeedback') ? <FeedbackDashboard /> : <Navigate to="/admin" replace />} />
                     <Route path="/get-all-donations"    element={isSuperAdmin || can('canViewDonations') ? <GetAllDonations /> : <Navigate to="/admin" replace />} />
+                    <Route path="/donation-receipt"     element={isSuperAdmin ? <DonationReceipt /> : <Navigate to="/admin" replace />} />
                     <Route path="/event-config"         element={isSuperAdmin ? <AdminEventConfig /> : <Navigate to="/admin" replace />} />
                     <Route path="/team"                 element={isSuperAdmin ? <TeamManagement /> : <Navigate to="/admin" replace />} />
                 </Routes>

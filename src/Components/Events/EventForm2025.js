@@ -354,9 +354,15 @@ function EventForm2026() {
                 body: JSON.stringify(getValues()),
             });
 
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                console.error('Razorpay order creation failed:', response.status, errData);
+                throw new Error(errData.error || `Payment server error (${response.status}). Please try again.`);
+            }
+
             const data = await response.json();
             if (!data.orderId) {
-                throw new Error('Failed to create order');
+                throw new Error('Payment server did not return order details. Please try again.');
             }
 
             const options = {
@@ -411,8 +417,19 @@ function EventForm2026() {
                 },
             };
 
+            // Wait for Razorpay SDK to load (with retry)
             if (!window.Razorpay) {
-                throw new Error('Razorpay SDK not loaded. Please refresh the page and try again.');
+                toast.info('Loading payment gateway, please wait...');
+                await new Promise((resolve, reject) => {
+                    let attempts = 0;
+                    const check = () => {
+                        attempts++;
+                        if (window.Razorpay) { resolve(); return; }
+                        if (attempts > 20) { reject(new Error('Payment gateway could not load. Please disable ad blockers, refresh the page, and try again.')); return; }
+                        setTimeout(check, 300);
+                    };
+                    check();
+                });
             }
 
             const rzp = new window.Razorpay(options);
@@ -429,7 +446,7 @@ function EventForm2026() {
             setPaymentLoading(false);
             setDisablePaymentButton(false);
             setPaymentStatus("");
-            toast.error('Failed to initialize Razorpay. Please try again or contact support.');
+            toast.error(error.message || 'Failed to initialize Razorpay. Please try again or contact support.');
         }
     };
 
