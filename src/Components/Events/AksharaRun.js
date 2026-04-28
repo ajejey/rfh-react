@@ -844,7 +844,7 @@ function AksharaRun2026() {
                                 View My Registration
                             </Button>
                             <p>Got questions or already planning for next year? Reach out to our awesome team below. 👇📞<br/>
-                            Sripada : +91 9964046022<br/>
+                            Deekshith : +91 8147775122<br/>
                             Raghu : +91 9164358027<br/>
                             Deepthi : +91 9986387435</p>
                         </div>
@@ -946,7 +946,7 @@ function AksharaRun2026() {
                                         For any more information about sponsorship / registration / queries, you can reach out to the below organizers:
                                     </p>
                                     <ul>
-                                        <li>Sripada : +91-99640 46022</li>
+                                        <li>Deekshith : +91-81477 75122</li>
                                         <li>Deepthi @ +91-99863 87435</li>
                                         <li>Raghu @ +91-91643 58027</li>
                                     </ul>

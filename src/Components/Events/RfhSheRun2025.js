@@ -760,7 +760,7 @@ function RfhSheRun2025() {
                             </Button>
                             <br/>
                             Got questions or already planning for next year? Reach out to our awesome team below. 👇📞<br/>
-                            Sripada : +91 9964046022<br/>
+                            Deekshith : +91 8147775122<br/>
                             Raghu : +91 9164358027<br/>
                             Deepthi : +91 9986387435</span>
                         </div>

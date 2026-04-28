@@ -383,7 +383,7 @@ function EventForm() {
                                     </p>
                                     <ul>
                                         <li>Deepthi @ <a href="tel:+91-9986387435" style={{ color: "#f39c12" }}>+91-99863 87435</a></li>
-                                        <li>Sripada @ <a href="tel:+91-9964046022" style={{ color: "#f39c12" }}>+91-99640 46022</a></li>
+                                        <li>Deekshith @ <a href="tel:+91-8147775122" style={{ color: "#f39c12" }}>+91-81477 75122</a></li>
                                         <li>Raghu @ <a href="tel:+91-9164358027" style={{ color: "#f39c12" }}>+91-91643 58027</a></li>
                                     </ul>
                                 </div>
