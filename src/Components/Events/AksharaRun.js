@@ -15,6 +15,7 @@ import tShirtGuide from '../../assets/images/tShirtGuide.jpeg'
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import FeedbackCard from './FeedbackCard';
+import { track, identify } from '../../lib/track';
 
 const EVENT_SLUG = 'rfh-akshara-run-2026';
 const MARATHON_NAME = 'RFH Akshara Run 2026';
@@ -289,6 +290,11 @@ function AksharaRun2026() {
     };
 
     const handleRazorpayClick = async () => {
+        const resetPaymentUI = () => {
+            setPaymentLoading(false);
+            setDisablePaymentButton(false);
+            setPaymentStatus("");
+        };
         try {
             setPaymentLoading(true);
             setDisablePaymentButton(true);
@@ -306,24 +312,45 @@ function AksharaRun2026() {
                 setValue("couponDiscount", 0)
             }
 
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/initiate-razorpay-payment`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(getValues()),
-            });
+            const formVals = getValues();
+            try {
+                if (formVals.email) identify(formVals.email, { email: formVals.email, name: formVals.fullName, phone: formVals.mobNo });
+            } catch (_) {}
+            track('payment_initiated', { eventSlug: EVENT_SLUG, marathonName: MARATHON_NAME, totalPrice, couponCode: formVals.couponCode || null });
+
+            // Order create with 25s timeout — Vercel cold-start + Mongo cold-start can stack to ~15s
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 25000);
+            let response;
+            try {
+                response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/initiate-razorpay-payment`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(formVals),
+                    signal: controller.signal,
+                });
+            } catch (fetchErr) {
+                clearTimeout(timeoutId);
+                track('order_create_failed', { reason: fetchErr.name === 'AbortError' ? 'timeout' : 'network', message: fetchErr.message });
+                throw new Error(fetchErr.name === 'AbortError'
+                    ? 'Server took too long to respond. Please try again — your details are still filled in.'
+                    : 'Network issue. Please check your connection and try again.');
+            }
+            clearTimeout(timeoutId);
 
             if (!response.ok) {
                 const errData = await response.json().catch(() => ({}));
                 console.error('Razorpay order creation failed:', response.status, errData);
+                track('order_create_failed', { reason: 'http_' + response.status, error: errData.error });
                 throw new Error(errData.error || `Payment server error (${response.status}). Please try again.`);
             }
 
             const data = await response.json();
             if (!data.orderId) {
+                track('order_create_failed', { reason: 'no_orderId' });
                 throw new Error('Payment server did not return order details. Please try again.');
             }
+            track('order_created', { orderId: data.orderId, merchantTransactionId: data.merchantTransactionId, amount: data.amount });
 
             const options = {
                 key: data.keyId,
@@ -333,12 +360,12 @@ function AksharaRun2026() {
                 description: `${MARATHON_NAME} Registration`,
                 order_id: data.orderId,
                 handler: async function (response) {
+                    setPaymentStatus("Verifying payment...");
+                    track('verify_started', { orderId: response.razorpay_order_id, paymentId: response.razorpay_payment_id });
                     try {
                         const verifyResponse = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/marathons/razorpay-webhook`, {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
+                            headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
                                 razorpay_payment_id: response.razorpay_payment_id,
                                 razorpay_order_id: response.razorpay_order_id,
@@ -350,34 +377,60 @@ function AksharaRun2026() {
                         console.log('Razorpay verification response:', verifyData);
 
                         if (verifyData.status === 'success') {
+                            track('verify_success', { merchantTransactionId: data.merchantTransactionId, paymentId: response.razorpay_payment_id });
                             localStorage.setItem('merchantTransactionId', data.merchantTransactionId);
                             localStorage.setItem('cause', MARATHON_NAME);
 
-                            // Show success dialog with payment details
-                            console.log('Payment details for dialog:', verifyData.payment);
                             setPaymentDetails(verifyData.payment);
                             setShowPaymentSuccessDialog(true);
-                            setPaymentLoading(false);
-                            setDisablePaymentButton(false);
+                            resetPaymentUI();
                         } else {
-                            toast.error('Payment verification failed. Please contact support.');
+                            // Payment likely succeeded at Razorpay — verify endpoint failed. Be reassuring, not alarming.
+                            track('verify_failed', { merchantTransactionId: data.merchantTransactionId, paymentId: response.razorpay_payment_id, verifyData });
+                            setPaymentDetails({
+                                merchantTransactionId: data.merchantTransactionId,
+                                transactionId: response.razorpay_payment_id,
+                                email: formVals.email,
+                                name: formVals.fullName,
+                                amount: data.amount,
+                                pending: true
+                            });
+                            setShowPaymentSuccessDialog(true);
+                            resetPaymentUI();
+                            toast.message('Payment received. We are finalising your receipt — if you do not get the email in 1 hour, WhatsApp Raghu (+91 91643 58027) with your phone number.');
                         }
                     } catch (error) {
                         console.error('Verification error:', error);
-                        toast.error('Payment verification failed. Please contact support.');
+                        track('verify_failed', { merchantTransactionId: data.merchantTransactionId, paymentId: response.razorpay_payment_id, error: error.message });
+                        setPaymentDetails({
+                            merchantTransactionId: data.merchantTransactionId,
+                            transactionId: response.razorpay_payment_id,
+                            email: formVals.email,
+                            name: formVals.fullName,
+                            amount: data.amount,
+                            pending: true
+                        });
+                        setShowPaymentSuccessDialog(true);
+                        resetPaymentUI();
+                        toast.message('Payment received. Receipt may be delayed — WhatsApp Raghu (+91 91643 58027) if you do not get the email in 1 hour.');
+                    }
+                },
+                modal: {
+                    ondismiss: function () {
+                        track('checkout_dismissed', { orderId: data.orderId });
+                        resetPaymentUI();
+                        toast.info('Payment cancelled. You can try again any time.');
                     }
                 },
                 prefill: {
-                    name: getValues().fullName,
-                    email: getValues().email,
-                    contact: getValues().mobNo,
+                    name: formVals.fullName,
+                    email: formVals.email,
+                    contact: formVals.mobNo,
                 },
-                theme: {
-                    color: "#040002",
-                },
+                theme: { color: "#040002" },
             };
 
-            // Wait for Razorpay SDK to load (with retry)
+            // Razorpay SDK is preloaded in public/index.html. This is a safety net.
             if (!window.Razorpay) {
                 toast.info('Loading payment gateway, please wait...');
                 await new Promise((resolve, reject) => {
@@ -385,7 +438,7 @@ function AksharaRun2026() {
                     const check = () => {
                         attempts++;
                         if (window.Razorpay) { resolve(); return; }
-                        if (attempts > 20) { reject(new Error('Payment gateway could not load. Please disable ad blockers, refresh the page, and try again.')); return; }
+                        if (attempts > 30) { reject(new Error('Payment gateway could not load. Please disable ad blockers / VPN, refresh, and try again. Or WhatsApp Raghu at +91 91643 58027.')); return; }
                         setTimeout(check, 300);
                     };
                     check();
@@ -394,19 +447,19 @@ function AksharaRun2026() {
 
             const rzp = new window.Razorpay(options);
             rzp.on('payment.failed', function (response) {
-                toast.error('Payment failed. Please try again.');
-                setPaymentLoading(false);
-                setDisablePaymentButton(false);
-                setPaymentStatus("");
+                const reason = response && response.error && response.error.description;
+                track('payment_failed', { orderId: data.orderId, reason, code: response?.error?.code, source: response?.error?.source });
+                toast.error(reason ? `Payment failed: ${reason}. Please try again.` : 'Payment failed. Please try again.');
+                resetPaymentUI();
             });
 
+            track('checkout_opened', { orderId: data.orderId });
             rzp.open();
         } catch (error) {
             console.error("Razorpay error:", error);
-            setPaymentLoading(false);
-            setDisablePaymentButton(false);
-            setPaymentStatus("");
-            toast.error(error.message || 'Failed to initialize Razorpay. Please try again or contact support.');
+            track('payment_error', { message: error.message });
+            resetPaymentUI();
+            toast.error(error.message || 'Failed to initialize Razorpay. Please try again or WhatsApp Raghu at +91 91643 58027.');
         }
     };
 
@@ -1565,6 +1618,9 @@ function AksharaRun2026() {
                                                         >
                                                             click here to try again
                                                         </button>
+                                                        <span style={{ display: 'block', marginTop: '6px' }}>
+                                                            Still stuck? <a href="https://wa.me/919164358027" target="_blank" rel="noreferrer" style={{ color: '#25D366', fontWeight: 600 }}>WhatsApp Raghu</a> for help.
+                                                        </span>
                                                     </small>
                                                 </div>
                                             )}
@@ -1647,6 +1703,9 @@ function AksharaRun2026() {
                                                         >
                                                             click here to try again
                                                         </button>
+                                                        <span style={{ display: 'block', marginTop: '6px' }}>
+                                                            Still stuck? <a href="https://wa.me/919164358027" target="_blank" rel="noreferrer" style={{ color: '#25D366', fontWeight: 600 }}>WhatsApp Raghu</a> for help.
+                                                        </span>
                                                     </small>
                                                 </div>
                                             )}
