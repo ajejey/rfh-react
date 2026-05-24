@@ -24,6 +24,7 @@ const SURFACE   = '#151929';
 
 const PERMISSION_LABELS = {
     canViewRunners:           { label: 'View Registered Runners',   description: 'See the full participant list' },
+    canEditRunners:           { label: 'Edit Participant Details',  description: 'Modify participant info (name, phone, t-shirt size, etc.)' },
     canUseCheckIn:            { label: 'Use Check-in Scanner',      description: 'Scan QR codes at the event' },
     canDownloadCSV:           { label: 'Download Runners CSV',      description: 'Export participant data' },
     canViewFeedback:          { label: 'View Feedback Dashboard',   description: 'See participant feedback' },

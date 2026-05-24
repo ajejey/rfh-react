@@ -49,6 +49,9 @@ import SearchIcon from '@mui/icons-material/Search';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import EmailIcon from '@mui/icons-material/Email';
+import EditIcon from '@mui/icons-material/Edit';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import useAdminAuth from '../../CustomHooks/useAdminAuth';
 
 const StyledFormControl = styled(FormControl)(({ theme }) => ({
     minWidth: 200,
@@ -162,6 +165,169 @@ const sampleRazorpayData = {
         } 
     }
 
+// Configuration for the participant details view/edit modal.
+// `editable: false` means the field is shown read-only even in edit mode (e.g. price/coupon).
+const PARTICIPANT_FIELD_GROUPS = [
+    {
+        title: 'Personal Info',
+        fields: [
+            { key: 'fullName', label: 'Full Name', editable: true },
+            { key: 'gender', label: 'Gender', editable: true, type: 'select', options: ['Male', 'Female', 'Other'] },
+            { key: 'dob', label: 'Date of Birth', editable: true, type: 'date' },
+            { key: 'bloodGroup', label: 'Blood Group', editable: true },
+            { key: 'nationality', label: 'Nationality', editable: true },
+        ],
+    },
+    {
+        title: 'Contact',
+        fields: [
+            { key: 'email', label: 'Email', editable: true },
+            { key: 'mobNo', label: 'Phone', editable: true },
+            { key: 'address', label: 'Address', editable: true, multiline: true },
+            { key: 'city', label: 'City', editable: true },
+            { key: 'state', label: 'State', editable: true },
+            { key: 'country', label: 'Country', editable: true },
+        ],
+    },
+    {
+        title: 'Event',
+        fields: [
+            { key: 'category', label: 'Category', editable: true },
+            { key: 'TshirtSize', label: 'T-shirt Size', editable: true },
+            { key: 'additionalTshirt', label: 'Additional T-shirt?', editable: true, type: 'select', options: ['Yes', 'No'] },
+            { key: 'additionalTshirtSize', label: 'Additional T-shirt Size(s)', editable: true },
+            { key: 'additionalTshirtQuantity', label: 'Additional T-shirt Qty', editable: true, type: 'number' },
+            { key: 'additionalBreakfast', label: 'Additional Breakfast', editable: true, type: 'number' },
+        ],
+    },
+    {
+        title: 'Emergency Contact',
+        fields: [
+            { key: 'emergencyName', label: 'Emergency Contact Name', editable: true },
+            { key: 'emergencyNo', label: 'Emergency Contact Number', editable: true },
+        ],
+    },
+    {
+        title: 'Accompanying Persons',
+        fields: [
+            { key: 'accompanyingCount', label: 'Accompanying Count', editable: true, type: 'number' },
+            { key: 'accompanyingPerson1Name', label: 'Person 1 Name', editable: true },
+            { key: 'accompanyingPerson1Age', label: 'Person 1 Age', editable: true, type: 'number' },
+            { key: 'accompanyingPerson2Name', label: 'Person 2 Name', editable: true },
+            { key: 'accompanyingPerson2Age', label: 'Person 2 Age', editable: true, type: 'number' },
+            { key: 'accompanyingPerson3Name', label: 'Person 3 Name', editable: true },
+            { key: 'accompanyingPerson3Age', label: 'Person 3 Age', editable: true, type: 'number' },
+        ],
+    },
+    {
+        title: 'Other',
+        fields: [
+            { key: 'reference', label: 'Reference', editable: true },
+            { key: 'brandAmbassador', label: 'Brand Ambassador', editable: true },
+            { key: 'donation', label: 'Donation Amount (₹)', editable: false },
+            { key: 'totalPrice', label: 'Total Price (₹)', editable: false },
+            { key: 'couponCode', label: 'Coupon Code', editable: false },
+            { key: 'couponDiscount', label: 'Coupon Discount %', editable: false },
+        ],
+    },
+];
+
+function ParticipantDetailsBody({ row, editMode, editForm, onChange }) {
+    const ud = row?.userDetails || {};
+    const lastEditedAt = ud.lastEditedAt ? new Date(ud.lastEditedAt) : null;
+
+    return (
+        <Box>
+            {/* Read-only registration meta */}
+            <Box sx={{ mb: 2, p: 1.5, bgcolor: 'rgba(0,0,0,0.03)', borderRadius: 1 }}>
+                <Grid container spacing={1}>
+                    <Grid item xs={6} sm={4}>
+                        <Typography variant="caption" color="text.secondary">Registered On</Typography>
+                        <Typography variant="body2">{row?.date ? new Date(row.date).toLocaleString() : '—'}</Typography>
+                    </Grid>
+                    <Grid item xs={6} sm={4}>
+                        <Typography variant="caption" color="text.secondary">Marathon</Typography>
+                        <Typography variant="body2">{row?.marathonName || ud.marathonName || '—'}</Typography>
+                    </Grid>
+                    <Grid item xs={6} sm={4}>
+                        <Typography variant="caption" color="text.secondary">Payment</Typography>
+                        <Typography variant="body2">
+                            {row?.paymentDetails?.success ? '✅ Success' : '❌ Failed'}
+                            {row?.paymentDetails?.paymentGateway ? ` · ${row.paymentDetails.paymentGateway}` : ''}
+                        </Typography>
+                    </Grid>
+                    {lastEditedAt && (
+                        <Grid item xs={12}>
+                            <Typography variant="caption" color="text.secondary">
+                                Last edited {lastEditedAt.toLocaleString()}
+                                {ud.lastEditedBy ? ` by ${ud.lastEditedBy}` : ''}
+                                {Array.isArray(ud.lastEditedFields) && ud.lastEditedFields.length
+                                    ? ` (changed: ${ud.lastEditedFields.join(', ')})`
+                                    : ''}
+                            </Typography>
+                        </Grid>
+                    )}
+                </Grid>
+            </Box>
+
+            {PARTICIPANT_FIELD_GROUPS.map(group => (
+                <Box key={group.title} sx={{ mb: 3 }}>
+                    <Typography variant="subtitle2" sx={{ mb: 1, color: 'primary.main', fontWeight: 600 }}>
+                        {group.title}
+                    </Typography>
+                    <Grid container spacing={2}>
+                        {group.fields.map(f => {
+                            const rawValue = editMode ? (editForm[f.key] ?? '') : (ud[f.key] ?? '');
+                            const displayValue = (rawValue === '' || rawValue == null) ? '—' : String(rawValue);
+                            const isEditable = editMode && f.editable;
+                            const fullWidth = f.multiline;
+                            return (
+                                <Grid item xs={12} sm={fullWidth ? 12 : 6} md={fullWidth ? 12 : 4} key={f.key}>
+                                    {isEditable ? (
+                                        f.type === 'select' ? (
+                                            <FormControl fullWidth size="small">
+                                                <InputLabel>{f.label}</InputLabel>
+                                                <Select
+                                                    label={f.label}
+                                                    value={editForm[f.key] ?? ''}
+                                                    onChange={e => onChange(f.key, e.target.value)}
+                                                >
+                                                    {(f.options || []).map(opt => (
+                                                        <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
+                                        ) : (
+                                            <TextField
+                                                fullWidth
+                                                size="small"
+                                                label={f.label}
+                                                type={f.type || 'text'}
+                                                multiline={!!f.multiline}
+                                                minRows={f.multiline ? 2 : undefined}
+                                                value={editForm[f.key] ?? ''}
+                                                onChange={e => onChange(f.key, e.target.value)}
+                                                InputLabelProps={f.type === 'date' ? { shrink: true } : undefined}
+                                            />
+                                        )
+                                    ) : (
+                                        <Box>
+                                            <Typography variant="caption" color="text.secondary">{f.label}</Typography>
+                                            <Typography variant="body2" sx={{ wordBreak: 'break-word' }}>
+                                                {displayValue}
+                                            </Typography>
+                                        </Box>
+                                    )}
+                                </Grid>
+                            );
+                        })}
+                    </Grid>
+                </Box>
+            ))}
+        </Box>
+    );
+}
+
 function EventParticipants() {
     // Function to download CSV data
     const downloadCSV = (data) => {
@@ -202,7 +368,9 @@ function EventParticipants() {
                 'Emergency Contact Number': item?.userDetails?.emergencyNo || '',
                 'Reference': item?.userDetails?.reference || '',
                 'Donation Amount': item?.userDetails?.donation || '0',
-                'Total Amount (â‚¹)': amount.toFixed(2),
+                'Coupon Code': item?.userDetails?.couponCode || '',
+                'Coupon Discount %': item?.userDetails?.couponDiscount || '',
+                'Total Amount (₹)': amount.toFixed(2),
                 'Payment Status': item?.paymentDetails?.success ? 'Success' : 'Failed',
                 'Payment Gateway': item?.paymentDetails?.paymentGateway || (item?.paymentDetails?.success ? 'PhonePe' : 'N/A')
             };
@@ -244,6 +412,7 @@ function EventParticipants() {
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
+    const [filterCoupon, setFilterCoupon] = useState('all');
     const [tabValue, setTabValue] = useState(0);
     const [snackbar, setSnackbar] = useState({
         open: false,
@@ -253,6 +422,15 @@ function EventParticipants() {
     const [resendDialogOpen, setResendDialogOpen] = useState(false);
     const [selectedReceiptRow, setSelectedReceiptRow] = useState(null);
     const [sendingReceiptId, setSendingReceiptId] = useState('');
+
+    // View/Edit modal state
+    const { isSuperAdmin, can, token } = useAdminAuth();
+    const canEdit = isSuperAdmin || can('canEditRunners');
+    const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+    const [detailsRow, setDetailsRow] = useState(null);
+    const [editMode, setEditMode] = useState(false);
+    const [editForm, setEditForm] = useState({});
+    const [savingEdit, setSavingEdit] = useState(false);
 
     // Filtered data based on search, filtering and test transaction exclusion
     const filteredData = useMemo(() => {
@@ -277,6 +455,16 @@ function EventParticipants() {
             if (filterStatus === 'success' && (!item.paymentDetails || !item.paymentDetails.success)) return false;
             if (filterStatus === 'failed' && item.paymentDetails && item.paymentDetails.success) return false;
 
+            // Filter based on coupon code
+            if (filterCoupon && filterCoupon !== 'all') {
+                const itemCoupon = (item?.userDetails?.couponCode || '').toUpperCase();
+                if (filterCoupon === 'none') {
+                    if (itemCoupon) return false;
+                } else if (itemCoupon !== filterCoupon) {
+                    return false;
+                }
+            }
+
             // Filter based on search term
             if (searchTerm) {
                 const searchTermLower = searchTerm.toLowerCase();
@@ -287,6 +475,9 @@ function EventParticipants() {
                     (userDetails.fullName && userDetails.fullName.toLowerCase().includes(searchTermLower)) ||
                     (userDetails.email && userDetails.email.toLowerCase().includes(searchTermLower)) ||
                     (userDetails.phone && userDetails.phone.includes(searchTerm)) ||
+                    (userDetails.mobNo && userDetails.mobNo.includes(searchTerm)) ||
+                    (userDetails.couponCode && userDetails.couponCode.toLowerCase().includes(searchTermLower)) ||
+                    (item.merchantTransactionId && item.merchantTransactionId.toLowerCase().includes(searchTermLower)) ||
                     (paymentDetails.data && paymentDetails.data.transactionId &&
                         paymentDetails.data.transactionId.toLowerCase().includes(searchTermLower))
                 );
@@ -294,7 +485,61 @@ function EventParticipants() {
 
             return true;
         });
-    }, [participantsData, searchTerm, filterStatus]);
+    }, [participantsData, searchTerm, filterStatus, filterCoupon]);
+
+    // List of unique coupon codes used in this event
+    const availableCoupons = useMemo(() => {
+        if (!participantsData) return [];
+        const set = new Set();
+        participantsData.forEach(item => {
+            const c = item?.userDetails?.couponCode;
+            if (c) set.add(String(c).toUpperCase());
+        });
+        return Array.from(set).sort();
+    }, [participantsData]);
+
+    // Per-coupon performance (volunteer conversion analytics)
+    const couponStats = useMemo(() => {
+        if (!participantsData) return [];
+        const map = new Map();
+        participantsData.forEach(item => {
+            const rawCode = item?.userDetails?.couponCode;
+            if (!rawCode) return; // only count attempts that used a coupon
+            const code = String(rawCode).toUpperCase();
+            const discount = Number(item?.userDetails?.couponDiscount || 0);
+            const isSuccess = !!(item?.paymentDetails && item.paymentDetails.success);
+            let amount = 0;
+            if (item.paymentDetails?.data?.amount) amount = item.paymentDetails.data.amount / 100;
+            else if (item.paymentDetails?.amount) amount = item.paymentDetails.amount / 100;
+
+            if (!map.has(code)) {
+                map.set(code, {
+                    code,
+                    discount,
+                    total: 0,
+                    successful: 0,
+                    failed: 0,
+                    revenue: 0
+                });
+            }
+            const row = map.get(code);
+            row.total += 1;
+            if (isSuccess) {
+                row.successful += 1;
+                row.revenue += amount;
+            } else {
+                row.failed += 1;
+            }
+            // Keep the most recently seen discount value (in case of mixed records)
+            if (discount) row.discount = discount;
+        });
+        return Array.from(map.values())
+            .map(r => ({
+                ...r,
+                conversionRate: r.total > 0 ? (r.successful / r.total) * 100 : 0
+            }))
+            .sort((a, b) => b.successful - a.successful);
+    }, [participantsData]);
 
     const handleMarathonNameChange = (event) => {
         setMarathonName(event.target.value);
@@ -321,6 +566,70 @@ function EventParticipants() {
     const handleFilterChange = (status) => {
         setFilterStatus(status);
         setPage(0);
+    };
+
+    const handleCouponFilterChange = (event) => {
+        setFilterCoupon(event.target.value);
+        setPage(0);
+    };
+
+    // Open the participant details modal in view mode
+    const handleOpenDetails = (item) => {
+        setDetailsRow(item);
+        setEditMode(false);
+        setEditForm({ ...(item?.userDetails || {}) });
+        setDetailsDialogOpen(true);
+    };
+
+    const handleCloseDetails = () => {
+        if (savingEdit) return;
+        setDetailsDialogOpen(false);
+        setDetailsRow(null);
+        setEditMode(false);
+        setEditForm({});
+    };
+
+    const handleEditFieldChange = (field, value) => {
+        setEditForm(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleSaveEdit = async () => {
+        if (!detailsRow?.merchantTransactionId) return;
+        try {
+            setSavingEdit(true);
+            const response = await fetch(
+                `${process.env.REACT_APP_BACKEND_BASE_URL}/api/payments/${encodeURIComponent(detailsRow.merchantTransactionId)}/details`,
+                {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify(editForm),
+                }
+            );
+            const result = await response.json();
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || 'Failed to update participant');
+            }
+            setSnackbar({
+                open: true,
+                message: result.message || 'Participant details updated',
+                severity: 'success',
+            });
+            setEditMode(false);
+            setDetailsRow(prev => prev ? { ...prev, userDetails: result.payment?.userDetails || prev.userDetails } : prev);
+            mutate();
+        } catch (err) {
+            console.error('Edit save error:', err);
+            setSnackbar({
+                open: true,
+                message: err.message || 'Could not update participant',
+                severity: 'error',
+            });
+        } finally {
+            setSavingEdit(false);
+        }
     };
 
     const handleSnackbarClose = () => {
@@ -649,7 +958,7 @@ return (
                                         </StatsIcon>
                                         <Box>
                                             <Typography variant="h5" component="div">
-                                                â‚¹{stats.totalAmount.toLocaleString()}
+                                                ₹{stats.totalAmount.toLocaleString()}
                                             </Typography>
                                             <Typography color="text.secondary" variant="subtitle2">
                                                 Total Revenue
@@ -783,7 +1092,22 @@ return (
                                 </Grid>
 
                                 <Grid item xs={12} md={7}>
-                                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
+                                        <FormControl size="small" sx={{ minWidth: 180 }}>
+                                            <InputLabel id="coupon-filter-label">Coupon</InputLabel>
+                                            <Select
+                                                labelId="coupon-filter-label"
+                                                label="Coupon"
+                                                value={filterCoupon}
+                                                onChange={handleCouponFilterChange}
+                                            >
+                                                <MenuItem value="all">All coupons</MenuItem>
+                                                <MenuItem value="none">No coupon used</MenuItem>
+                                                {availableCoupons.map(code => (
+                                                    <MenuItem key={code} value={code}>{code}</MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
                                         <Button
                                             variant={filterStatus === 'all' ? 'contained' : 'outlined'}
                                             size="small"
@@ -832,11 +1156,12 @@ return (
 
                         {/* Tabs for different views */}
                         <Box sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}>
-                            <Tabs value={tabValue} onChange={handleTabChange} aria-label="dashboard tabs">
+                            <Tabs value={tabValue} onChange={handleTabChange} aria-label="dashboard tabs" variant="scrollable" scrollButtons="auto">
                                 <Tab label="Participants List" />
                                 <Tab label="Payment Details" />
                                 <Tab label="T-Shirt Orders" />
                                 <Tab label="Breakfast Orders" />
+                                <Tab label={`Coupon Performance${couponStats.length ? ` (${couponStats.length})` : ''}`} />
                             </Tabs>
                         </Box>
 
@@ -855,6 +1180,8 @@ return (
                                             <TableCell>Category</TableCell>
                                             <TableCell>Gender</TableCell>
                                             <TableCell>T-shirt Size</TableCell>
+                                            <TableCell>Coupon</TableCell>
+                                            <TableCell>Discount</TableCell>
                                             <TableCell>Payment Status</TableCell>
                                             <TableCell>Actions</TableCell>
                                         </TableRow>
@@ -875,6 +1202,23 @@ return (
                                                 <TableCell>{item?.userDetails?.gender}</TableCell>
                                                 <TableCell>{item?.userDetails?.TshirtSize}</TableCell>
                                                 <TableCell>
+                                                    {item?.userDetails?.couponCode ? (
+                                                        <Chip
+                                                            label={String(item.userDetails.couponCode).toUpperCase()}
+                                                            size="small"
+                                                            color="info"
+                                                            variant="outlined"
+                                                        />
+                                                    ) : (
+                                                        <Typography variant="caption" color="text.secondary">—</Typography>
+                                                    )}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {item?.userDetails?.couponDiscount
+                                                        ? `${item.userDetails.couponDiscount}%`
+                                                        : '—'}
+                                                </TableCell>
+                                                <TableCell>
                                                     <Chip
                                                         label={item?.paymentDetails?.success ? "Success" : "Failed"}
                                                         color={item?.paymentDetails?.success ? "success" : "error"}
@@ -882,12 +1226,9 @@ return (
                                                     />
                                                 </TableCell>
                                                 <TableCell>
-                                                    <Tooltip title="View Complete Details">
-                                                        <IconButton size="small" onClick={() => {
-                                                            // This would show a detailed modal in a full implementation
-                                                            alert(`Details for ${item?.userDetails?.fullName}`);
-                                                        }}>
-                                                            <SearchIcon fontSize="small" />
+                                                    <Tooltip title={canEdit ? 'View / Edit Details' : 'View Details'}>
+                                                        <IconButton size="small" onClick={() => handleOpenDetails(item)}>
+                                                            <VisibilityIcon fontSize="small" />
                                                         </IconButton>
                                                     </Tooltip>
                                                     {item?.paymentDetails?.success && (
@@ -932,7 +1273,7 @@ return (
                                             <TableCell>Full Name</TableCell>
                                             <TableCell>Date</TableCell>
                                             <TableCell>Payment Status</TableCell>
-                                            <TableCell>Amount (â‚¹)</TableCell>
+                                            <TableCell>Amount (₹)</TableCell>
                                             <TableCell>Payment Method</TableCell>
                                             <TableCell>Payment Gateway</TableCell>
                                             <TableCell>PhonePe Transaction ID</TableCell>
@@ -1056,6 +1397,83 @@ return (
                             </StyledTableContainer>
                         )}
 
+                        {tabValue === 4 && (
+                            <StyledTableContainer component={Paper}>
+                                <Box sx={{ p: 2 }}>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Per-coupon conversion analytics. Each coupon code typically corresponds to a single volunteer/ambassador.
+                                        Conversion rate = Successful registrations ÷ Total registration attempts using that code.
+                                    </Typography>
+                                </Box>
+                                <Table stickyHeader>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>Coupon Code</TableCell>
+                                            <TableCell align="right">Discount %</TableCell>
+                                            <TableCell align="right">Total Attempts</TableCell>
+                                            <TableCell align="right">Successful</TableCell>
+                                            <TableCell align="right">Failed</TableCell>
+                                            <TableCell align="right">Conversion Rate</TableCell>
+                                            <TableCell align="right">Revenue (₹)</TableCell>
+                                            <TableCell align="center">Action</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {couponStats.length === 0 ? (
+                                            <TableRow>
+                                                <TableCell colSpan={8} align="center">
+                                                    <Typography variant="body2" color="text.secondary" sx={{ py: 3 }}>
+                                                        No coupon codes have been used for this event yet.
+                                                    </Typography>
+                                                </TableCell>
+                                            </TableRow>
+                                        ) : couponStats.map(row => (
+                                            <TableRow key={row.code} hover>
+                                                <TableCell>
+                                                    <Chip label={row.code} color="info" size="small" />
+                                                </TableCell>
+                                                <TableCell align="right">{row.discount || '—'}</TableCell>
+                                                <TableCell align="right">{row.total}</TableCell>
+                                                <TableCell align="right">
+                                                    <Chip label={row.successful} color="success" size="small" />
+                                                </TableCell>
+                                                <TableCell align="right">
+                                                    <Chip label={row.failed} color={row.failed > 0 ? 'error' : 'default'} size="small" />
+                                                </TableCell>
+                                                <TableCell align="right">
+                                                    <strong style={{
+                                                        color: row.conversionRate >= 75 ? '#2e7d32'
+                                                            : row.conversionRate >= 50 ? '#ed6c02'
+                                                            : '#d32f2f'
+                                                    }}>
+                                                        {row.conversionRate.toFixed(1)}%
+                                                    </strong>
+                                                </TableCell>
+                                                <TableCell align="right">
+                                                    ₹{row.revenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    <Tooltip title="View participants who used this coupon">
+                                                        <Button
+                                                            size="small"
+                                                            variant="outlined"
+                                                            onClick={() => {
+                                                                setFilterCoupon(row.code);
+                                                                setTabValue(0);
+                                                                setPage(0);
+                                                            }}
+                                                        >
+                                                            View
+                                                        </Button>
+                                                    </Tooltip>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </StyledTableContainer>
+                        )}
+
                         {tabValue === 3 && (
                             <StyledTableContainer component={Paper}>
                                 <Table stickyHeader>
@@ -1114,6 +1532,64 @@ return (
                     </Paper>
                 )}
             </Box>
+            {/* View / Edit Participant Details Dialog */}
+            <Dialog
+                open={detailsDialogOpen}
+                onClose={handleCloseDetails}
+                maxWidth="md"
+                fullWidth
+            >
+                <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Box>
+                        <Typography variant="h6" component="div">
+                            {editMode ? 'Edit Participant Details' : 'Participant Details'}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                            {detailsRow?.merchantTransactionId}
+                        </Typography>
+                    </Box>
+                    {!editMode && canEdit && (
+                        <Button
+                            startIcon={<EditIcon />}
+                            variant="outlined"
+                            size="small"
+                            onClick={() => setEditMode(true)}
+                        >
+                            Edit
+                        </Button>
+                    )}
+                </DialogTitle>
+                <DialogContent dividers>
+                    {detailsRow ? (
+                        <ParticipantDetailsBody
+                            row={detailsRow}
+                            editMode={editMode}
+                            editForm={editForm}
+                            onChange={handleEditFieldChange}
+                        />
+                    ) : null}
+                </DialogContent>
+                <DialogActions>
+                    {editMode ? (
+                        <>
+                            <Button onClick={() => { setEditMode(false); setEditForm({ ...(detailsRow?.userDetails || {}) }); }} disabled={savingEdit}>
+                                Cancel
+                            </Button>
+                            <Button
+                                variant="contained"
+                                onClick={handleSaveEdit}
+                                disabled={savingEdit}
+                                startIcon={savingEdit ? <CircularProgress size={16} color="inherit" /> : null}
+                            >
+                                {savingEdit ? 'Saving...' : 'Save Changes'}
+                            </Button>
+                        </>
+                    ) : (
+                        <Button onClick={handleCloseDetails}>Close</Button>
+                    )}
+                </DialogActions>
+            </Dialog>
+
             <Dialog open={resendDialogOpen} onClose={handleCloseResendDialog} maxWidth="xs" fullWidth>
                 <DialogTitle>Resend registration receipt?</DialogTitle>
                 <DialogContent>
