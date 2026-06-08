@@ -14,6 +14,7 @@ import ReceiptRoundedIcon from '@mui/icons-material/ReceiptRounded';
 import TuneRoundedIcon from '@mui/icons-material/TuneRounded';
 import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded';
 import PriceCheckRoundedIcon from '@mui/icons-material/PriceCheckRounded';
+import ConfirmationNumberRoundedIcon from '@mui/icons-material/ConfirmationNumberRounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded';
@@ -29,6 +30,7 @@ import GetAllDonations from './GetAllDonations';
 import DonationReceipt from './DonationReceipt';
 import TeamManagement from './TeamManagement';
 import PaymentRecovery from './PaymentRecovery';
+import GatePasses from './GatePasses';
 
 const SIDEBAR_WIDTH = 256;
 const SIDEBAR_COLLAPSED = 72;
@@ -92,6 +94,7 @@ function Sidebar({ collapsed, onToggle, user, isSuperAdmin, can, onLogout }) {
         { icon: <DashboardRoundedIcon />,       label: 'Dashboard',          to: '/admin',                     show: true },
         { icon: <PeopleAltRoundedIcon />,       label: 'Registered Runners', to: '/admin/marathon-participants', show: isSuperAdmin || can('canViewRunners') },
         { icon: <QrCodeScannerRoundedIcon />,   label: 'Check-in Scanner',   to: '/admin/checkin',              show: isSuperAdmin || can('canUseCheckIn') },
+        { icon: <ConfirmationNumberRoundedIcon />, label: 'Gate Passes',      to: '/admin/gate-passes',          show: isSuperAdmin },
         { icon: <EditNoteRoundedIcon />,        label: 'Offline Reg',        to: '/admin/offline-registration', show: isSuperAdmin || can('canDoOfflineRegistration') },
         { icon: <FeedbackRoundedIcon />,        label: 'Feedback',           to: '/admin/feedback-dashboard',   show: isSuperAdmin || can('canViewFeedback') },
         { icon: <MonetizationOnRoundedIcon />,  label: 'Donations',          to: '/admin/get-all-donations',    show: isSuperAdmin || can('canViewDonations') },
@@ -225,6 +228,7 @@ export default function AdminMain() {
                     <Route path="/get-all-donations"    element={isSuperAdmin || can('canViewDonations') ? <GetAllDonations /> : <Navigate to="/admin" replace />} />
                     <Route path="/donation-receipt"     element={isSuperAdmin ? <DonationReceipt /> : <Navigate to="/admin" replace />} />
                     <Route path="/payment-recovery"     element={isSuperAdmin ? <PaymentRecovery /> : <Navigate to="/admin" replace />} />
+                    <Route path="/gate-passes"          element={isSuperAdmin ? <GatePasses /> : <Navigate to="/admin" replace />} />
                     <Route path="/event-config"         element={isSuperAdmin ? <AdminEventConfig /> : <Navigate to="/admin" replace />} />
                     <Route path="/team"                 element={isSuperAdmin ? <TeamManagement /> : <Navigate to="/admin" replace />} />
                 </Routes>
