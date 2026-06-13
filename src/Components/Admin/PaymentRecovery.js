@@ -174,7 +174,7 @@ export default function PaymentRecovery() {
                     onChange={e => setDays(Number(e.target.value))} disabled={scanning}
                     sx={{ width: 140, '& .MuiInputBase-root': { color: TEXT_PRI }, '& label': { color: TEXT_SEC }, '& fieldset': { borderColor: BORDER } }}
                 >
-                    {[3, 7, 14, 30, 60].map(d => <MenuItem key={d} value={d}>{d} days</MenuItem>)}
+                    {[3, 7, 14, 30, 60, 90, 120].map(d => <MenuItem key={d} value={d}>{d} days</MenuItem>)}
                 </TextField>
                 <Button variant="contained" startIcon={<RefreshRoundedIcon />} onClick={scan} disabled={scanning}
                     sx={{ bgcolor: '#2f6e49', '&:hover': { bgcolor: '#256039' }, textTransform: 'none' }}>

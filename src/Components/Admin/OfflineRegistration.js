@@ -46,16 +46,19 @@ function OfflineRegistration() {
         'RFH She run 2025': 800,
         'RFH Juniors run 2025': 599,
         'RFH Juniors Run 2026': 699,
+        'RFH Akshara Run 2026': 849,
     };
     const ADDITIONAL_TSHIRT_PRICE_MAP = {
         'RFH She run 2025': 225,
         'RFH Juniors run 2025': 225,
         'RFH Juniors Run 2026': 250,
+        'RFH Akshara Run 2026': 250,
     };
     const BREAKFAST_PRICE_MAP = {
         'RFH She run 2025': 80,
         'RFH Juniors run 2025': 80,
         'RFH Juniors Run 2026': 100,
+        'RFH Akshara Run 2026': 100,
     };
     const ADDITIONAL_TSHIRT_PRICE = ADDITIONAL_TSHIRT_PRICE_MAP[marathonName] || 225;
     const BREAKFAST_PRICE = BREAKFAST_PRICE_MAP[marathonName] || 80;
@@ -86,6 +89,14 @@ function OfflineRegistration() {
         ],
         'RFH Juniors run 2025': KIDS_TSHIRT_SIZES,
         'RFH Juniors Run 2026': KIDS_TSHIRT_SIZES,
+        'RFH Akshara Run 2026': [
+            { value: 'XS', label: 'Extra Small (XS)' },
+            { value: 'S', label: 'Small (S)' },
+            { value: 'M', label: 'Medium (M)' },
+            { value: 'L', label: 'Large (L)' },
+            { value: 'XL', label: 'Extra Large (XL)' },
+            { value: 'XXL', label: 'Double XL (XXL)' }
+        ],
     };
 
     // Categories based on marathon
@@ -104,6 +115,10 @@ function OfflineRegistration() {
             { value: 'Power-Run', label: 'Power Run (Ages 7-10, 1.1K)' },
             { value: 'Bolts-Run', label: 'Bolts Run (Ages 11-15, 1.6K)' },
             { value: 'Open-Run', label: 'Open Run (Ages 16+, 1.6K)' }
+        ],
+        'RFH Akshara Run 2026': [
+            { value: 'Fun-Run', label: 'Fun Run (2.5 kms)' },
+            { value: 'Challenge-Run', label: 'Challenge Run (5 kms)' }
         ]
     };
 
@@ -326,6 +341,7 @@ function OfflineRegistration() {
                                         <MenuItem value="RFH She run 2025">RFH She run 2025</MenuItem>
                                         <MenuItem value="RFH Juniors run 2025">RFH Juniors run 2025</MenuItem>
                                         <MenuItem value="RFH Juniors Run 2026">RFH Juniors Run 2026</MenuItem>
+                                        <MenuItem value="RFH Akshara Run 2026">RFH Akshara Run 2026</MenuItem>
                                     </Select>
                                     {errors.marathonName && <FormHelperText>{errors.marathonName.message}</FormHelperText>}
                                 </FormControl>
