@@ -30,6 +30,8 @@ const PERMISSION_LABELS = {
     canViewFeedback:          { label: 'View Feedback Dashboard',   description: 'See participant feedback' },
     canDoOfflineRegistration: { label: 'Offline Registration',      description: 'Add manual registrations' },
     canViewDonations:         { label: 'View Donations',            description: 'Access donation records' },
+    canManageGuests:          { label: 'Gate Passes',               description: 'Invite guests & add companions, issue/email QR passes' },
+    canRecoverPayments:       { label: 'Payment Recovery',          description: 'Find Razorpay-paid-but-unrecorded registrations and recover them' },
 };
 
 function getToken() { return localStorage.getItem('rfh_admin_token'); }

@@ -94,12 +94,12 @@ function Sidebar({ collapsed, onToggle, user, isSuperAdmin, can, onLogout }) {
         { icon: <DashboardRoundedIcon />,       label: 'Dashboard',          to: '/admin',                     show: true },
         { icon: <PeopleAltRoundedIcon />,       label: 'Registered Runners', to: '/admin/marathon-participants', show: isSuperAdmin || can('canViewRunners') },
         { icon: <QrCodeScannerRoundedIcon />,   label: 'Check-in Scanner',   to: '/admin/checkin',              show: isSuperAdmin || can('canUseCheckIn') },
-        { icon: <ConfirmationNumberRoundedIcon />, label: 'Gate Passes',      to: '/admin/gate-passes',          show: isSuperAdmin },
+        { icon: <ConfirmationNumberRoundedIcon />, label: 'Gate Passes',      to: '/admin/gate-passes',          show: isSuperAdmin || can('canManageGuests') },
         { icon: <EditNoteRoundedIcon />,        label: 'Offline Reg',        to: '/admin/offline-registration', show: isSuperAdmin || can('canDoOfflineRegistration') },
         { icon: <FeedbackRoundedIcon />,        label: 'Feedback',           to: '/admin/feedback-dashboard',   show: isSuperAdmin || can('canViewFeedback') },
         { icon: <MonetizationOnRoundedIcon />,  label: 'Donations',          to: '/admin/get-all-donations',    show: isSuperAdmin || can('canViewDonations') },
         { icon: <ReceiptRoundedIcon />,          label: 'Donation Receipt',   to: '/admin/donation-receipt',     show: isSuperAdmin },
-        { icon: <PriceCheckRoundedIcon />,      label: 'Payment Recovery',   to: '/admin/payment-recovery',     show: isSuperAdmin },
+        { icon: <PriceCheckRoundedIcon />,      label: 'Payment Recovery',   to: '/admin/payment-recovery',     show: isSuperAdmin || can('canRecoverPayments') },
         { icon: <TuneRoundedIcon />,            label: 'Event Config',       to: '/admin/event-config',         show: isSuperAdmin },
         { icon: <GroupsRoundedIcon />,          label: 'Team',               to: '/admin/team',                 show: isSuperAdmin },
     ];
@@ -227,8 +227,8 @@ export default function AdminMain() {
                     <Route path="/feedback-dashboard"   element={isSuperAdmin || can('canViewFeedback') ? <FeedbackDashboard /> : <Navigate to="/admin" replace />} />
                     <Route path="/get-all-donations"    element={isSuperAdmin || can('canViewDonations') ? <GetAllDonations /> : <Navigate to="/admin" replace />} />
                     <Route path="/donation-receipt"     element={isSuperAdmin ? <DonationReceipt /> : <Navigate to="/admin" replace />} />
-                    <Route path="/payment-recovery"     element={isSuperAdmin ? <PaymentRecovery /> : <Navigate to="/admin" replace />} />
-                    <Route path="/gate-passes"          element={isSuperAdmin ? <GatePasses /> : <Navigate to="/admin" replace />} />
+                    <Route path="/payment-recovery"     element={isSuperAdmin || can('canRecoverPayments') ? <PaymentRecovery /> : <Navigate to="/admin" replace />} />
+                    <Route path="/gate-passes"          element={isSuperAdmin || can('canManageGuests') ? <GatePasses /> : <Navigate to="/admin" replace />} />
                     <Route path="/event-config"         element={isSuperAdmin ? <AdminEventConfig /> : <Navigate to="/admin" replace />} />
                     <Route path="/team"                 element={isSuperAdmin ? <TeamManagement /> : <Navigate to="/admin" replace />} />
                 </Routes>

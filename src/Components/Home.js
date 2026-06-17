@@ -78,111 +78,94 @@ function Home() {
     }
 
     const onSubmit = async (formData) => {
-        console.log("donate data ", formData)
-        // setValue("merchantTransactionId", generateTransactionId())
-        // setOpen(false);
-        setLoading(true)
-        let formDataCopy = JSON.parse(JSON.stringify(formData))
-        // formDataCopy = { ...formDataCopy, merchantTransactionId: generateTransactionId() }
-        formDataCopy = { ...formDataCopy }
-
-        // favDispatch({ type: "SET_TRANSACTION_ID", payload: formDataCopy })
-        setTransaction({ ...formDataCopy })
-        // localStorage.setItem('transactionID', formDataCopy.merchantTransactionId);
-
+        // Razorpay donation flow (replaces the retired PhonePe redirect).
+        setLoading(true);
+        setPaymentStatus('Starting secure payment…');
         try {
-            // const response = await fetch("https://rfh-backend.up.railway.app/api/initiate-payment", {
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/initiate-payment`, {
-                method: "POST",
-                timeout: 1200000,
-                signal: signal,
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(formDataCopy),
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/donations/initiate-razorpay-donation`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
             });
+            if (!response.ok) {
+                const err = await response.json().catch(() => ({}));
+                throw new Error(err.error || `Payment server error (${response.status}). Please try again.`);
+            }
             const data = await response.json();
-            console.log("data.message", data, data.message);
-            console.log("merchantTransactionId from backend ", data?.data?.merchantTransactionId)
-            localStorage.setItem('merchantTransactionId', data?.data?.merchantTransactionId
-            );
-            setPaymentStatus(data.message)
-            setPaymentLink(data?.data?.instrumentResponse?.redirectInfo?.url)
-            // window.location.href = data?.data?.instrumentResponse?.redirectInfo?.url;
+            if (!data.orderId) throw new Error('Payment server did not return order details. Please try again.');
 
-            // window.open(
-            //     data?.data?.instrumentResponse?.redirectInfo?.url,
-            //     '_blank' // <- This is what makes it open in a new window.
-            // );
+            const resetUI = () => { setLoading(false); setPaymentStatus(''); };
 
-            // Detect if user is on iOS/Safari
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+            const options = {
+                key: data.keyId,
+                amount: data.amount,
+                currency: data.currency,
+                name: 'Rupee For Humanity',
+                description: 'Donation',
+                order_id: data.orderId,
+                handler: async function (rzp) {
+                    setPaymentStatus('Verifying payment…');
+                    try {
+                        const verifyRes = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/donations/razorpay-donation-webhook`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                razorpay_payment_id: rzp.razorpay_payment_id,
+                                razorpay_order_id: rzp.razorpay_order_id,
+                                razorpay_signature: rzp.razorpay_signature,
+                            }),
+                        });
+                        const verifyData = await verifyRes.json();
+                        if (verifyData.status === 'success') {
+                            resetUI();
+                            setOpen(false);
+                            setSearchParams({});
+                            toast.success('Thank you for your donation! Your receipt has been emailed to you.', { duration: 8000 });
+                        } else {
+                            resetUI();
+                            setOpen(false);
+                            toast.message('Payment received. Your receipt will arrive shortly — if not within an hour, contact rupee4humanity@gmail.com.', { duration: 10000 });
+                        }
+                    } catch (err) {
+                        console.error('Donation verify error:', err);
+                        resetUI();
+                        setOpen(false);
+                        toast.message('Payment received. Receipt may be delayed — contact rupee4humanity@gmail.com if you do not get it within an hour.', { duration: 10000 });
+                    }
+                },
+                modal: { ondismiss: function () { resetUI(); toast.info('Donation cancelled. You can try again any time.'); } },
+                prefill: { name: formData.fullName, email: formData.email, contact: formData.mobNo },
+                theme: { color: '#040002' },
+            };
 
-            const paymentUrl = data?.data?.instrumentResponse?.redirectInfo?.url
-
-            if (paymentUrl) {
-                if (isIOS || isSafari) {
-                    // For iOS devices, use a form submission approach which works better
-                    const form = document.createElement('form');
-                    form.method = 'GET';
-                    form.action = paymentUrl;
-                    form.target = '_self';
-                    document.body.appendChild(form);
-                    form.submit();
-                } else {
-                    // For non-iOS devices, use the standard approach
-                    window.location.href = paymentUrl;
-                }
-            } else {
-                console.error("Payment URL was not provided in the response");
-                setPaymentStatus("");
-                toast.error('Payment gateway error. Please try again or contact support.');
+            // SDK is preloaded in index.html; this is a safety net.
+            if (!window.Razorpay) {
+                toast.info('Loading payment gateway, please wait…');
+                await new Promise((resolve, reject) => {
+                    let attempts = 0;
+                    const check = () => {
+                        attempts++;
+                        if (window.Razorpay) return resolve();
+                        if (attempts > 30) return reject(new Error('Payment gateway could not load. Please disable ad blockers / VPN, refresh, and try again.'));
+                        setTimeout(check, 300);
+                    };
+                    check();
+                });
             }
 
-            const callCheckAPI = async () => {
-                let merchantTransactionId = localStorage.getItem('merchantTransactionId')
-                // let transactionID = formDataCopy.merchantTransactionId
-                let body = { merchantTransactionId: merchantTransactionId }
-                try {
-                    const res = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/app/payment-status`, {
-                        method: 'POST',
-                        timeout: 1200000,
-                        signal: signal,
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify(body)
-                    });
-                    const data = await res.json();
-                    console.log("data ", data)
-
-                    setStatus(data);
-                    setLoading(false)
-
-                    // navigate('/payment-redirect')
-
-                    // Check if payment is still pending
-                    // if (data.success === true && data.data.state === 'PENDING') {
-                    //     setTimeout(fetchStatus, 3000);
-                    // }
-                } catch (error) {
-                    console.error(error);
-                    setLoading(false)
-                    setPaymentStatus(error)
-                }
-            }
-
-            // setTimeout(callCheckAPI, 20000)
-
-
+            const rzp = new window.Razorpay(options);
+            rzp.on('payment.failed', function (resp) {
+                const reason = resp && resp.error && resp.error.description;
+                resetUI();
+                toast.error(reason ? `Payment failed: ${reason}. Please try again.` : 'Payment failed. Please try again.');
+            });
+            rzp.open();
         } catch (error) {
-            console.error(error);
+            console.error('Donation error:', error);
             setLoading(false);
-            setPaymentStatus(error)
+            setPaymentStatus('');
+            toast.error(error.message || 'Something went wrong. Please try again or contact rupee4humanity@gmail.com.');
         }
-
     }
     console.log("paymentstatus ", paymentStatus)
     console.log("payment Link ", paymentLink)
