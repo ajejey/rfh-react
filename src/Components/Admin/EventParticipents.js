@@ -331,6 +331,15 @@ function ParticipantDetailsBody({ row, editMode, editForm, onChange }) {
 function EventParticipants() {
     // Function to download CSV data
     const downloadCSV = (data) => {
+        // Largest number of accompanying persons across the rows, so every row
+        // emits the same Person-N columns (added this year; was missing from export).
+        const maxAccompanying = data.reduce((max, item) => {
+            const u = item?.userDetails || {};
+            let n = parseInt(u.accompanyingCount || 0) || 0;
+            for (let i = 1; i <= 50; i++) { if (u[`accompanyingPerson${i}Name`]) n = Math.max(n, i); }
+            return Math.max(max, n);
+        }, 0);
+
         // Format the data for CSV export
         const csvData = data.map((item) => {
             // Get payment amount in a readable format
@@ -339,6 +348,14 @@ function EventParticipants() {
                 amount = item.paymentDetails.data.amount / 100;
             } else if (item.paymentDetails?.amount) {
                 amount = item.paymentDetails.amount / 100;
+            }
+
+            // Flatten accompanying persons into Person N Name/Age columns (consistent across rows).
+            const u = item?.userDetails || {};
+            const accompanying = { 'Accompanying Count': u.accompanyingCount || '0' };
+            for (let i = 1; i <= maxAccompanying; i++) {
+                accompanying[`Accompanying ${i} Name`] = u[`accompanyingPerson${i}Name`] || '';
+                accompanying[`Accompanying ${i} Age`] = u[`accompanyingPerson${i}Age`] || '';
             }
 
             // Create a comprehensive data object with all relevant fields
@@ -357,6 +374,7 @@ function EventParticipants() {
                 'Additional T-shirt Quantity': item?.userDetails?.additionalTshirtQuantity || '0',
                 'Additional Breakfast': item?.userDetails?.additionalBreakfast || '0',
                 'Total Breakfast Count': (Number(item?.userDetails?.additionalBreakfast || 0) + 1).toString(),
+                ...accompanying,
                 'Blood Group': item?.userDetails?.bloodGroup || '',
                 'Address': item?.userDetails?.address || '',
                 'City': item?.userDetails?.city || '',

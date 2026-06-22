@@ -8,6 +8,7 @@ import {
 } from '@mui/material';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import Papa from 'papaparse';
 
 const BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL;
 
@@ -181,6 +182,28 @@ export default function AdminCheckIn() {
 
     const pct = stats ? (stats.total > 0 ? Math.round((stats.checkedIn / stats.total) * 100) : 0) : null;
 
+    // Export the full attendee list (runners + accompanying + guests) with check-in status.
+    const exportCheckinCSV = () => {
+        if (!participants.length) return;
+        const eventName = allEvents.find(e => e.eventSlug === selectedSlug)?.eventName || 'event';
+        const rows = participants.map(p => ({
+            'Name': p.name || '',
+            'Registration ID': p.registrationId || '',
+            'Category': p.category || '',
+            'Type': p.type || '',
+            'Phone': p.phone || '',
+            'Parent / Linked To': p.parentName || '',
+            'Checked In': p.checkedIn ? 'Yes' : 'No',
+            'Check-in Time': p.checkedInAt ? new Date(p.checkedInAt).toLocaleString('en-IN') : '',
+        }));
+        const csv = Papa.unparse(rows);
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.setAttribute('download', `${eventName.replace(/\s+/g, '_')}_checkin_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(a); a.click(); a.remove();
+    };
+
     function formatTime(iso) {
         if (!iso) return '—';
         return new Date(iso).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
@@ -289,6 +312,10 @@ export default function AdminCheckIn() {
                                     />
                                     <Button variant="outlined" size="small" onClick={loadParticipants}>
                                         Refresh
+                                    </Button>
+                                    <Button variant="contained" size="small" onClick={exportCheckinCSV} disabled={!participants.length}
+                                        sx={{ bgcolor: '#2f6e49', '&:hover': { bgcolor: '#256039' } }}>
+                                        Download CSV
                                     </Button>
                                 </Box>
                             </Box>
