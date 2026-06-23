@@ -12,6 +12,13 @@ import Papa from 'papaparse';
 
 const BASE_URL = process.env.REACT_APP_BACKEND_BASE_URL;
 
+// Check-in checkpoints (must match server routes/checkin.js).
+const STAGES = [
+    { key: 'gate', label: 'Gate Entry' },
+    { key: 'kit', label: 'Racer Kit' },
+    { key: 'certificate', label: 'Certificate / Medal' },
+];
+
 function StatCard({ label, value, color }) {
     return (
         <Card sx={{ flex: 1, minWidth: 120, borderRadius: 2, boxShadow: 2 }}>
@@ -93,44 +100,31 @@ export default function AdminCheckIn() {
         }
     }
 
-    async function handleCheckIn(regId) {
-        setActionLoading(prev => ({ ...prev, [regId]: true }));
+    // Toggle a specific checkpoint for a person (admin override). key = `${regId}:${stage}`.
+    async function toggleStage(regId, stage, currentlyDone) {
+        const key = `${regId}:${stage}`;
+        setActionLoading(prev => ({ ...prev, [key]: true }));
         try {
-            const res = await fetch(`${BASE_URL}/api/checkin/${encodeURIComponent(regId)}`, {
-                method: 'POST',
+            const res = await fetch(`${BASE_URL}/api/checkin/${encodeURIComponent(regId)}?stage=${stage}`, {
+                method: currentlyDone ? 'DELETE' : 'POST',
                 headers: { 'Content-Type': 'application/json' },
             });
             const data = await res.json();
-            if (data.success || data.alreadyCheckedIn) {
-                // Update participant in-place
-                setParticipants(prev => prev.map(p =>
-                    p.registrationId === regId
-                        ? { ...p, checkedIn: true, checkedInAt: data.checkedInAt || p.checkedInAt }
-                        : p
-                ));
-                setStats(prev => prev ? { ...prev, checkedIn: prev.checkedIn + (data.success ? 1 : 0) } : prev);
-            }
-        } catch { /* ignore */ }
-        finally { setActionLoading(prev => ({ ...prev, [regId]: false })); }
-    }
-
-    async function handleUndo(regId) {
-        setActionLoading(prev => ({ ...prev, [regId]: true }));
-        try {
-            const res = await fetch(`${BASE_URL}/api/checkin/${encodeURIComponent(regId)}`, {
-                method: 'DELETE',
+            const nowDone = currentlyDone ? !(data.success) : !!(data.success || data.alreadyCheckedIn);
+            const at = !currentlyDone ? (data.checkedInAt || new Date().toISOString()) : null;
+            setParticipants(prev => prev.map(p => {
+                if (p.registrationId !== regId) return p;
+                const stages = { ...(p.stages || {}), [stage]: { done: nowDone, at } };
+                return { ...p, stages, ...(stage === 'gate' ? { checkedIn: nowDone, checkedInAt: at } : {}) };
+            }));
+            setStats(prev => {
+                if (!prev) return prev;
+                const delta = nowDone === currentlyDone ? 0 : (nowDone ? 1 : -1);
+                const byStage = { ...(prev.byStage || {}), [stage]: Math.max(0, (prev.byStage?.[stage] || 0) + delta) };
+                return { ...prev, byStage, ...(stage === 'gate' ? { checkedIn: byStage.gate } : {}) };
             });
-            const data = await res.json();
-            if (data.success) {
-                setParticipants(prev => prev.map(p =>
-                    p.registrationId === regId
-                        ? { ...p, checkedIn: false, checkedInAt: null }
-                        : p
-                ));
-                setStats(prev => prev ? { ...prev, checkedIn: Math.max(0, prev.checkedIn - 1) } : prev);
-            }
         } catch { /* ignore */ }
-        finally { setActionLoading(prev => ({ ...prev, [regId]: false })); }
+        finally { setActionLoading(prev => ({ ...prev, [key]: false })); }
     }
 
     async function handleSavePin() {
@@ -186,16 +180,22 @@ export default function AdminCheckIn() {
     const exportCheckinCSV = () => {
         if (!participants.length) return;
         const eventName = allEvents.find(e => e.eventSlug === selectedSlug)?.eventName || 'event';
-        const rows = participants.map(p => ({
-            'Name': p.name || '',
-            'Registration ID': p.registrationId || '',
-            'Category': p.category || '',
-            'Type': p.type || '',
-            'Phone': p.phone || '',
-            'Parent / Linked To': p.parentName || '',
-            'Checked In': p.checkedIn ? 'Yes' : 'No',
-            'Check-in Time': p.checkedInAt ? new Date(p.checkedInAt).toLocaleString('en-IN') : '',
-        }));
+        const rows = participants.map(p => {
+            const row = {
+                'Name': p.name || '',
+                'Registration ID': p.registrationId || '',
+                'Category': p.category || '',
+                'Type': p.type || '',
+                'Phone': p.phone || '',
+                'Parent / Linked To': p.parentName || '',
+            };
+            for (const s of STAGES) {
+                const st = p.stages?.[s.key] || {};
+                row[s.label] = st.done ? 'Yes' : 'No';
+                row[`${s.label} Time`] = st.at ? new Date(st.at).toLocaleString('en-IN') : '';
+            }
+            return row;
+        });
         const csv = Papa.unparse(rows);
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const a = document.createElement('a');
@@ -256,9 +256,11 @@ export default function AdminCheckIn() {
                             ) : stats ? (
                                 <>
                                     <StatCard label="Total Registered" value={stats.total} />
-                                    <StatCard label="Checked In" value={stats.checkedIn} color="#27ae60" />
-                                    <StatCard label="% Checked In" value={`${pct}%`} color="#3498db" />
-                                    <StatCard label="Remaining" value={stats.total - stats.checkedIn} color="#e74c3c" />
+                                    {STAGES.map(s => (
+                                        <StatCard key={s.key} label={s.label}
+                                            value={stats.byStage?.[s.key] ?? (s.key === 'gate' ? stats.checkedIn : 0)}
+                                            color="#27ae60" />
+                                    ))}
                                 </>
                             ) : null}
                         </Box>
@@ -333,15 +335,15 @@ export default function AdminCheckIn() {
                                                 <TableCell><strong>Reg ID</strong></TableCell>
                                                 <TableCell><strong>Category</strong></TableCell>
                                                 <TableCell><strong>Phone</strong></TableCell>
-                                                <TableCell><strong>Status</strong></TableCell>
-                                                <TableCell><strong>Time</strong></TableCell>
-                                                <TableCell align="center"><strong>Action</strong></TableCell>
+                                                {STAGES.map(s => (
+                                                    <TableCell key={s.key} align="center"><strong>{s.label}</strong></TableCell>
+                                                ))}
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
                                             {filteredParticipants.length === 0 ? (
                                                 <TableRow>
-                                                    <TableCell colSpan={7} align="center" sx={{ py: 4, color: 'text.secondary' }}>
+                                                    <TableCell colSpan={4 + STAGES.length} align="center" sx={{ py: 4, color: 'text.secondary' }}>
                                                         {searchQuery ? 'No results matching your search' : 'No participants found'}
                                                     </TableCell>
                                                 </TableRow>
@@ -357,48 +359,31 @@ export default function AdminCheckIn() {
                                                         </TableCell>
                                                         <TableCell>{p.category}</TableCell>
                                                         <TableCell>{p.phone}</TableCell>
-                                                        <TableCell>
-                                                            <Chip
-                                                                icon={p.checkedIn ? <CheckCircleIcon /> : undefined}
-                                                                label={p.checkedIn ? 'Checked In' : 'Pending'}
-                                                                size="small"
-                                                                sx={{
-                                                                    bgcolor: p.checkedIn ? '#e8f5e9' : '#f5f5f5',
-                                                                    color: p.checkedIn ? '#27ae60' : '#888',
-                                                                    fontWeight: 'bold',
-                                                                }}
-                                                            />
-                                                        </TableCell>
-                                                        <TableCell sx={{ color: 'text.secondary', fontSize: '0.82rem' }}>
-                                                            {formatTime(p.checkedInAt)}
-                                                        </TableCell>
-                                                        <TableCell align="center">
-                                                            {actionLoading[p.registrationId] ? (
-                                                                <CircularProgress size={18} />
-                                                            ) : p.checkedIn ? (
-                                                                <Button
-                                                                    size="small"
-                                                                    color="warning"
-                                                                    variant="outlined"
-                                                                    onClick={() => handleUndo(p.registrationId)}
-                                                                    sx={{ fontSize: '0.75rem' }}
-                                                                >
-                                                                    Undo
-                                                                </Button>
-                                                            ) : (
-                                                                <Button
-                                                                    size="small"
-                                                                    variant="contained"
-                                                                    onClick={() => handleCheckIn(p.registrationId)}
-                                                                    sx={{
-                                                                        bgcolor: '#27ae60', fontSize: '0.75rem',
-                                                                        '&:hover': { bgcolor: '#219a52' },
-                                                                    }}
-                                                                >
-                                                                    Check In
-                                                                </Button>
-                                                            )}
-                                                        </TableCell>
+                                                        {STAGES.map(s => {
+                                                            const st = p.stages?.[s.key] || {};
+                                                            const busy = actionLoading[`${p.registrationId}:${s.key}`];
+                                                            return (
+                                                                <TableCell key={s.key} align="center">
+                                                                    {busy ? (
+                                                                        <CircularProgress size={16} />
+                                                                    ) : (
+                                                                        <Chip
+                                                                            icon={st.done ? <CheckCircleIcon /> : undefined}
+                                                                            label={st.done ? (formatTime(st.at) || 'Done') : 'Mark'}
+                                                                            size="small"
+                                                                            onClick={() => toggleStage(p.registrationId, s.key, !!st.done)}
+                                                                            sx={{
+                                                                                cursor: 'pointer',
+                                                                                bgcolor: st.done ? '#e8f5e9' : '#f5f5f5',
+                                                                                color: st.done ? '#27ae60' : '#888',
+                                                                                fontWeight: 'bold',
+                                                                                '&:hover': { bgcolor: st.done ? '#d4efd9' : '#e8e8e8' },
+                                                                            }}
+                                                                        />
+                                                                    )}
+                                                                </TableCell>
+                                                            );
+                                                        })}
                                                     </TableRow>
                                                 ))
                                             )}

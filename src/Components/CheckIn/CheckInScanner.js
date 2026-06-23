@@ -262,10 +262,13 @@ const numpadBtnSx = {
 
 // ─── Result Card ──────────────────────────────────────────────────────────────
 
-function ResultCard({ resultState, result, onCheckIn, checkingIn, undoCountdown, onUndo, undoing, onScanNext }) {
+function ResultCard({ resultState, result, onCheckIn, checkingIn, undoCountdown, onUndo, undoing, onScanNext, station, stationLabel }) {
     const accentColor = COLORS[resultState] || '#aaa';
 
     if (!result) return null;
+
+    const stages = result.stages || {};
+    const selectedAt = stages[station]?.at;
 
     return (
         <Card sx={{ borderLeft: `6px solid ${accentColor}`, borderRadius: 2, boxShadow: 3 }}>
@@ -276,10 +279,10 @@ function ResultCard({ resultState, result, onCheckIn, checkingIn, undoCountdown,
                     {resultState === 'already' && <WarningAmberIcon sx={{ color: COLORS.already, fontSize: 28 }} />}
                     {resultState === 'invalid' && <ErrorIcon sx={{ color: COLORS.invalid, fontSize: 28 }} />}
                     <Typography variant="h6" fontWeight="bold" sx={{ color: accentColor }}>
-                        {resultState === 'valid'   && 'Not Yet Checked In'}
-                        {resultState === 'already' && (result.checkedInAt
-                            ? `Checked in at ${formatTime(result.checkedInAt)}`
-                            : 'Already Checked In')}
+                        {resultState === 'valid'   && `${stationLabel} — not done yet`}
+                        {resultState === 'already' && (selectedAt
+                            ? `${stationLabel} done at ${formatTime(selectedAt)}`
+                            : `${stationLabel} — already done`)}
                         {resultState === 'invalid' && 'Invalid'}
                     </Typography>
                 </Box>
@@ -325,7 +328,28 @@ function ResultCard({ resultState, result, onCheckIn, checkingIn, undoCountdown,
                             </>}
                         </Box>
 
-                        {/* Check In button */}
+                        {/* All checkpoints status */}
+                        <Box sx={{ mt: 2, p: 1.5, bgcolor: '#f6f8fa', borderRadius: 2 }}>
+                            {STAGES.map(s => {
+                                const done = stages[s.key]?.done;
+                                const at = stages[s.key]?.at;
+                                const isStation = s.key === station;
+                                return (
+                                    <Box key={s.key} sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5,
+                                        fontWeight: isStation ? 700 : 400 }}>
+                                        <span style={{ color: done ? COLORS.valid : '#bbb', fontSize: 18 }}>{done ? '✓' : '○'}</span>
+                                        <Typography variant="body2" sx={{ flex: 1, fontWeight: 'inherit' }}>
+                                            {s.label}{isStation ? '  (this desk)' : ''}
+                                        </Typography>
+                                        <Typography variant="caption" color="text.secondary">
+                                            {done ? (at ? formatTime(at) : 'done') : '—'}
+                                        </Typography>
+                                    </Box>
+                                );
+                            })}
+                        </Box>
+
+                        {/* Mark button — marks THIS desk's checkpoint */}
                         {resultState === 'valid' && (
                             <Button
                                 variant="contained"
@@ -334,14 +358,14 @@ function ResultCard({ resultState, result, onCheckIn, checkingIn, undoCountdown,
                                 onClick={onCheckIn}
                                 disabled={checkingIn}
                                 sx={{
-                                    mt: 3, py: 1.75, fontSize: '1.1rem', borderRadius: 2,
+                                    mt: 2, py: 1.75, fontSize: '1.1rem', borderRadius: 2,
                                     backgroundColor: COLORS.valid,
                                     '&:hover': { backgroundColor: '#219a52' },
                                 }}
                             >
                                 {checkingIn
                                     ? <CircularProgress size={24} color="inherit" />
-                                    : '✓  CHECK IN'}
+                                    : `✓  MARK ${stationLabel.toUpperCase()}`}
                             </Button>
                         )}
 
@@ -353,7 +377,7 @@ function ResultCard({ resultState, result, onCheckIn, checkingIn, undoCountdown,
                                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                             }}>
                                 <Typography variant="body2" color="text.secondary">
-                                    Checked in at {formatTime(result.checkedInAt)}
+                                    {stationLabel} marked{selectedAt ? ` at ${formatTime(selectedAt)}` : ''}
                                 </Typography>
                                 <Button
                                     size="small"
@@ -405,6 +429,15 @@ function DetailRow({ label, value, mono }) {
     );
 }
 
+// ─── Checkpoints (must match server routes/checkin.js STAGES) ────────────────
+const STAGES = [
+    { key: 'gate', label: 'Gate Entry' },
+    { key: 'kit', label: 'Racer Kit' },
+    { key: 'certificate', label: 'Certificate / Medal' },
+];
+const STATION_KEY = 'rfh_checkin_station';
+const stageLabel = (key) => STAGES.find(s => s.key === key)?.label || key;
+
 // ─── Screen 3: Scanner + Manual ──────────────────────────────────────────────
 
 function ScannerScreen({ eventSlug, eventName, onChangeEvent }) {
@@ -413,6 +446,16 @@ function ScannerScreen({ eventSlug, eventName, onChangeEvent }) {
 
     const [activeTab, setActiveTab] = useState(0); // 0=Scan, 1=Manual
     const [scanning, setScanning] = useState(false);
+
+    // Which checkpoint this device is manning (persisted per device).
+    const [station, setStation] = useState(() => {
+        const saved = typeof localStorage !== 'undefined' && localStorage.getItem(STATION_KEY);
+        return STAGES.some(s => s.key === saved) ? saved : 'gate';
+    });
+    const changeStation = (key) => {
+        setStation(key);
+        try { localStorage.setItem(STATION_KEY, key); } catch {}
+    };
 
     const [resultState, setResultState] = useState('');
     const [result, setResult] = useState(null);
@@ -520,13 +563,10 @@ function ScannerScreen({ eventSlug, eventName, onChangeEvent }) {
                 return;
             }
 
-            if (data.checkedIn) {
-                setResultState('already');
-                setResult(data);
-            } else {
-                setResultState('valid');
-                setResult(data);
-            }
+            // Status reflects THIS station's checkpoint (gate / kit / certificate).
+            const stageDone = data.stages?.[station]?.done;
+            setResult(data);
+            setResultState(stageDone ? 'already' : 'valid');
         } catch {
             setResultState('invalid');
             setResult({ message: 'Network error. Please check connection and try again.' });
@@ -537,18 +577,25 @@ function ScannerScreen({ eventSlug, eventName, onChangeEvent }) {
         if (!result) return;
         setCheckingIn(true);
         try {
-            const res = await fetch(`${BASE_URL}/api/checkin/${encodeURIComponent(result.registrationId)}`, {
+            const res = await fetch(`${BASE_URL}/api/checkin/${encodeURIComponent(result.registrationId)}?stage=${station}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
             });
             const data = await res.json();
 
+            // Merge the marked stage into result.stages so the card updates live.
+            const applyStage = (prev, at) => ({
+                ...prev,
+                stages: { ...(prev.stages || {}), [station]: { done: true, at } },
+                ...(station === 'gate' ? { checkedIn: true, checkedInAt: at } : {}),
+            });
+
             if (data.alreadyCheckedIn) {
                 setResultState('already');
-                setResult(prev => ({ ...prev, checkedIn: true, checkedInAt: data.checkedInAt }));
+                setResult(prev => applyStage(prev, data.checkedInAt));
             } else if (data.success) {
                 setResultState('already');
-                setResult(prev => ({ ...prev, checkedIn: true, checkedInAt: data.checkedInAt }));
+                setResult(prev => applyStage(prev, data.checkedInAt));
                 // Start 30-second undo countdown
                 setUndoCountdown(30);
                 undoTimerRef.current = setInterval(() => {
@@ -577,7 +624,7 @@ function ScannerScreen({ eventSlug, eventName, onChangeEvent }) {
         if (!result) return;
         setUndoing(true);
         try {
-            const res = await fetch(`${BASE_URL}/api/checkin/${encodeURIComponent(result.registrationId)}`, {
+            const res = await fetch(`${BASE_URL}/api/checkin/${encodeURIComponent(result.registrationId)}?stage=${station}`, {
                 method: 'DELETE',
             });
             const data = await res.json();
@@ -585,7 +632,11 @@ function ScannerScreen({ eventSlug, eventName, onChangeEvent }) {
                 clearUndoTimer();
                 setUndoCountdown(0);
                 setResultState('valid');
-                setResult(prev => ({ ...prev, checkedIn: false, checkedInAt: null }));
+                setResult(prev => ({
+                    ...prev,
+                    stages: { ...(prev.stages || {}), [station]: { done: false, at: null } },
+                    ...(station === 'gate' ? { checkedIn: false, checkedInAt: null } : {}),
+                }));
             }
         } catch {
             // silently fail undo
@@ -625,7 +676,7 @@ function ScannerScreen({ eventSlug, eventName, onChangeEvent }) {
 
     function handleSelectManualResult(r) {
         setResult(r);
-        setResultState(r.checkedIn ? 'already' : 'valid');
+        setResultState(r.stages?.[station]?.done ? 'already' : 'valid');
         setManualResults(null);
     }
 
@@ -654,6 +705,28 @@ function ScannerScreen({ eventSlug, eventName, onChangeEvent }) {
             </Box>
 
             <Container maxWidth="sm" sx={{ pt: 2, pb: 8 }}>
+
+                {/* Checkpoint / station selector — this device marks the chosen checkpoint */}
+                <Box sx={{ mb: 2, p: 1.5, bgcolor: 'white', borderRadius: 2, boxShadow: 1 }}>
+                    <Typography variant="caption" sx={{ color: '#888', display: 'block', mb: 0.75 }}>
+                        This device is checking in at:
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                        {STAGES.map(s => (
+                            <Button key={s.key} fullWidth size="small"
+                                variant={station === s.key ? 'contained' : 'outlined'}
+                                onClick={() => changeStation(s.key)}
+                                sx={{
+                                    textTransform: 'none', fontWeight: station === s.key ? 700 : 400,
+                                    ...(station === s.key
+                                        ? { bgcolor: '#040002', '&:hover': { bgcolor: '#222' } }
+                                        : { color: '#040002', borderColor: '#ccc' }),
+                                }}>
+                                {s.label}
+                            </Button>
+                        ))}
+                    </Box>
+                </Box>
 
                 {/* Tabs */}
                 {!showResultCard && (
@@ -759,13 +832,15 @@ function ScannerScreen({ eventSlug, eventName, onChangeEvent }) {
                                         No registrations found
                                     </Typography>
                                 ) : (
-                                    manualResults.map((r, i) => (
+                                    manualResults.map((r, i) => {
+                                        const sDone = r.stages?.[station]?.done;
+                                        return (
                                         <Card
                                             key={i}
                                             onClick={() => handleSelectManualResult(r)}
                                             sx={{
                                                 mb: 1.5, cursor: 'pointer', borderRadius: 2,
-                                                borderLeft: `5px solid ${r.checkedIn ? COLORS.already : COLORS.valid}`,
+                                                borderLeft: `5px solid ${sDone ? COLORS.already : COLORS.valid}`,
                                                 '&:hover': { boxShadow: 4 },
                                             }}
                                         >
@@ -774,12 +849,13 @@ function ScannerScreen({ eventSlug, eventName, onChangeEvent }) {
                                                 <Typography variant="body2" color="text.secondary">
                                                     {r.registrationId} · {r.category}
                                                 </Typography>
-                                                <Typography variant="caption" sx={{ color: r.checkedIn ? COLORS.already : COLORS.valid }}>
-                                                    {r.checkedIn ? 'Already checked in' : 'Not yet checked in'}
+                                                <Typography variant="caption" sx={{ color: sDone ? COLORS.already : COLORS.valid }}>
+                                                    {stageLabel(station)}: {sDone ? 'done' : 'pending'}
                                                 </Typography>
                                             </CardContent>
                                         </Card>
-                                    ))
+                                        );
+                                    })
                                 )}
                             </Box>
                         )}
@@ -797,6 +873,8 @@ function ScannerScreen({ eventSlug, eventName, onChangeEvent }) {
                         onUndo={handleUndo}
                         undoing={undoing}
                         onScanNext={handleScanNext}
+                        station={station}
+                        stationLabel={stageLabel(station)}
                     />
                 )}
             </Container>
