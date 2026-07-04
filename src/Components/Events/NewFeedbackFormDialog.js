@@ -94,7 +94,7 @@ const feedbackSchema = yup.object().shape({
     .string()
     .oneOf(
       [
-        'To run in Cubbon Park',
+        'For the running experience',
         'Supporting the cause',
         'Health & fitness',
         'Community involvement',
@@ -775,7 +775,7 @@ const FeedbackFormDialog = ({ open, onClose, eventId, eventName }) => {
                       control={control}
                       render={({ field }) => (
                         <RadioGroup {...field}>
-                          <FormControlLabel value="To run in Cubbon Park" control={<Radio />} label="To run in Cubbon Park" />
+                          <FormControlLabel value="For the running experience" control={<Radio />} label="For the running experience" />
                           <FormControlLabel value="Supporting the cause" control={<Radio />} label="Supporting the cause" />
                           <FormControlLabel value="Health & fitness" control={<Radio />} label="Health & fitness" />
                           <FormControlLabel value="Community involvement" control={<Radio />} label="Community involvement" />

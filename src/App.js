@@ -91,6 +91,7 @@ function App() {
             {/* Active 2026 events */}
             <Route path='/rfh-juniors-run-2026' element={<EventForm2026 />} />
             <Route path='/rfh-akshara-run-2026' element={<AksharaRun2026 />} />
+            <Route path='/feedback' element={<FeedbackPage />} />
             <Route path='/rfhrun2025-feedback' element={<FeedbackPage />} />
             <Route path='/checkin' element={<CheckInScanner />} />
             <Route path='/blog' element={<IndexPage />} />

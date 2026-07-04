@@ -26,16 +26,16 @@ import feedBackIllustration from '../../assets/images/feedback-illustration.jpg'
 
 const events = [
   {
-    id: "RFH She Run 2025",
-    name: "RFH She Run 2025",
-    description: "The premier women's running event organized by Rupee For Humanity in Cubbon Park, Bengaluru.",
-    date: "May 25, 2025"
+    id: "RFH Akshara Run 2026",
+    name: "RFH Akshara Run 2026",
+    description: "Rupee For Humanity's flagship run at IIM Bangalore.",
+    date: "June 28, 2026"
   },
   {
-    id: "RFH Juniors Run 2025",
-    name: "RFH Juniors Run 2025",
-    description: "A special running event for children organized by Rupee For Humanity in Cubbon Park, Bengaluru.",
-    date: "May 25, 2025"
+    id: "RFH Juniors Run 2026",
+    name: "RFH Juniors Run 2026",
+    description: "A special running event for children organized by Rupee For Humanity at IIM Bangalore.",
+    date: "June 28, 2026"
   }
 ];
 
@@ -66,8 +66,8 @@ const FeedbackPage = () => {
   return (
     <>
       <Helmet>
-        <title>Event Feedback | RFH Run 2025</title>
-        <meta name="description" content="Share your feedback about RFH She Run 2025 and RFH Juniors Run 2025 events." />
+        <title>Event Feedback | RFH Run 2026</title>
+        <meta name="description" content="Share your feedback about RFH Akshara Run 2026 and RFH Juniors Run 2026 events." />
       </Helmet>
       <Header />
       <Container maxWidth="lg" sx={{ py: 8 }}>
