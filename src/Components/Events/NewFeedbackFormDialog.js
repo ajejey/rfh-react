@@ -67,7 +67,11 @@ const steps = ['Your Information', 'Event Experience', 'Event Logistics', 'Impac
 const feedbackSchema = yup.object().shape({
   // Personal Information
   name: yup.string().required('Name is required').min(2, 'Name must be at least 2 characters'),
-  email: yup.string().email('Please enter a valid email').required('Email is required'),
+  email: yup
+    .string()
+    .transform((v) => (v === '' ? undefined : v))
+    .email('Please enter a valid email')
+    .notRequired(),
   phone: yup
     .string()
     .required('Phone number is required')
@@ -484,14 +488,13 @@ const FeedbackFormDialog = ({ open, onClose, eventId, eventName }) => {
                       <TextField
                         {...field}
                         id="email"
-                        label="Email Address"
+                        label="Email Address (optional)"
                         type="email"
                         variant="outlined"
                         fullWidth
                         margin="normal"
                         error={!!errors.email}
                         helperText={errors.email?.message}
-                        required
                       />
                     )}
                   />
