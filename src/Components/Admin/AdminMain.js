@@ -98,7 +98,7 @@ function Sidebar({ collapsed, onToggle, user, isSuperAdmin, can, onLogout }) {
         { icon: <EditNoteRoundedIcon />,        label: 'Offline Reg',        to: '/admin/offline-registration', show: isSuperAdmin || can('canDoOfflineRegistration') },
         { icon: <FeedbackRoundedIcon />,        label: 'Feedback',           to: '/admin/feedback-dashboard',   show: isSuperAdmin || can('canViewFeedback') },
         { icon: <MonetizationOnRoundedIcon />,  label: 'Donations',          to: '/admin/get-all-donations',    show: isSuperAdmin || can('canViewDonations') },
-        { icon: <ReceiptRoundedIcon />,          label: 'Donation Receipt',   to: '/admin/donation-receipt',     show: isSuperAdmin },
+        { icon: <ReceiptRoundedIcon />,          label: 'Add Manual Donation', to: '/admin/donation-receipt',    show: isSuperAdmin },
         { icon: <PriceCheckRoundedIcon />,      label: 'Payment Recovery',   to: '/admin/payment-recovery',     show: isSuperAdmin || can('canRecoverPayments') },
         { icon: <TuneRoundedIcon />,            label: 'Event Config',       to: '/admin/event-config',         show: isSuperAdmin },
         { icon: <GroupsRoundedIcon />,          label: 'Team',               to: '/admin/team',                 show: isSuperAdmin },

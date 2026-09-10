@@ -8,6 +8,7 @@ import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded';
 import EmailRoundedIcon from '@mui/icons-material/EmailRounded';
 import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
 import ReceiptRoundedIcon from '@mui/icons-material/ReceiptRounded';
+import useAdminAuth from '../../CustomHooks/useAdminAuth';
 
 const CARD_BG = '#1a2035';
 const BORDER = 'rgba(255,255,255,0.06)';
@@ -17,56 +18,67 @@ const TEXT_PRI = '#f1f5f9';
 const TEXT_SEC = '#64748b';
 
 const DONATION_FIELDS = [
-    { name: 'email', label: 'Email', type: 'email' },
-    { name: 'mobNo', label: 'Mobile Number', type: 'text' },
-    { name: 'fullName', label: 'Full Name', type: 'text' },
+    { name: 'email', label: 'Email', type: 'email', required: true },
+    // Required: User.mobNo is non-null in the schema, so a blank one fails the save.
+    { name: 'mobNo', label: 'Mobile Number', type: 'text', required: true },
+    { name: 'fullName', label: 'Full Name', type: 'text', required: true },
     { name: 'PANno', label: 'PAN Number', type: 'text' },
     { name: 'cause', label: 'Cause', type: 'text' },
     { name: 'transactionNo', label: 'Transaction Number', type: 'text' },
     { name: 'paymentMode', label: 'Payment Mode', type: 'text' },
-    { name: 'donationAmount', label: 'Donation Amount', type: 'number' },
+    { name: 'donationAmount', label: 'Donation Amount', type: 'number', required: true },
 ];
 
+// The admin's calendar day in IST, not the browser's UTC day — `toISOString()` rolls
+// over at 05:30 IST and would default the form to yesterday for an early-morning entry.
+const istToday = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+
 export default function DonationReceipt() {
-    const { handleSubmit, register, reset, setValue, getValues } = useForm();
+    const today = istToday();
+    // Registered via defaultValues so reset() restores the date instead of blanking it —
+    // an empty date makes the server stamp today, silently backdating nothing.
+    const { handleSubmit, register, reset, setValue, getValues } = useForm({
+        defaultValues: { date: today },
+    });
+    const { token } = useAdminAuth();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     const [loading, setLoading] = useState(false);
     const [downloadLink, setDownloadLink] = useState(null);
     const [emailData, setEmailData] = useState(null);
+    const [emailStatus, setEmailStatus] = useState(null);
     const [apiError, setApiError] = useState('');
     const [donorLookupLoading, setDonorLookupLoading] = useState(false);
     const [donorLookupError, setDonorLookupError] = useState('');
-    const [csvLoading, setCsvLoading] = useState(false);
-    const [csvLink, setCsvLink] = useState(null);
     const [copySuccess, setCopySuccess] = useState('');
     const receiptRef = useRef(null);
 
-    const today = new Date().toISOString().split('T')[0];
 
     const handleDonationFormSubmit = async (data) => {
         setLoading(true);
         setApiError('');
+        // Clear the previous receipt too. Leaving it on screen after a failed submit
+        // shows a green "Receipt Generated Successfully" card for the donation BEFORE
+        // this one, which reads as confirmation that this one saved.
+        setDownloadLink(null);
+        setEmailData(null);
+        setEmailStatus(null);
         try {
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/create-receipt`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/donations/admin/manual`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
                 body: JSON.stringify(data),
             });
-            if (!response.ok) throw new Error('Failed to create receipt');
-            const responseData = await response.json();
-            const { downloadLink: dl, emailData: ed } = responseData;
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(dl, 'text/html');
-            const linkEl = doc.querySelector('a');
-            const pdfDataUrl = linkEl?.href || '';
-            setDownloadLink(pdfDataUrl);
-            setEmailData(ed);
-            reset();
+            const responseData = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(responseData.message || 'Failed to record the donation.');
+            setDownloadLink(`data:application/pdf;base64,${responseData.pdfBase64}`);
+            setEmailData(responseData.emailData);
+            setEmailStatus(responseData.emailStatus);
+            reset({ date: today });
         } catch (error) {
             console.error(error);
-            setApiError('Failed to create receipt. Please try again.');
+            setApiError(error.message);
         } finally {
             setLoading(false);
         }
@@ -85,7 +97,7 @@ export default function DonationReceipt() {
             if (hasValidEmail) params.set('email', email);
             if (hasValidMobNo) params.set('mobNo', mobNo);
             const url = `${process.env.REACT_APP_BACKEND_BASE_URL}/api/donations/donor-lookup?${params.toString()}`;
-            const response = await fetch(url);
+            const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
             if (!response.ok) {
                 if (response.status === 404) {
                     setDonorLookupError('No existing donor found for the given email/phone');
@@ -111,19 +123,6 @@ export default function DonationReceipt() {
             setDonorLookupError('Could not lookup donor details');
         } finally {
             setDonorLookupLoading(false);
-        }
-    };
-
-    const downloadCsv = async () => {
-        try {
-            setCsvLoading(true);
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/donations/csv`);
-            const blob = await response.blob();
-            setCsvLink(URL.createObjectURL(blob));
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setCsvLoading(false);
         }
     };
 
@@ -169,55 +168,17 @@ export default function DonationReceipt() {
                     </Box>
                     <Box>
                         <Typography sx={{ color: TEXT_PRI, fontWeight: 700, fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>
-                            Generate Offline Donation Receipt
+                            Add Manual Donation
                         </Typography>
                         <Typography sx={{ color: TEXT_SEC, fontSize: { xs: '0.75rem', sm: '0.85rem' } }}>
-                            Create and email donation receipts for offline payments
+                            Record cash, cheque, NEFT or UPI donations collected outside the website.
+                            The 80G receipt is emailed automatically and the entry shows up under
+                            Donations as &quot;Manual&quot;.
                         </Typography>
                     </Box>
                 </Box>
             </Box>
 
-            {/* CSV Download Section */}
-            <Card elevation={0} sx={{
-                bgcolor: CARD_BG, border: `1px solid ${BORDER}`, borderRadius: 2,
-                p: { xs: 2, sm: 3 }, mb: 3
-            }}>
-                <Box sx={{
-                    display: 'flex', alignItems: 'center', gap: 2,
-                    flexDirection: isMobile ? 'column' : 'row',
-                    justifyContent: isMobile ? 'center' : 'flex-start'
-                }}>
-                    <Button
-                        variant="outlined"
-                        size="small"
-                        startIcon={csvLoading ? <CircularProgress size={16} /> : <DownloadRoundedIcon />}
-                        onClick={downloadCsv}
-                        disabled={csvLoading}
-                        sx={{
-                            borderColor: 'rgba(255,255,255,0.12)', color: TEXT_SEC,
-                            '&:hover': { borderColor: 'rgba(255,255,255,0.25)' },
-                            minWidth: isMobile ? '100%' : 'auto'
-                        }}
-                        fullWidth={isMobile}
-                    >
-                        {csvLoading ? 'Generating...' : 'Download Donations CSV'}
-                    </Button>
-                    {csvLink && (
-                        <Button
-                            variant="text"
-                            size="small"
-                            startIcon={<DownloadRoundedIcon />}
-                            href={csvLink}
-                            download="donations.csv"
-                            sx={{ color: ACCENT_LT }}
-                            fullWidth={isMobile}
-                        >
-                            Save CSV File
-                        </Button>
-                    )}
-                </Box>
-            </Card>
 
             {/* Donation Form */}
             <Card elevation={0} sx={{
@@ -230,10 +191,11 @@ export default function DonationReceipt() {
                             <Grid item xs={12} sm={6} md={4} key={field.name}>
                                 <TextField
                                     fullWidth
+                                    required={!!field.required}
                                     label={field.label}
                                     type={field.type}
                                     size={isMobile ? 'small' : 'medium'}
-                                    {...register(field.name)}
+                                    {...register(field.name, field.required ? { required: true } : {})}
                                     onBlur={field.name === 'email' || field.name === 'mobNo' ? lookupAndAutofillDonor : undefined}
                                     InputLabelProps={{ sx: { color: TEXT_SEC } }}
                                     InputProps={{ sx: { color: TEXT_PRI } }}
@@ -253,7 +215,6 @@ export default function DonationReceipt() {
                                 label="Date"
                                 type="date"
                                 size={isMobile ? 'small' : 'medium'}
-                                defaultValue={today}
                                 {...register('date')}
                                 InputLabelProps={{ sx: { color: TEXT_SEC } }}
                                 InputProps={{ sx: { color: TEXT_PRI } }}
@@ -318,13 +279,24 @@ export default function DonationReceipt() {
                         </Typography>
                     </Box>
                     <Box sx={{ p: { xs: 2, sm: 3 } }}>
-                        <Alert severity="info" sx={{
-                            mb: 2, bgcolor: 'rgba(59,130,246,0.08)', color: '#93c5fd',
-                            '& .MuiAlert-message': { width: '100%' }
-                        }}>
-                            <strong>Email Status:</strong> Being sent automatically in the background.<br />
-                            <strong>If email fails:</strong> Use the quick tools below to send manually.
-                        </Alert>
+                        {emailStatus === 'sent' ? (
+                            <Alert severity="success" sx={{
+                                mb: 2, bgcolor: 'rgba(74,222,128,0.08)', color: ACCENT_LT,
+                                '& .MuiAlert-message': { width: '100%' }
+                            }}>
+                                Receipt emailed to <strong>{emailData.to}</strong>. Nothing more to do —
+                                the tools below are only if you also want to send it by hand.
+                            </Alert>
+                        ) : (
+                            <Alert severity="warning" sx={{
+                                mb: 2, bgcolor: 'rgba(245,158,11,0.1)', color: '#fbbf24',
+                                '& .MuiAlert-message': { width: '100%' }
+                            }}>
+                                <strong>The email did not go out.</strong> The donation and receipt are
+                                saved correctly — send it manually using the tools below, or re-send it
+                                any time from the Donations page.
+                            </Alert>
+                        )}
 
                         <Box sx={{ mb: 2 }}>
                             <Typography sx={{ color: TEXT_SEC, fontSize: { xs: '0.75rem', sm: '0.85rem' } }}>
